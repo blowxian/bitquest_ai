@@ -1,5 +1,6 @@
 // 站点通用头部菜单
 import Image from "next/image";
+
 export default function Header() {
     return (
         <header className="pb-6 bg-white w-full lg:pb-0">
@@ -9,7 +10,10 @@ export default function Header() {
                     <div className="flex-shrink-0">
                         <a href="#" title="" className="flex">
                             <Image className="w-auto h-8 lg:h-10"
-                                 src="/coogle_logo.svg" alt=""/>
+                                   src="/coogle_logo.svg"
+                                   width={100}
+                                   height={24}
+                                   alt=""/>
                         </a>
                     </div>
 
