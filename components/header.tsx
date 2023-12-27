@@ -9,7 +9,7 @@ export default function Header() {
                     <div className="flex-shrink-0">
                         <a href="#" title="" className="flex">
                             <Image className="w-auto h-8 lg:h-10"
-                                 src="/coogle_logo.svg" alt=""/>
+                                 src="/coogle_logo.svg" width={140} height={27} alt=""/>
                         </a>
                     </div>
 
