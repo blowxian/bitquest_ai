@@ -13,7 +13,9 @@ export default function Header() {
                                    src="/coogle_logo.svg"
                                    width={100}
                                    height={24}
-                                   alt=""/>
+                                   alt=""
+                                   priority
+                            />
                         </a>
                     </div>
 
