@@ -15,10 +15,18 @@ export default function RootLayout({
                                    }: {
     children: React.ReactNode
 }) {
+    // 假设 NEXT_PUBLIC_GA_ID 是逗号分隔的字符串
+    const gaIds = process.env.NEXT_PUBLIC_GA_IDS?.split(',') || [];
+
+    // 组装 Google Analytics 配置脚本
+    const gaConfigScript = gaIds.map(id =>
+        `gtag('config', '${id}', { page_path: window.location.pathname });`
+    ).join('');
+
     return (
         <html lang="en">
         <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=${gaIds[0]}`}
             strategy="afterInteractive"
         />
         <Script
@@ -29,9 +37,7 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
-              page_path: window.location.pathname,
-            });
+            ${gaConfigScript}
           `,
             }}
         />
