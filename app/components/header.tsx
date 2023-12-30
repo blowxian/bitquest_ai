@@ -14,6 +14,7 @@ export default function Header() {
                                 width={140}
                                 height={27}
                                 alt=""
+                                priority
                             />
                         </a>
                     </div>
