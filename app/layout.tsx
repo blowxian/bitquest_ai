@@ -6,8 +6,8 @@ import './globals.css'
 const inter = Inter({subsets: ['latin']})
 
 export const metadata: Metadata = {
-    title: 'Coogle.ai, The Final Search Engine for Programmers, Powered by AI.',
-    description: 'Coogle.ai–The Final Search Engine for Programming Queries. Powered by cutting-edge AI like GPT4, Gemini,Claude2 and Mistral AI, this is not just a search engine, but a complete AI solution for programmers. ',
+    title: 'Coogle.ai, Make AI Search Affordable For Everyone,Everywhere',
+    description: 'Coogle.ai is the leading platform for affordable AI search solutions, its affordable  and easy to use compared with perplexity alternative',
     /*'google-site-verification': 'XlVgQsgr-59VgeJdUJ6u_DkzHTdT144bB7PJGWIMhDM',*/
 }
 
