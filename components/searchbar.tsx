@@ -1,22 +1,23 @@
 'use client';
 
-import {useSearchParams,usePathname,useRouter} from 'next/navigation';
-import * as repl from "repl";
+import {useSearchParams, useRouter} from 'next/navigation';
 
 export default function SearchBar({placeholder}: { placeholder: string }) {
     const searchParams = useSearchParams();
-    const pathname = usePathname();
     const {replace} = useRouter();
 
-    function handleSearch(term: string) {
-        const params = new URLSearchParams(searchParams);
+    function handleSearch(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (e.key === "Enter") {
+            const params = new URLSearchParams(searchParams);
+            const term = (e.target as HTMLInputElement)?.value;
 
-        if(term) {
-            params.set('q', term);
-        } else {
-            params.delete('q');
+            if (term) {
+                params.set('q', term);
+            } else {
+                params.delete('q');
+            }
+            replace(`/search?${params.toString()}`);
         }
-        replace(`${pathname}?${params.toString()}`);
     }
 
     return (
@@ -26,7 +27,9 @@ export default function SearchBar({placeholder}: { placeholder: string }) {
                     type="text"
                     className="w-full py-4 pl-10 pr-10 mr-16 text-lg border-none focus:ring-0 focus:outline-none  bg-gray-100"
                     placeholder={placeholder}
-                    onChange={(e) => handleSearch(e.target.value)}
+                    onKeyUp={(e) => {
+                        handleSearch(e);
+                    }}
                     defaultValue={searchParams.get('q')?.toString()}
                 />
                 <button

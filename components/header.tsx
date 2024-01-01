@@ -7,7 +7,7 @@ export default function Header() {
             <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <nav className="flex justify-center items-center h-20">
                     <div className="">
-                        <a href="#" title="">
+                        <a href="/bitquest_ai/public" title="">
                             <Image
                                 className="w-auto h-16"
                                 src="/coogle_logo.svg"

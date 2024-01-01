@@ -1,6 +1,5 @@
-import Header from '@/app/components/header'
-import SearchBar from "@/app/components/searchbar";
-import {Suspense} from "react";
+import Header from '@/components/header'
+import SearchBar from "@/components/searchbar";
 
 export default function Home() {
     return (
