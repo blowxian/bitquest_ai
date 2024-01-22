@@ -43,18 +43,6 @@ export default async function handler(req, res) {
             const chunkAsString = chunk.toString('utf-8');
             console.log('Received chunk: ', chunkAsString);
 
-            /*// 将数据添加到缓冲区
-            buffer += chunkAsString;
-
-            // 检查是否应该将缓冲区数据发送给客户端
-            if (Date.now() - lastFlushTime > flushInterval) {
-                console.log('Buffer: ', buffer);
-                res.write(buffer);
-                console.log('Sent chunk: ', buffer);
-                buffer = ''; // 清空缓冲区
-                lastFlushTime = Date.now();
-            }*/
-
             // 也可以将数据块直接传输给客户端
             res.write(chunkAsString);
             res.flush;
@@ -62,19 +50,6 @@ export default async function handler(req, res) {
 
         // 当流结束时，结束响应
         response.data.on('end', () => {
-            /*if (buffer.length > 0) {
-                res.write(buffer);
-            }*/
-            /*buffer = 'Hello World';
-            const interval = setInterval(() => {
-                if (buffer.length > 0) {
-                    console.log('buffer', buffer);
-                    res.write(buffer);
-                    res.flush;
-                }
-            }, 1000); // 每1000毫秒（1秒）更新一次*/
-
-            // return () => clearInterval(interval);
             console.log('Stream ended');
             res.end();
         });

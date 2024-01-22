@@ -12,43 +12,6 @@ import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
 
-async function fetchAPI() {
-    const togetherAIRequest = axios.create({
-        baseURL: '/',
-        headers: {
-            'Content-Type': 'application/json',
-            'Conection': 'keep-alive',
-        },
-        responseType: 'stream' // 重要：设置响应类型为流
-    });
-
-
-    try {
-        // 向 TogetherAI 发送请求
-        const response = await togetherAIRequest.post('/api/stream', {
-            // TogetherAI API 请求体
-            prompt: "分析并说明杭州有什么好吃的并罗列。",
-        });
-
-
-        // 监听流上的 'data' 事件
-        response.data.on('data', (chunk: string) => {
-            const chunkAsString = chunk.toString();
-            console.log('Received chunk: ', chunkAsString);
-        });
-
-        // 当流结束时，结束响应
-        response.data.on('end', () => {
-            console.log('Stream ended');
-        });
-
-        // 将 TogetherAI 响应的数据流直接传输给客户端
-        // response.data.pipe(res);
-    } catch (error) {
-        console.error('Error communicating with TogetherAI:', error);
-    }
-}
-
 async function touchUpdate() {
     // 调用 Next.js API 路由
     fetch('/api/update', {
@@ -57,7 +20,15 @@ async function touchUpdate() {
             'Content-Type': 'application/json',
             'Connection': 'keep-alive',
         },
-        body: JSON.stringify({prompt: '杭州有什么好吃的，详细罗列。'}),
+        body: JSON.stringify({prompt: `
+合并以下多个搜索结果，结合GPT的知识，生成用户想要的答案，并在回复中标注各条搜索结果的引用部分。
+
+1. 搜索结果1： [搜索结果1的摘要]
+2. 搜索结果2： [搜索结果2的摘要]
+3. 搜索结果3： [搜索结果3的摘要]
+
+结合上述搜索结果和GPT的知识，请提供关于 [用户问题或主题] 的综合性答案，并在回复中明确标注引用的部分。谢谢！
+`}),
     }).catch(err => console.error('Fetch error:', err));
 }
 
