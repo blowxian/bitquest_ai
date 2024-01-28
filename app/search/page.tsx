@@ -1,39 +1,13 @@
 'use client';
 
-import Header from "@/components/header";
-import SearchBar from "@/components/searchbar";
-import DynamicResultViewer from "@/components/dynamic-result-viewer";
 import {useState, useEffect} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import Markdown from "@/lib/mark-down";
-import axios from "axios";
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
 import {GoogleCustomSearchResponse} from "@/pages/api/types";
-
-async function touchUpdate() {
-    // 调用 Next.js API 路由
-    fetch('/api/update', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Connection': 'keep-alive',
-        },
-        body: JSON.stringify({
-            prompt: `
-合并以下多个搜索结果，结合GPT的知识，生成用户想要的答案，并在回复中标注各条搜索结果的引用部分。
-
-1. 搜索结果1： [搜索结果1的摘要]
-2. 搜索结果2： [搜索结果2的摘要]
-3. 搜索结果3： [搜索结果3的摘要]
-
-结合上述搜索结果和GPT的知识，请提供关于 [用户问题或主题] 的综合性答案，并在回复中明确标注引用的部分。谢谢！
-`
-        }),
-    }).catch(err => console.error('Fetch error:', err));
-}
 
 export default function Page() {
     /*const [count, setCount] = useState({content: 'Answer 1', count: 1});*/
@@ -45,26 +19,12 @@ export default function Page() {
             nextPage: [],
         },
     });
-    const [buffer, setBuffer] = useState('');
-    const [error, setError] = useState('');
-    let done = false;
     const searchParams = useSearchParams();
-    const {replace} = useRouter();
+
+    let done = false;
 
     const searchResults = [
         {
-            title: '杭州有什么好吃的，详细罗列。',
-            content: '杭州有什么好吃的，详细罗列。',
-        }, {
-            title: '杭州有什么好吃的，详细罗列。',
-            content: '杭州有什么好吃的，详细罗列。',
-        }, {
-            title: '杭州有什么好吃的，详细罗列。',
-            content: '杭州有什么好吃的，详细罗列。',
-        }, {
-            title: '杭州有什么好吃的，详细罗列。',
-            content: '杭州有什么好吃的，详细罗列。',
-        }, {
             title: '杭州有什么好吃的，详细罗列。',
             content: '杭州有什么好吃的，详细罗列。',
         }];
