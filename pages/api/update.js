@@ -18,7 +18,7 @@ export default async function handler(req, res) {
             // TogetherAI API 请求体
             model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
             prompt: "{}<human>: " + req.query.prompt + "\n response limit in 500 token \n<expert>:",
-            max_tokens: 512,
+            max_tokens: 2048,
             stop: '[/INST],</s>',
             temperature: 0.7,
             top_p: 0.7,
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
         // 监听流上的 'data' 事件
         response.data.on('data', (chunk) => {
             const chunkAsString = chunk.toString('utf-8');
-            console.log('Received chunk: ', chunkAsString);
+            // console.log('Received chunk: ', chunkAsString);
 
             // 也可以将数据块直接传输给客户端
             res.write(chunkAsString);

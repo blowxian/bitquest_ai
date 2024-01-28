@@ -17,7 +17,7 @@ export default function DynamicResultViewer() {
 
     return (
         <div>
-            <h3>{searchParams.get('q')}</h3>
+            <h3>{searchParams?.get('q')}</h3>
             <p>dynamic result viewer</p>
 
             <div className="p-2 border m-2">test</div>

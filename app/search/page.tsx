@@ -11,6 +11,7 @@ import axios from "axios";
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
+import {GoogleCustomSearchResponse} from "@/pages/api/types";
 
 async function touchUpdate() {
     // 调用 Next.js API 路由
@@ -20,7 +21,8 @@ async function touchUpdate() {
             'Content-Type': 'application/json',
             'Connection': 'keep-alive',
         },
-        body: JSON.stringify({prompt: `
+        body: JSON.stringify({
+            prompt: `
 合并以下多个搜索结果，结合GPT的知识，生成用户想要的答案，并在回复中标注各条搜索结果的引用部分。
 
 1. 搜索结果1： [搜索结果1的摘要]
@@ -28,32 +30,21 @@ async function touchUpdate() {
 3. 搜索结果3： [搜索结果3的摘要]
 
 结合上述搜索结果和GPT的知识，请提供关于 [用户问题或主题] 的综合性答案，并在回复中明确标注引用的部分。谢谢！
-`}),
+`
+        }),
     }).catch(err => console.error('Fetch error:', err));
 }
 
 export default function Page() {
     /*const [count, setCount] = useState({content: 'Answer 1', count: 1});*/
-    const [data, setData] = useState([
-        {
-            title: "示例参考 #1",
-            image: "https://via.placeholder.com/150",
-            description: "这是第一条参考信息的描述。",
-            link: "https://example.com"
+    const [data, setData] = useState('');
+    const [query, setQuery] = useState<GoogleCustomSearchResponse>({
+        items: [],
+        queries: {
+            request: [],
+            nextPage: [],
         },
-        {
-            title: "示例参考 #2",
-            image: "https://via.placeholder.com/150",
-            description: "这是第二条参考信息的描述。",
-            link: "https://example.com"
-        },
-        {
-            title: "示例参考 #3",
-            image: "https://via.placeholder.com/150",
-            description: "这是第三条参考信息的描述。",
-            link: "https://example.com"
-        }
-    ]);
+    });
     const [buffer, setBuffer] = useState('');
     const [error, setError] = useState('');
     let done = false;
@@ -62,23 +53,23 @@ export default function Page() {
 
     const searchResults = [
         {
-        title: '杭州有什么好吃的，详细罗列。',
-        content: '杭州有什么好吃的，详细罗列。',
-    }, {
-        title: '杭州有什么好吃的，详细罗列。',
-        content: '杭州有什么好吃的，详细罗列。',
-    }, {
-        title: '杭州有什么好吃的，详细罗列。',
-        content: '杭州有什么好吃的，详细罗列。',
-    }, {
-        title: '杭州有什么好吃的，详细罗列。',
-        content: '杭州有什么好吃的，详细罗列。',
-    }, {
-        title: '杭州有什么好吃的，详细罗列。',
-        content: '杭州有什么好吃的，详细罗列。',
-    }];
+            title: '杭州有什么好吃的，详细罗列。',
+            content: '杭州有什么好吃的，详细罗列。',
+        }, {
+            title: '杭州有什么好吃的，详细罗列。',
+            content: '杭州有什么好吃的，详细罗列。',
+        }, {
+            title: '杭州有什么好吃的，详细罗列。',
+            content: '杭州有什么好吃的，详细罗列。',
+        }, {
+            title: '杭州有什么好吃的，详细罗列。',
+            content: '杭州有什么好吃的，详细罗列。',
+        }, {
+            title: '杭州有什么好吃的，详细罗列。',
+            content: '杭州有什么好吃的，详细罗列。',
+        }];
 
-    const referenceData = data;
+    const referenceData = query.items;
 
     const derivedQuestions = [
         {
@@ -98,8 +89,13 @@ export default function Page() {
         }
     ];
 
-    /*useEffect(() => {
-        const eventSource = new EventSource('/api/update?prompt=杭州有什么好吃的，详细罗列。');
+    const fetchAndSummarizeData = (googleSearchRes: GoogleCustomSearchResponse) => {
+        const eventSource = new EventSource(`/api/update?prompt=` + encodeURIComponent(`合并以下多个搜索结果，结合你的知识，生成用户想要的答案，并在回复中标注各条搜索结果的引用部分。
+
+${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${result.snippet}`).join('\n')}
+    
+结合上述搜索结果和你的知识，请提供关于 ${googleSearchRes.queries?.request[0].searchTerms} 的综合性中文答案，并在回复中明确标注引用的部分。
+`));
 
         eventSource.onmessage = (event) => {
             // 将完整的字符串拆分为单独的 JSON 对象，并处理每一个
@@ -129,21 +125,32 @@ export default function Page() {
         return () => {
             eventSource.close();
         };
-    }, []); // 空依赖数组意味着这个 effect 只在组件挂载时运行*/
+    };
+
+    useEffect(() => {
+        if (query.items?.length === 0) {
+            return;
+        }
+        fetchAndSummarizeData(query);
+    }, [query]);
 
     useEffect(() => {
         const query = searchParams?.get('q');
 
-        if (query) {
+        if (query && !done) {
+            done = true;
             fetch('/api/googleSearch', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ query }),
+                body: JSON.stringify({query}),
             })
                 .then((response) => response.json())
-                .then((data) => setData(data.items));
+                .then((data) => {
+                    setQuery(data);
+                    done = false;
+                });
         }
     }, [searchParams]);
 
@@ -205,14 +212,14 @@ export default function Page() {
                                     <h2 className="text-lg font-medium text-gray-800">{result.title}</h2>
 
                                     <div className="flex overflow-x-auto p-2 space-x-4">
-                                        {referenceData.map((data, index) => (
+                                        {referenceData?.map((data, index) => (
                                             <ReferenceCard key={index} data={data}/>
                                         ))}
                                     </div>
 
                                     {/* Markdown 渲染 */}
                                     <div className="prose mt-2 max-w-none">
-                                        <Markdown content={result.content}/>
+                                        <Markdown content={data}/>
                                     </div>
 
                                     <div className="flex flex-wrap justify-around">

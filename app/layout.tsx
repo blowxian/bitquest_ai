@@ -1,8 +1,13 @@
 import type {Metadata} from 'next'
-import {Inter} from 'next/font/google'
 import './globals.css'
+import {Pathway_Extreme} from 'next/font/google'
 
-const inter = Inter({subsets: ['latin']})
+const pathway_extreme = Pathway_Extreme({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-pathway-extreme',
+})
+
 
 export const metadata: Metadata = {
     title: 'Coogle.ai, The Final Search Engine for Programmers, Powered by AI.',
@@ -16,7 +21,9 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-        <body className={inter.className}>{children}</body>
+        <body className={pathway_extreme.className}>
+        {children}
+        </body>
         </html>
     )
 }

@@ -16,6 +16,7 @@ export default async function getServerSideProps(req, res) {
                     key: process.env.GOOGLE_API_TOKEN,
                     cx: process.env.GOOGLE_CS_ID,
                     q: query,
+                    num: 5,
                 },
             });
 
