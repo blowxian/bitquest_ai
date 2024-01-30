@@ -3,10 +3,10 @@ import axios from 'axios';
 export default async function getServerSideProps(req, res) {
     if (req.method === 'POST') {
         // 获取 POST 请求中的 query 参数
-        const {query} = req.body;
+        const {keywords} = req.body;
 
         // 确保 query 参数存在
-        if (!query) {
+        if (!keywords) {
             return res.status(400).json({error: 'Query parameter is required'});
         }
 
@@ -15,7 +15,9 @@ export default async function getServerSideProps(req, res) {
                 params: {
                     key: process.env.GOOGLE_API_TOKEN,
                     cx: process.env.GOOGLE_CS_ID,
-                    q: query,
+                    safe: 'active',
+                    excludeTerms: 'Google My Maps',
+                    q: keywords,
                     num: 5,
                 },
             });

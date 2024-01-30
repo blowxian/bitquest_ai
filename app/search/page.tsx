@@ -1,6 +1,6 @@
 'use client';
 
-import {useState, useEffect} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import Markdown from "@/lib/mark-down";
@@ -10,7 +10,6 @@ import {useSearchParams, useRouter} from 'next/navigation';
 import {GoogleCustomSearchResponse} from "@/pages/api/types";
 
 export default function Page() {
-    /*const [count, setCount] = useState({content: 'Answer 1', count: 1});*/
     const [data, setData] = useState('');
     const [query, setQuery] = useState<GoogleCustomSearchResponse>({
         items: [],
@@ -20,13 +19,15 @@ export default function Page() {
         },
     });
     const searchParams = useSearchParams();
+    const [searchTerms, setSearchTerms] = useState('');
+    const router = useRouter();
 
     let done = false;
 
     const searchResults = [
         {
-            title: '杭州有什么好吃的，详细罗列。',
-            content: '杭州有什么好吃的，详细罗列。',
+            title: '',
+            content: '',
         }];
 
     const referenceData = query.items;
@@ -48,6 +49,12 @@ export default function Page() {
             moreInfoLink: "#link3"
         }
     ];
+
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = useCallback(() => {
+        setIsMenuOpen(!isMenuOpen);
+    }, [isMenuOpen]);
 
     const fetchAndSummarizeData = (googleSearchRes: GoogleCustomSearchResponse) => {
         const eventSource = new EventSource(`/api/update?prompt=` + encodeURIComponent(`合并以下多个搜索结果，结合你的知识，生成用户想要的答案，并在回复中标注各条搜索结果的引用部分。
@@ -87,6 +94,24 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         };
     };
 
+    const handleSearch = () => {
+        // 更新 URL，这里将触发 useSearchParams 的变化
+        router.push(`/search?q=${encodeURIComponent(searchTerms)}`);
+    };
+
+    // 更新状态变量以匹配输入框的内容
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerms(event.target.value);
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        // 检查是否同时按下了 'Enter' 键和 'Meta' 键（Mac 的 Command 键）或 'Control' 键（Windows/Linux）
+        if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+            handleSearch(); // 调用搜索处理函数
+        }
+    };
+
+
     useEffect(() => {
         if (query.items?.length === 0) {
             return;
@@ -95,16 +120,17 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
     }, [query]);
 
     useEffect(() => {
-        const query = searchParams?.get('q');
+        const keywords = searchParams?.get('q');
+        setSearchTerms(keywords?keywords:'');
 
-        if (query && !done) {
+        if (keywords && !done) {
             done = true;
             fetch('/api/googleSearch', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({query}),
+                body: JSON.stringify({keywords}),
             })
                 .then((response) => response.json())
                 .then((data) => {
@@ -116,84 +142,94 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
     return (
         <div className="flex min-h-screen">
-            {/*左侧边栏*/}
-            <div className="bg-customGray flex h-screen w-72 flex-col">
-                {/*顶部区域：Logo和搜索按钮*/}
-                <div className="border-customWhite flex h-20 items-center justify-between border-b">
-                    {/*Logo*/}
-                    <img className="ml-4 h-8" src="http://localhost:3000/logo-final.svg" alt="Logo"/>
-                    {/*搜索按钮*/}
-                    <button className="mr-4 p-2 text-xl">
-                        <FontAwesomeIcon icon={faSearch}
-                                         className="text-customWhite hover:text-customOrange transition duration-150 ease-in-out"/>
-                    </button>
-                </div>
-
-                {/*历史搜索结果容器*/}
-                <div className="flex-1 overflow-y-auto">
-                    {/*历史搜索结果*/}
-                    <div className="p-4">
-                        <h2 className="text-customWhite mb-4 text-xl font-semibold">历史搜索</h2>
-                        <ul className="space-y-2">
-                            <li><a href="#" className="block rounded p-2 text-customWhite">搜索结果
-                                #1</a></li>
-                            <li><a href="#" className="block rounded p-2 text-customWhite">搜索结果
-                                #2</a></li>
-                            <li><a href="#" className="block rounded p-2 text-customWhite">搜索结果
-                                #3</a></li>
-                            {/*更多历史搜索结果*/}
-                        </ul>
+            {/*顶部菜单栏*/}
+            <div className="fixed left-1/2 transform -translate-x-1/2 p-4 w-full">
+                <div className="bg-customBlack rounded-lg p-4 w-full flex items-center justify-between">
+                    {/* 左侧 Logo */}
+                    <div className="text-customWhite2 text-2xl font-semibold">
+                        Coogle.AI
                     </div>
-                </div>
 
-                {/*账号信息*/}
-                <div className="p-4 border-t border-customGray">
-                    <div className="mb-4 flex items-center">
-                        <img className="mr-3 h-10 w-10 rounded-full"
-                             src="https://imagedelivery.net/MPdwyYSWT8IY7lxgN3x3Uw/a9572d6d-2c7f-408b-2f17-65d1e09d9500/thumbnail"
-                             alt="用户头像"/>
-                        <div>
-                            <div className="font-semibold text-customWhite">Lison Allen</div>
-                            <a href="#" className="text-sm text-customOrange">设置</a>
-                        </div>
+                    {/* 中间搜索框 */}
+                    <div className="flex-1 mx-4 flex justify-center items-center">
+                        <input
+                            type="text"
+                            placeholder="搜索..."
+                            className="bg-gray-700 text-white border border-gray-600 rounded-full py-2 px-4 w-3/4"
+                            value={searchTerms}
+                            onChange={handleInputChange}
+                            onKeyDown={handleKeyDown} // 添加 onKeyDown 事件处理器
+                        />
+                        {/* 搜索按钮 */}
+                        <button className="p-2 text-xl ml-4" onClick={handleSearch}>
+                            <FontAwesomeIcon icon={faSearch}
+                                             className="text-customWhite hover:text-customOrange transition duration-150 ease-in-out"/>
+                        </button>
+                    </div>
+
+                    {/* 右侧账号头像和下拉菜单 */}
+                    <div className="relative">
+                        <button
+                            className="text-white relative z-10 flex items-center"
+                            onClick={toggleMenu}
+                        >
+                            <img
+                                src="https://imagedelivery.net/MPdwyYSWT8IY7lxgN3x3Uw/a9572d6d-2c7f-408b-2f17-65d1e09d9500/thumbnail" // 替换成您的账号头像路径
+                                alt="Your Avatar"
+                                className="w-8 h-8 rounded-full"
+                            />
+                        </button>
+
+                        {/* 下拉菜单 */}
+                        {isMenuOpen && (
+                            <div
+                                className="absolute right-0 mt-2 py-2 w-48 bg-white border border-gray-300 shadow-lg rounded-lg">
+                                <a
+                                    href="#"
+                                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                >
+                                    账号设置
+                                </a>
+                                <a
+                                    href="#"
+                                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                >
+                                    注销
+                                </a>
+                                {/* 添加更多菜单项 */}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
 
             {/*主内容区*/}
-            <div className="flex-1 p-4">
-                <div className="overflow-hidden rounded bg-white shadow">
+            <div className="flex-1 p-4 pt-28 bg-customWhite2 text-customBlackText">
+                <div className="overflow-hidden rounded bg-customWhite shadow">
                     <div className="p-4 sm:p-6">
-                        <h1 className="mb-4 text-xl font-semibold text-gray-800">搜索结果</h1>
-                        <div className="border-t border-gray-200">
-                            {/* 迭代搜索结果 */}
-                            {searchResults.map((result, index) => (
-                                <div key={index} className="border-b border-gray-200 px-4 py-5 sm:px-6">
-                                    <h2 className="text-lg font-medium text-gray-800">{result.title}</h2>
+                        {/* 迭代搜索结果 */}
+                        {searchResults.map((result, index) => (
+                            <div key={index} className="border-b border-gray-200 px-4 py-5 sm:px-6">
+                                <h2 className="text-lg font-medium text-gray-800">{query.queries?.request[0]?.searchTerms}</h2>
 
-                                    <div className="flex overflow-x-auto p-2 space-x-4">
-                                        {referenceData?.map((data, index) => (
-                                            <ReferenceCard key={index} data={data}/>
-                                        ))}
-                                    </div>
-
-                                    {/* Markdown 渲染 */}
-                                    <div className="prose mt-2 max-w-none">
-                                        <Markdown content={data}/>
-                                    </div>
-
-                                    <div className="flex flex-wrap justify-around">
-                                        {derivedQuestions.map(question => (
-                                            <DerivedQuestionCard key={question.id} question={question}/>
-                                        ))}
-                                    </div>
+                                {/* Markdown 渲染 */}
+                                <div className="prose mt-2 max-w-none">
+                                    <Markdown content={data}/>
                                 </div>
-                            ))}
-                        </div>
-                        {/* 底部链接或信息 */}
-                        <div className="mt-4 px-4 py-4 sm:px-6">
-                            <p className="text-xs text-gray-500">其他信息或链接。</p>
-                        </div>
+
+                                <div className="flex flex-wrap overflow-x-auto pt-2 pb-2 space-x-4">
+                                    {referenceData?.map((data, index) => (
+                                        <ReferenceCard key={index} data={data}/>
+                                    ))}
+                                </div>
+
+                                <div className="flex flex-wrap justify-around">
+                                    {derivedQuestions.map(question => (
+                                        <DerivedQuestionCard key={question.id} question={question}/>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
