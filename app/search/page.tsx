@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState, useEffect, useCallback} from "react";
+import React, {useState, useEffect, useCallback, useRef} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import Markdown from "@/lib/mark-down";
@@ -56,6 +56,42 @@ export default function Page() {
         setIsMenuOpen(!isMenuOpen);
     }, [isMenuOpen]);
 
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // 点击外部关闭菜单的函数
+    const handleClickOutside = (event: MouseEvent) => {
+        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+            setIsMenuOpen(false);
+        }
+    };
+
+    // 创建一个 ref 来引用输入框
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
+    // 键盘事件处理函数
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+
+        // 检查是否按下了 'K' 键，同时按下了 'Meta' 键（Mac）或 'Control' 键（Windows/Linux）
+        if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+            event.preventDefault(); // 阻止默认行为
+            searchInputRef.current?.focus(); // 聚焦到输入框
+        }
+    };
+
+    useEffect(() => {
+        // 添加事件监听器
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        // 添加全局点击事件监听器
+        window.addEventListener('mousedown', handleClickOutside);
+
+        // 组件卸载时移除事件监听器
+        return () => {
+            window.removeEventListener('keydown', handleGlobalKeyDown);
+            window.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+
     const fetchAndSummarizeData = (googleSearchRes: GoogleCustomSearchResponse) => {
         const eventSource = new EventSource(`/api/update?prompt=` + encodeURIComponent(`合并以下多个搜索结果，结合你的知识，生成用户想要的答案，并在回复中标注各条搜索结果的引用部分。
 
@@ -106,7 +142,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         // 检查是否同时按下了 'Enter' 键和 'Meta' 键（Mac 的 Command 键）或 'Control' 键（Windows/Linux）
-        if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+        if (event.key === 'Enter') {
             handleSearch(); // 调用搜索处理函数
         }
     };
@@ -146,29 +182,32 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
             <div className="fixed left-1/2 transform -translate-x-1/2 p-4 w-full">
                 <div className="bg-customBlack rounded-lg p-4 w-full flex items-center justify-between">
                     {/* 左侧 Logo */}
-                    <div className="text-customWhite2 text-2xl font-semibold">
+                    <div className="text-customWhite2 text-2xl font-semibold mr-16">
                         Coogle.AI
                     </div>
 
                     {/* 中间搜索框 */}
-                    <div className="flex-1 mx-4 flex justify-center items-center">
+                    <div className="flex-1 mx-4 flex items-center relative w-3/4">
                         <input
+                            ref={searchInputRef}
                             type="text"
                             placeholder="搜索..."
-                            className="bg-gray-700 text-white border border-gray-600 rounded-full py-2 px-4 w-3/4"
+                            className="bg-gray-700 text-white border border-gray-600 rounded-full py-2 pl-4 pr-10 w-full"
                             value={searchTerms}
                             onChange={handleInputChange}
-                            onKeyDown={handleKeyDown} // 添加 onKeyDown 事件处理器
+                            onKeyDown={handleKeyDown}
                         />
-                        {/* 搜索按钮 */}
-                        <button className="p-2 text-xl ml-4" onClick={handleSearch}>
-                            <FontAwesomeIcon icon={faSearch}
-                                             className="text-customWhite hover:text-customOrange transition duration-150 ease-in-out"/>
-                        </button>
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <span className="mr-2 text-sm text-gray-400">⌘ + K</span>
+                            <button className="p-2 text-xl" onClick={handleSearch}>
+                                <FontAwesomeIcon icon={faSearch}
+                                                 className="text-customWhite hover:text-customOrange transition duration-150 ease-in-out"/>
+                            </button>
+                        </div>
                     </div>
 
                     {/* 右侧账号头像和下拉菜单 */}
-                    <div className="relative">
+                    <div className="relative ml-16" ref={menuRef}>
                         <button
                             className="text-white relative z-10 flex items-center"
                             onClick={toggleMenu}
@@ -183,16 +222,10 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                         {/* 下拉菜单 */}
                         {isMenuOpen && (
                             <div
-                                className="absolute right-0 mt-2 py-2 w-48 bg-white border border-gray-300 shadow-lg rounded-lg">
+                                className="absolute right-0 mt-2 py-2 w-36 bg-customWhite2 border border-gray-300 shadow-lg rounded-lg">
                                 <a
                                     href="#"
-                                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                                >
-                                    账号设置
-                                </a>
-                                <a
-                                    href="#"
-                                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                    className="block px-4 py-2 text-customBlackText hover:bg-customWhite"
                                 >
                                     注销
                                 </a>
