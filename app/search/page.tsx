@@ -2,7 +2,7 @@
 
 import React, {useState, useEffect, useCallback, useRef} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSearch} from "@fortawesome/free-solid-svg-icons";
+import {faSearch, faClipboardQuestion} from "@fortawesome/free-solid-svg-icons";
 import Markdown from "@/lib/mark-down";
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
@@ -26,6 +26,9 @@ export default function Page() {
 
     const searchResults = [
         {
+            title: '',
+            content: '',
+        }, {
             title: '',
             content: '',
         }];
@@ -157,7 +160,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
     useEffect(() => {
         const keywords = searchParams?.get('q');
-        setSearchTerms(keywords?keywords:'');
+        setSearchTerms(keywords ? keywords : '');
 
         if (keywords && !done) {
             done = true;
@@ -179,8 +182,8 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
     return (
         <div className="flex min-h-screen">
             {/*顶部菜单栏*/}
-            <div className="fixed left-1/2 transform -translate-x-1/2 p-4 w-full">
-                <div className="bg-customBlack rounded-lg p-4 w-full flex items-center justify-between">
+            <div className="fixed left-1/2 transform -translate-x-1/2 p-4 w-full z-50">
+                <div className="bg-customBlack rounded-lg p-4 w-full flex items-center justify-between shadow">
                     {/* 左侧 Logo */}
                     <div className="text-customWhite2 text-2xl font-semibold mr-16">
                         Coogle.AI
@@ -201,7 +204,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             <span className="mr-2 text-sm text-gray-400">⌘ + K</span>
                             <button className="p-2 text-xl" onClick={handleSearch}>
                                 <FontAwesomeIcon icon={faSearch}
-                                                 className="text-customWhite hover:text-customOrange transition duration-150 ease-in-out"/>
+                                                 className="text-customWhite2 hover:text-customOrange transition duration-150 ease-in-out"/>
                             </button>
                         </div>
                     </div>
@@ -237,34 +240,31 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
             </div>
 
             {/*主内容区*/}
-            <div className="flex-1 p-4 pt-28 bg-customWhite2 text-customBlackText">
-                <div className="overflow-hidden rounded bg-customWhite shadow">
-                    <div className="p-4 sm:p-6">
-                        {/* 迭代搜索结果 */}
-                        {searchResults.map((result, index) => (
-                            <div key={index} className="border-b border-gray-200 px-4 py-5 sm:px-6">
-                                <h2 className="text-lg font-medium text-gray-800">{query.queries?.request[0]?.searchTerms}</h2>
+            <div className="flex-1 p-4 pt-24 bg-customWhite2 text-customBlackText">
+                {/* 迭代搜索结果 */}
+                {searchResults.map((result, index) => (
+                    <div key={index}
+                         className="px-8 py-5 sm:px-6 overflow-hidden rounded bg-customWhite shadow mt-4">
+                        <h2 className="text-lg font-medium text-gray-800 mb-4"><FontAwesomeIcon className="text-customOrange mr-2" icon={faClipboardQuestion} /> {query.queries?.request[0]?.searchTerms}</h2>
 
-                                {/* Markdown 渲染 */}
-                                <div className="prose mt-2 max-w-none">
-                                    <Markdown content={data}/>
-                                </div>
+                        {/* Markdown 渲染 */}
+                        <div className="prose mt-2 max-w-none pb-4 border-dashed border-b border-customGray">
+                            <Markdown content={data}/>
+                        </div>
 
-                                <div className="flex flex-wrap overflow-x-auto pt-2 pb-2 space-x-4">
-                                    {referenceData?.map((data, index) => (
-                                        <ReferenceCard key={index} data={data}/>
-                                    ))}
-                                </div>
+                        <div className="flex flex-wrap overflow-x-auto pt-2 pb-2">
+                            {referenceData?.map((data, index) => (
+                                <ReferenceCard key={index} data={data}/>
+                            ))}
+                        </div>
 
-                                <div className="flex flex-wrap justify-around">
-                                    {derivedQuestions.map(question => (
-                                        <DerivedQuestionCard key={question.id} question={question}/>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
+                        <div className="flex flex-wrap justify-around">
+                            {derivedQuestions.map(question => (
+                                <DerivedQuestionCard key={question.id} question={question}/>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                ))}
             </div>
         </div>
     )
