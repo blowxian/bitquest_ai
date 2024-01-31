@@ -94,13 +94,28 @@ export default function Page() {
         };
     }, []);
 
+    const replaceReferences = (text: string) => {
+        const parts = text.split(/\[\[Ref (\d+)\]\]/g);
+        return parts.map((part, index) => {
+            if ((index % 2) === 1) {
+                const refNumber = parseInt(part, 10) - 1;
+                const refLink = referenceData[refNumber].link;
+                if (refLink) {
+                    // 转换为 Markdown 链接格式
+                    return ` [<span class="text-blue-600 hover:text-blue-800 visited:text-purple-600 text-xs">[${refNumber + 1}]</span>](${refLink})`;
+                }
+                return ``;
+            }
+            return part;
+        }).join('');
+    }
 
     const fetchAndSummarizeData = (googleSearchRes: GoogleCustomSearchResponse) => {
         const eventSource = new EventSource(`/api/update?prompt=` + encodeURIComponent(`合并以下多个搜索结果，结合你的知识，生成用户想要的答案，并在回复中标注各条搜索结果的引用部分。
 
 ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${result.snippet}`).join('\n')}
     
-结合上述搜索结果和你的知识，请提供关于 ${googleSearchRes.queries?.request[0].searchTerms} 的综合性中文答案，并在回复中明确标注引用的部分。
+结合上述搜索结果和你的知识，请提供关于 ${googleSearchRes.queries?.request[0].searchTerms} 的综合性中文答案，用 Markdown 格式结构化输出，并在回复中明确标注引用的部分。格式为：在引用相关信息后加上[[Ref X]]，其中X是搜索结果的序号。
 `));
 
         eventSource.onmessage = (event) => {
@@ -112,7 +127,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                     const jsonData = JSON.parse(jsonStr);
                     // 处理每一个 JSON 对象
                     if (jsonData.generated_text !== null && jsonData.generated_text !== '') {
-                        setData(jsonData.generated_text);
+                        setData(replaceReferences(jsonData.generated_text));
                         return;
                     }
                     console.log(jsonData.choices[0]?.text);
@@ -204,7 +219,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             <span className="mr-2 text-sm text-gray-400">⌘ + K</span>
                             <button className="p-2 text-xl" onClick={handleSearch}>
                                 <FontAwesomeIcon icon={faSearch}
-                                                 className="text-customWhite2 hover:text-customOrange transition duration-150 ease-in-out"/>
+                                                 className="text-customWhite2 hover:shadow transition duration-150 ease-in-out"/>
                             </button>
                         </div>
                     </div>
@@ -245,7 +260,9 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                 {searchResults.map((result, index) => (
                     <div key={index}
                          className="px-8 py-5 sm:px-6 overflow-hidden rounded bg-customWhite shadow mt-4">
-                        <h2 className="text-lg font-medium text-gray-800 mb-4"><FontAwesomeIcon className="text-customOrange mr-2" icon={faClipboardQuestion} /> {query.queries?.request[0]?.searchTerms}</h2>
+                        <h2 className="text-lg font-medium text-gray-800 mb-4"><FontAwesomeIcon
+                            className="text-customOrange mr-2"
+                            icon={faClipboardQuestion}/> {query.queries?.request[0]?.searchTerms}</h2>
 
                         {/* Markdown 渲染 */}
                         <div className="prose mt-2 max-w-none pb-4 border-dashed border-b border-customGray">
