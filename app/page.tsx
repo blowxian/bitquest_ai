@@ -1,12 +1,14 @@
 import Header from '@/components/header'
 import SearchBar from "@/components/searchbar";
+import {Suspense} from "react";
 
 export default function Home() {
     return (
         <main className="flex min-h-screen flex-col items-center justify-between">
             <Header/>
-
-            <SearchBar placeholder="Search for a Noodlion NFT..."/>
+            <Suspense>
+                <SearchBar placeholder="Search for a Noodlion NFT..."/>
+            </Suspense>
 
             <div className="mb-32 text-center lg:w-full lg:mb-0 lg:text-center">
                 <a

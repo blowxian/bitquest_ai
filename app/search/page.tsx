@@ -32,7 +32,7 @@ export default function Page() {
 
     const referenceData = query.items;
 
-    const[derivedQuestions, setDerivedQuestions] = useState<string[]>([]);
+    const [derivedQuestions, setDerivedQuestions] = useState<string[]>([]);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -226,15 +226,15 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
                     {/* 中间搜索框 */}
                     <div className="flex-1 mx-4 flex items-center relative w-3/4">
-                        <input
-                            ref={searchInputRef}
-                            type="text"
-                            placeholder="搜索..."
-                            className="bg-gray-700 text-white border border-gray-600 rounded-full py-2 pl-4 pr-10 w-full"
-                            value={searchTerms}
-                            onChange={handleInputChange}
-                            onKeyDown={handleKeyDown}
-                        />
+                            <input
+                                ref={searchInputRef}
+                                type="text"
+                                placeholder="Coooooooogle"
+                                className="bg-gray-700 text-white border border-gray-600 rounded-full py-2 pl-4 pr-10 w-full"
+                                value={searchTerms}
+                                onChange={handleInputChange}
+                                onKeyDown={handleKeyDown}
+                            />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                             <span className="mr-2 text-sm text-gray-400">⌘ + K</span>
                             <button className="p-2 text-xl" onClick={() => handleSearch()}>
