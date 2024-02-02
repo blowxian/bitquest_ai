@@ -13,12 +13,13 @@ export default async function handler(req, res) {
     });
 
     try {
+        console.log(req.query.max_token ? +req.query.max_token : 2048);
         // 向 TogetherAI 发送请求
         const response = await togetherAIRequest.post('/inference', {
             // TogetherAI API 请求体
             model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-            prompt: "{}<human>: " + req.query.prompt + "\n response limit in 500 token \n<expert>:",
-            max_tokens: 2048,
+            prompt: "{}<human>: " + req.query.prompt + "\n\n<expert>:",
+            max_tokens: req.query.max_token ? +req.query.max_token : 2048,
             stop: '[/INST],</s>',
             temperature: 0.7,
             top_p: 0.7,
@@ -63,7 +64,7 @@ export default async function handler(req, res) {
 
         // 当流结束时，结束响应
         response.data.on('end', () => {
-            if(buffer.length > 0){
+            if (buffer.length > 0) {
                 console.log('Flushing buffer...');
                 res.write(buffer);
                 res.flush();  // 确保调用 flush 方法

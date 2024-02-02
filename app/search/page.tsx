@@ -32,23 +32,7 @@ export default function Page() {
 
     const referenceData = query.items;
 
-    const derivedQuestions = [
-        {
-            id: 1,
-            text: "衍生问题 1",
-            moreInfoLink: "#link1"
-        },
-        {
-            id: 2,
-            text: "衍生问题 2",
-            moreInfoLink: "#link2"
-        },
-        {
-            id: 3,
-            text: "衍生问题 3",
-            moreInfoLink: "#link3"
-        }
-    ];
+    const[derivedQuestions, setDerivedQuestions] = useState<string[]>([]);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -135,7 +119,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         };
 
         eventSource.onerror = (error) => {
-            console.error('EventSource failed:', error);
+            console.error('fetchAndSummarizeData EventSource failed:', error);
             eventSource.close();
         };
 
@@ -144,9 +128,43 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         };
     };
 
-    const handleSearch = () => {
+    const extractArrayFromString = (str: string) => {
+        const regex = /'[^']+'/g;
+        const matches = str.match(regex);
+        return matches ? matches.map(match => match.replace(/'/g, "")) : [];
+    }
+
+    const fetchAndDisplayUserSuggestion = () => {
+        const eventSource = new EventSource(`/api/update?max_token=128&prompt=` + encodeURIComponent(`根据用户之前的搜索内容：“${searchParams?.get('q')}”，请提供四个紧密相关的、用户可能感兴趣的中文搜索话题或问题。请确保每个话题或问题控制在15个汉字内，并且仅回复一个格式为['话题1', '话题2', '话题3', '话题4']的列表。除此之外不需要包含任何其他信息。请仅回复一次并且确保回复仅包含这个列表。`));
+
+        eventSource.onmessage = (event) => {
+            if (event.data !== '[DONE]') {
+                const jsonData = JSON.parse(event.data);
+                if (jsonData.finish_reason === 'stop') {
+                    console.log('UserSuggestion: ', jsonData.generated_text);
+                    const extractedArray = extractArrayFromString(jsonData.generated_text);
+                    console.log("User Suggestion Array: ", extractedArray);
+                    setDerivedQuestions(extractedArray);
+                    eventSource.close();
+                }
+            } else {
+                eventSource.close();
+            }
+        }
+
+        eventSource.onerror = (error) => {
+            console.error('fetchAndDisplayUserSuggestion EventSource failed:', error);
+            eventSource.close();
+        };
+
+        return () => {
+            eventSource.close();
+        };
+    }
+
+    const handleSearch = (searchTermsInput: string = '') => {
         // 更新 URL，这里将触发 useSearchParams 的变化
-        router.push(`/search?q=${encodeURIComponent(searchTerms)}`);
+        router.push(`/search?q=${encodeURIComponent(searchTermsInput === '' ? searchTerms : searchTermsInput)}`);
         if (searchInputRef.current) {
             searchInputRef.current.blur();
         }
@@ -191,6 +209,8 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                     setQuery(data);
                     done = false;
                 });
+
+            fetchAndDisplayUserSuggestion();
         }
     }, [searchParams]);
 
@@ -217,7 +237,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                             <span className="mr-2 text-sm text-gray-400">⌘ + K</span>
-                            <button className="p-2 text-xl" onClick={handleSearch}>
+                            <button className="p-2 text-xl" onClick={() => handleSearch()}>
                                 <FontAwesomeIcon icon={faSearch}
                                                  className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
                             </button>
@@ -265,19 +285,23 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             icon={faClipboardQuestion}/> {searchParams?.get('q')}</h2>
 
                         {/* Markdown 渲染 */}
-                        <div className="prose mt-2 max-w-none pb-4 border-dashed border-b border-customWhite">
+                        <div className="prose mt-2 max-w-none pb-4">
                             <Markdown content={data}/>
                         </div>
 
-                        <div className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
+                        <h4 className='text-sm'>参考信息：</h4>
+                        <div
+                            className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
                             {referenceData?.map((data, index) => (
                                 <ReferenceCard key={index} data={data}/>
                             ))}
                         </div>
 
-                        <div className="flex flex-wrap justify-around">
-                            {derivedQuestions.map(question => (
-                                <DerivedQuestionCard key={question.id} question={question}/>
+                        <h4 className='text-sm'>你还想问：</h4>
+                        <div className="flex flex-wrap justify-around pt-2">
+
+                            {derivedQuestions.map((question, index) => (
+                                <DerivedQuestionCard key={index} question={question} onSearch={handleSearch}/>
                             ))}
                         </div>
                     </div>

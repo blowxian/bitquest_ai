@@ -10,7 +10,7 @@ const Markdown = ({content}) => {
     const [cursorVisible, setCursorVisible] = useState(true);
 
     useEffect(() => {
-        console.log('Markdown content: ', content);
+        // console.log('Markdown content: ', content);
 
         // Clear the displayed content only if the content prop is empty
         if (content === '') {
@@ -22,7 +22,7 @@ const Markdown = ({content}) => {
         let timer;
 
         const addCharacter = () => {
-            console.log('dispalyIndex,content.length: ', displayIndex, content.length);
+            // console.log('dispalyIndex,content.length: ', displayIndex, content.length);
             if (displayIndex < content.length) {
                 // 移除现有的光标
                 let updatedContent = displayedContent.replace('<span class="cursor"></span>', '');
