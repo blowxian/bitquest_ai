@@ -28,9 +28,6 @@ export default function Page() {
         {
             title: '',
             content: '',
-        }, {
-            title: '',
-            content: '',
         }];
 
     const referenceData = query.items;
@@ -77,7 +74,12 @@ export default function Page() {
         // 检查是否按下了 'K' 键，同时按下了 'Meta' 键（Mac）或 'Control' 键（Windows/Linux）
         if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
             event.preventDefault(); // 阻止默认行为
-            searchInputRef.current?.focus(); // 聚焦到输入框
+
+            const searchInput = searchInputRef.current;
+            if (searchInput) {
+                searchInput.focus(); // 聚焦到输入框
+                searchInput.select(); // 全选输入框内容
+            }
         }
     };
 
@@ -118,24 +120,18 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 结合上述搜索结果和你的知识，请提供关于 ${googleSearchRes.queries?.request[0].searchTerms} 的综合性中文答案，用 Markdown 格式结构化输出，并在回复中明确标注引用的部分。格式为：在引用相关信息后加上[[Ref X]]，其中X是搜索结果的序号。
 `));
 
+        let partString = '';
+
         eventSource.onmessage = (event) => {
-            // 将完整的字符串拆分为单独的 JSON 对象，并处理每一个
-            const jsonObjects = event.data.split('data: ').slice(0);
-            let partString = '';
-            jsonObjects.forEach((jsonStr: string) => {
-                if (jsonStr.trim() !== '[DONE]') {
-                    const jsonData = JSON.parse(jsonStr);
-                    // 处理每一个 JSON 对象
-                    if (jsonData.generated_text !== null && jsonData.generated_text !== '') {
-                        setData(replaceReferences(jsonData.generated_text));
-                        return;
-                    }
-                    console.log(jsonData.choices[0]?.text);
-                    partString += jsonData.choices[0]?.text.toString();
-                } else {
-                    eventSource.close();
-                }
-            });
+            if (event.data !== '[DONE]') {
+                const jsonData = JSON.parse(event.data);
+                // console.log('Received message: ', jsonData.token.text);
+
+                partString += jsonData.token.text;
+                setData(replaceReferences(partString));
+            } else {
+                eventSource.close();
+            }
         };
 
         eventSource.onerror = (error) => {
@@ -151,6 +147,9 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
     const handleSearch = () => {
         // 更新 URL，这里将触发 useSearchParams 的变化
         router.push(`/search?q=${encodeURIComponent(searchTerms)}`);
+        if (searchInputRef.current) {
+            searchInputRef.current.blur();
+        }
     };
 
     // 更新状态变量以匹配输入框的内容
@@ -176,6 +175,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
     useEffect(() => {
         const keywords = searchParams?.get('q');
         setSearchTerms(keywords ? keywords : '');
+        setData('');
 
         if (keywords && !done) {
             done = true;
@@ -219,7 +219,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             <span className="mr-2 text-sm text-gray-400">⌘ + K</span>
                             <button className="p-2 text-xl" onClick={handleSearch}>
                                 <FontAwesomeIcon icon={faSearch}
-                                                 className="text-customWhite2 hover:shadow transition duration-150 ease-in-out"/>
+                                                 className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
                             </button>
                         </div>
                     </div>
@@ -255,21 +255,21 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
             </div>
 
             {/*主内容区*/}
-            <div className="flex-1 p-4 pt-24 bg-customWhite2 text-customBlackText">
+            <div className="flex-1 p-4 pt-24 text-customBlackText">
                 {/* 迭代搜索结果 */}
                 {searchResults.map((result, index) => (
                     <div key={index}
-                         className="px-8 py-5 sm:px-6 overflow-hidden rounded bg-customWhite shadow mt-4">
+                         className="px-8 py-5 sm:px-6 overflow-hidden rounded bg-customWhite2 shadow mt-4">
                         <h2 className="text-lg font-medium text-gray-800 mb-4"><FontAwesomeIcon
                             className="text-customOrange mr-2"
-                            icon={faClipboardQuestion}/> {query.queries?.request[0]?.searchTerms}</h2>
+                            icon={faClipboardQuestion}/> {searchParams?.get('q')}</h2>
 
                         {/* Markdown 渲染 */}
-                        <div className="prose mt-2 max-w-none pb-4 border-dashed border-b border-customGray">
+                        <div className="prose mt-2 max-w-none pb-4 border-dashed border-b border-customWhite">
                             <Markdown content={data}/>
                         </div>
 
-                        <div className="flex flex-wrap overflow-x-auto pt-2 pb-2">
+                        <div className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
                             {referenceData?.map((data, index) => (
                                 <ReferenceCard key={index} data={data}/>
                             ))}

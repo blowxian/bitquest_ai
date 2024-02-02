@@ -18,7 +18,7 @@
 
 body {
     color: rgb(var(--foreground-rgb));
-    background-color: #f9f5f3;
+    background-color: #f5ede9;
     /*
       background: linear-gradient(
           to bottom,
@@ -26,4 +26,23 @@ body {
           rgb(var(--background-end-rgb))
         )
         rgb(var(--background-start-rgb));*/
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1); /* Original size */
+    }
+    50% {
+        transform: scale(1.5); /* 50% larger */
+    }
+}
+
+.cursor {
+    display: inline-block;
+    width: 10px; /* Set the width of the circle */
+    height: 10px; /* Set the height of the circle */
+    background: #4c4243; /* Circle color */
+    border-radius: 50%; /* Makes it circular */
+    animation: pulse 1s infinite; /* Apply the pulse animation */
+    vertical-align: middle; /* Vertically aligns with text */
 }

@@ -36,26 +36,41 @@ export default async function handler(req, res) {
 
         let buffer = '';
         let lastFlushTime = Date.now();
-        const flushInterval = 1000; // 设置为 1000 毫秒（1秒）
+        const flushInterval = 500; // 设置为 1000 毫秒（1秒）
 
         // 监听流上的 'data' 事件
         response.data.on('data', (chunk) => {
             const chunkAsString = chunk.toString('utf-8');
-            // console.log('Received chunk: ', chunkAsString);
+            console.log('Received chunk: ', chunkAsString);
+
+            // 将数据块添加到缓冲区
+            buffer += chunkAsString;
+
+            // 检查距离上次 flush 是否已过 1000 毫秒
+            if (Date.now() - lastFlushTime >= flushInterval) {
+                console.log('Flushing buffer...');
+                // 如果是，则 flush 缓冲区并重置计时器
+                res.write(buffer);
+                res.flush();  // 确保调用 flush 方法
+                buffer = '';  // 清空缓冲区
+                lastFlushTime = Date.now();  // 更新上次 flush 时间
+            }
 
             // 也可以将数据块直接传输给客户端
-            res.write(chunkAsString);
-            res.flush;
+            /*res.write(chunkAsString);
+            res.flush;*/
         });
 
         // 当流结束时，结束响应
         response.data.on('end', () => {
+            if(buffer.length > 0){
+                console.log('Flushing buffer...');
+                res.write(buffer);
+                res.flush();  // 确保调用 flush 方法
+            }
             console.log('Stream ended');
             res.end();
         });
-
-        // 将 TogetherAI 响应的数据流直接传输给客户端
-        // response.data.pipe(res);
     } catch (error) {
         console.error('Error communicating with TogetherAI:', error);
         res.status(500).send('Internal Server Error');

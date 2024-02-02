@@ -6,7 +6,7 @@ export default function ReferenceCard({ data }) {
     const imageUrl = data.pagemap?.cse_thumbnail?.length ? data.pagemap.cse_thumbnail[0].src : "https://via.placeholder.com/200x160";
 
     return (
-        <div className="group relative bg-customWhite2 rounded-lg shadow p-4 m-2 w-64 overflow-y-hidden">
+        <div className="group relative bg-customWhite rounded-lg shadow p-4 m-2 w-64 overflow-y-hidden">
             <div className="flex">
                 {imageUrl && (
                     <img src={imageUrl} alt={data.title} className="flex-none h-16 w-20 rounded-lg object-contain mr-4"/>

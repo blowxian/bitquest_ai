@@ -21,6 +21,7 @@ const config: Config = {
                 customGray: '#EDDCD4',
                 customWhite: '#f5ede9',
                 customWhite2: '#f9f5f3',
+                customSearchHover: '#c0bfbd',
                 // customWhite: '#EFF1ED',
                 customOrange: '#FA9F42',
                 customBlue: '#5941A9',
