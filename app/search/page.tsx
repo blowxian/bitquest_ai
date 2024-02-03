@@ -220,9 +220,9 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
             <div className="fixed left-1/2 transform -translate-x-1/2 p-4 w-full z-50">
                 <div className="bg-customBlack rounded-lg p-4 w-full flex items-center justify-between shadow">
                     {/* 左侧 Logo */}
-                    <div className="text-customWhite2 text-2xl font-semibold mr-16">
+                    <a href="/" className="text-customWhite2 text-2xl font-semibold mr-16">
                         Coogle.AI
-                    </div>
+                    </a>
 
                     {/* 中间搜索框 */}
                     <div className="flex-1 mx-4 flex items-center relative w-3/4">
@@ -297,7 +297,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             ))}
                         </div>
 
-                        <h4 className='text-sm'>你还想问：</h4>
+                        <h4 className='text-sm'>您还想问：</h4>
                         <div className="flex flex-wrap justify-around pt-2">
 
                             {derivedQuestions.map((question, index) => (

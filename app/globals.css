@@ -46,3 +46,8 @@ body {
     animation: pulse 1s infinite; /* Apply the pulse animation */
     vertical-align: middle; /* Vertically aligns with text */
 }
+
+/* 在 hover 时改变按钮内图标的颜色 */
+.hover-icon:hover .fa-clipboard-question {
+    color: #1D4ED8;
+}

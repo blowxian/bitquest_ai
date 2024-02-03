@@ -10,7 +10,7 @@ export default function Header() {
                         <a href="/" title="">
                             <Image
                                 className="w-auto h-16"
-                                src="/logo-final.svg"
+                                src="/logo_final_v.svg"
                                 width={140}
                                 height={27}
                                 alt=""
