@@ -25,7 +25,7 @@ export default function SearchBar() {
     }
 
     return (
-        <div className={"w-3/4"}>
+        <div className={"w-3/4 max-w-6xl"}>
             {/* 中间搜索框 */}
             <div className="flex-1 mx-4 flex items-center relative w-full">
                 <input

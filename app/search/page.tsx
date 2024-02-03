@@ -8,6 +8,7 @@ import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
 import {GoogleCustomSearchResponse} from "@/pages/api/types";
+import Head from "next/head";
 
 export default function Page() {
     const [data, setData] = useState('');
@@ -196,6 +197,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         setData('');
 
         if (keywords && !done) {
+            document.title = `${keywords} | Coogle.ai`;
             done = true;
             fetch('/api/googleSearch', {
                 method: 'POST',
@@ -216,8 +218,9 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
     return (
         <div className="flex min-h-screen">
+
             {/*顶部菜单栏*/}
-            <div className="fixed left-1/2 transform -translate-x-1/2 p-4 w-full z-50">
+            <div className="fixed left-1/2 transform -translate-x-1/2 p-4 w-full z-50 max-w-6xl">
                 <div className="bg-customBlack rounded-lg p-4 w-full flex items-center justify-between shadow">
                     {/* 左侧 Logo */}
                     <a href="/" className="text-customWhite2 text-2xl font-semibold mr-16">
@@ -275,7 +278,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
             </div>
 
             {/*主内容区*/}
-            <div className="flex-1 p-4 pt-24 text-customBlackText">
+            <div className="flex-1 mx-auto p-4 pt-24 text-customBlackText max-w-6xl">
                 {/* 迭代搜索结果 */}
                 {searchResults.map((result, index) => (
                     <div key={index}
