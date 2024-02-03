@@ -1,9 +1,14 @@
 import type {Metadata} from 'next'
-import {Inter} from 'next/font/google'
 import Script from "next/script";
 import './globals.css'
+import {Pathway_Extreme} from 'next/font/google'
 
-const inter = Inter({subsets: ['latin']})
+const pathway_extreme = Pathway_Extreme({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-pathway-extreme',
+})
+
 
 export const metadata: Metadata = {
     title: 'Coogle.ai, Make AI Search Affordable For Everyone,Everywhere',
@@ -12,9 +17,9 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({
-                                       children,
-                                   }: {
-    children: React.ReactNode
+  children,
+}: {
+  children: React.ReactNode
 }) {
     // 假设 NEXT_PUBLIC_GA_ID 是逗号分隔的字符串
     const gaIds = process.env.NEXT_PUBLIC_GA_IDS?.split(',') || [];
@@ -42,7 +47,7 @@ export default function RootLayout({
           `,
             }}
         />
-        <body className={inter.className}>{children}</body>
+        <body className={pathway_extreme.className}>{children}</body>
         </html>
     )
 }
