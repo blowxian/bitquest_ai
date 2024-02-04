@@ -282,7 +282,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                 {/* 迭代搜索结果 */}
                 {searchResults.map((result, index) => (
                     <div key={index}
-                         className="px-8 py-5 sm:px-6 overflow-hidden rounded bg-customWhite2 shadow mt-4">
+                         className="px-8 py-5 sm:px-6 overflow-hidden rounded-lg bg-customWhite2 shadow mt-4">
                         <h2 className="text-lg font-medium text-gray-800 mb-4"><FontAwesomeIcon
                             className="text-customOrange mr-2"
                             icon={faClipboardQuestion}/> {searchParams?.get('q')}</h2>
