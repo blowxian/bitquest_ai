@@ -30,7 +30,7 @@ export default function Page() {
             content: '',
         }];
 
-    const [referenceData, setReferenceData] = useState([null,null,null,null,null])
+    const [referenceData, setReferenceData] = useState([])
     // const referenceData = query.items;
 
     const [derivedQuestions, setDerivedQuestions] = useState<string[]>([]);
@@ -86,7 +86,8 @@ export default function Page() {
         return parts.map((part, index) => {
             if ((index % 2) === 1) {
                 const refNumber = parseInt(part, 10) - 1;
-                const refLink = referenceData[refNumber].link;
+                // @ts-ignore
+                const refLink = referenceData[refNumber]?.link;
                 if (refLink) {
                     // 转换为 Markdown 链接格式
                     return ` [<span class="text-blue-600 hover:text-blue-800 visited:text-purple-600 text-xs">[${refNumber + 1}]</span>](${refLink})`;
@@ -195,7 +196,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         const keywords = searchParams?.get('q');
         setSearchTerms(keywords ? keywords : '');
         setData('');
-        setReferenceData([null,null,null,null,null]);
+        setReferenceData([]);
 
         if (keywords && !done) {
             document.title = `${keywords} | Coogle.ai`;
@@ -297,7 +298,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                         <h4 className='text-sm'>参考信息：</h4>
                         <div
                             className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
-                            {(referenceData ? referenceData : [null, null, null, null, null]).map((data, index) => (
+                            {(referenceData.length > 0 ? referenceData : [null, null, null, null, null]).map((data, index) => (
                                 <ReferenceCard key={index} data={data}/>
                             ))}
                         </div>
