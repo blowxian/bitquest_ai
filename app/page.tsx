@@ -23,17 +23,17 @@ export default function Home() {
             </div>
             <div className="mb-32 text-center lg:w-full lg:mb-0">
                 <div className="flex justify-center space-x-4 text-sm">
-                    <a href="/blog"
+                    <a href="https://coogle.ai/blog"
                        className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
                        target="_blank">
                         <span><FontAwesomeIcon icon={faBlog}/> Blog</span>
                     </a>
-                    <a href="/blog/forums"
+                    <a href="https://coogle.ai/blog/forums"
                        className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
                        target="_blank">
                         <span><FontAwesomeIcon icon={faComments}/> Forum</span>
                     </a>
-                    <a href="/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice"
+                    <a href="https://coogle.ai/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice"
                        className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
                        target="_blank">
                         <span><FontAwesomeIcon icon={faCommentDots}/> Feedback</span>
