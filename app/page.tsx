@@ -2,7 +2,7 @@ import Header from '@/components/header'
 import SearchBar from "@/components/searchbar";
 import {Suspense} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faMessage} from "@fortawesome/free-solid-svg-icons";
+import {faBlog, faCommentDots, faComments, faMessage} from "@fortawesome/free-solid-svg-icons";
 
 export async function generateMetadata() {
     return {
@@ -22,16 +22,23 @@ export default function Home() {
                 </Suspense>
             </div>
             <div className="mb-32 text-center lg:w-full lg:mb-0">
-                <a
-                    href="mailto:lisonallen@qq.com"
-                    className="rounded-lg border border-transparent px-5 py-4 transition-colors hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <p className="m-0 text-sm opacity-50 leading-normal">
-                        <FontAwesomeIcon icon={faMessage}/> Noodlion
-                    </p>
-                </a>
+                <div className="flex justify-center space-x-4 text-sm">
+                    <a href="/blog"
+                       className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
+                       target="_blank">
+                        <span><FontAwesomeIcon icon={faBlog}/> Blog</span>
+                    </a>
+                    <a href="/blog/forums"
+                       className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
+                       target="_blank">
+                        <span><FontAwesomeIcon icon={faComments}/> Forum</span>
+                    </a>
+                    <a href="/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice"
+                       className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
+                       target="_blank">
+                        <span><FontAwesomeIcon icon={faCommentDots}/> Feedback</span>
+                    </a>
+                </div>
             </div>
         </main>
     )
