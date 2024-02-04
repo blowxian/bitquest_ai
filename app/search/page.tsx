@@ -8,7 +8,6 @@ import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
 import {GoogleCustomSearchResponse} from "@/pages/api/types";
-import Head from "next/head";
 
 export default function Page() {
     const [data, setData] = useState('');
@@ -31,7 +30,8 @@ export default function Page() {
             content: '',
         }];
 
-    const referenceData = query.items;
+    const [referenceData, setReferenceData] = useState([null,null,null,null,null])
+    // const referenceData = query.items;
 
     const [derivedQuestions, setDerivedQuestions] = useState<string[]>([]);
 
@@ -195,6 +195,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         const keywords = searchParams?.get('q');
         setSearchTerms(keywords ? keywords : '');
         setData('');
+        setReferenceData([null,null,null,null,null]);
 
         if (keywords && !done) {
             document.title = `${keywords} | Coogle.ai`;
@@ -209,6 +210,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                 .then((response) => response.json())
                 .then((data) => {
                     setQuery(data);
+                    setReferenceData(data.items);
                     done = false;
                 });
 
@@ -229,15 +231,15 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
                     {/* 中间搜索框 */}
                     <div className="flex-1 mx-4 flex items-center relative w-3/4">
-                            <input
-                                ref={searchInputRef}
-                                type="text"
-                                placeholder="Coooooooogle"
-                                className="bg-gray-700 text-white border border-gray-600 rounded-full py-2 pl-4 pr-10 w-full"
-                                value={searchTerms}
-                                onChange={handleInputChange}
-                                onKeyDown={handleKeyDown}
-                            />
+                        <input
+                            ref={searchInputRef}
+                            type="text"
+                            placeholder="Coooooooogle"
+                            className="bg-gray-700 text-white border border-gray-600 rounded-full py-2 pl-4 pr-10 w-full"
+                            value={searchTerms}
+                            onChange={handleInputChange}
+                            onKeyDown={handleKeyDown}
+                        />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                             <span className="mr-2 text-sm text-gray-400">⌘ + K</span>
                             <button className="p-2 text-xl" onClick={() => handleSearch()}>
@@ -295,7 +297,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                         <h4 className='text-sm'>参考信息：</h4>
                         <div
                             className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
-                            {referenceData?.map((data, index) => (
+                            {(referenceData ? referenceData : [null, null, null, null, null]).map((data, index) => (
                                 <ReferenceCard key={index} data={data}/>
                             ))}
                         </div>
