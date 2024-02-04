@@ -31,7 +31,7 @@ export default function ReferenceCard({data}) {
         return <Skeleton />;
     }
 
-    const imageUrl = data.pagemap?.cse_thumbnail?.length ? data.pagemap.cse_thumbnail[0].src : "";
+    const imageUrl = data?.pagemap?.cse_thumbnail?.length ? data.pagemap.cse_thumbnail[0].src : "";
     return (<div className="group relative bg-customWhite rounded-lg shadow p-4 m-2 w-64 overflow-y-hidden">
         <div className="flex">
             {imageUrl && (<img src={imageUrl} alt={data.title}

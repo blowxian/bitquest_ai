@@ -33,7 +33,7 @@ export default function Page() {
     const [referenceData, setReferenceData] = useState([])
     // const referenceData = query.items;
 
-    const [derivedQuestions, setDerivedQuestions] = useState<string[]>([]);
+    const [derivedQuestions, setDerivedQuestions] = useState<string[]>(['', '', '', '']);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -147,6 +147,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                     const extractedArray = extractArrayFromString(jsonData.generated_text);
                     console.log("User Suggestion Array: ", extractedArray);
                     setDerivedQuestions(extractedArray);
+                    setIsLoading(false);
                     eventSource.close();
                 }
             } else {
@@ -192,11 +193,15 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         fetchAndSummarizeData(query);
     }, [query]);
 
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
         const keywords = searchParams?.get('q');
         setSearchTerms(keywords ? keywords : '');
         setData('');
         setReferenceData([]);
+        setDerivedQuestions(['', '', '', ''])
+        setIsLoading(true);
 
         if (keywords && !done) {
             document.title = `${keywords} | Coogle.ai`;
@@ -218,6 +223,15 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
             fetchAndDisplayUserSuggestion();
         }
     }, [searchParams]);
+
+    function DerivedQuestionCardSkeleton() {
+        return (
+            <div className="bg-customWhite shadow rounded-lg p-3 m-2 w-52">
+                <div className="rounded bg-slate-300 h-4 w-3/4 mb-2"></div>
+                <div className="rounded bg-slate-300 h-4 w-1/2"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex min-h-screen">
@@ -305,10 +319,15 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
                         <h4 className='text-sm'>您还想问：</h4>
                         <div className="flex flex-wrap justify-around pt-2">
-
-                            {derivedQuestions.map((question, index) => (
-                                <DerivedQuestionCard key={index} question={question} onSearch={handleSearch}/>
-                            ))}
+                            {isLoading ? (
+                                // 渲染一定数量的骨架图组件
+                                [...Array(4)].map((_, index) => <DerivedQuestionCardSkeleton key={index}/>)
+                            ) : (
+                                // 渲染实际数据组件
+                                derivedQuestions.map((question, index) => (
+                                    <DerivedQuestionCard key={index} question={question} onSearch={handleSearch}/>
+                                ))
+                            )}
                         </div>
                     </div>
                 ))}
