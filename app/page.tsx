@@ -15,11 +15,12 @@ export async function generateMetadata() {
 export default function Home() {
     return (
         <main className="flex min-h-screen flex-col items-center justify-between">
-            <Header/>
-            <Suspense>
-                <SearchBar/>
-            </Suspense>
-
+            <div className="w-full items-center flex flex-col">
+                <Header/>
+                <Suspense>
+                    <SearchBar/>
+                </Suspense>
+            </div>
             <div className="mb-32 text-center lg:w-full lg:mb-0">
                 <a
                     href="mailto:lisonallen@qq.com"
