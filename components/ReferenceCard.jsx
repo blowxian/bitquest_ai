@@ -3,8 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowUpRightFromSquare} from "@fortawesome/free-solid-svg-icons";
 
 export default function ReferenceCard({data}) {
-    const imageUrl = data.pagemap?.cse_thumbnail?.length ? data.pagemap.cse_thumbnail[0].src : "https://via.placeholder.com/200x160";
-
+    const imageUrl = data.pagemap?.cse_thumbnail?.length ? data.pagemap.cse_thumbnail[0].src : "";
     return (
         <div className="group relative bg-customWhite rounded-lg shadow p-4 m-2 w-64 overflow-y-hidden">
             <div className="flex">
@@ -12,7 +11,7 @@ export default function ReferenceCard({data}) {
                     <img src={imageUrl} alt={data.title}
                          className="flex-none h-16 w-20 rounded-lg object-contain mr-4"/>
                 )}
-                <div className={`flex-grow ${!imageUrl ? 'text-center' : ''}`}>
+                <div className={`flex-grow ${!imageUrl ? 'w-full' : ''}`}>
                     <h3 className="text-xs font-semibold">
                         {data.title}
                     </h3>
