@@ -318,7 +318,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                         </div>
 
                         <h4 className='text-sm'>您还想问：</h4>
-                        <div className="flex flex-wrap justify-around pt-2">
+                        <div className="flex flex-wrap justify-center pt-2">
                             {isLoading ? (
                                 // 渲染一定数量的骨架图组件
                                 [...Array(4)].map((_, index) => <DerivedQuestionCardSkeleton key={index}/>)
