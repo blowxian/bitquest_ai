@@ -87,7 +87,7 @@ export default function Page() {
             if ((index % 2) === 1) {
                 const refNumber = parseInt(part, 10) - 1;
                 // @ts-ignore
-                const refLink = referenceData[refNumber]?.link;
+                const refLink = referenceData ? referenceData[refNumber]?.link : '';
                 if (refLink) {
                     // 转换为 Markdown 链接格式
                     return ` [<span class="text-blue-600 hover:text-blue-800 visited:text-purple-600 text-xs">[${refNumber + 1}]</span>](${refLink})`;
@@ -312,7 +312,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                         <h4 className='text-sm'>参考信息：</h4>
                         <div
                             className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
-                            {(referenceData.length > 0 ? referenceData : [null, null, null, null, null]).map((data, index) => (
+                            {(referenceData?.length > 0 ? referenceData : [null, null, null, null, null]).map((data, index) => (
                                 <ReferenceCard key={index} data={data}/>
                             ))}
                         </div>
