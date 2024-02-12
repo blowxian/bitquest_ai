@@ -237,15 +237,15 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         <div className="flex min-h-screen">
 
             {/*顶部菜单栏*/}
-            <div className="fixed left-1/2 transform -translate-x-1/2 p-4 w-full z-50 max-w-6xl">
-                <div className="bg-customBlack rounded-lg p-4 w-full flex items-center justify-between shadow">
+            <div className="fixed left-1/2 transform -translate-x-1/2 p-0 sm:p-4 w-full z-50 sm:max-w-6xl">
+                <div className="bg-customBlack sm:rounded-lg p-4 w-full flex items-center justify-between shadow">
                     {/* 左侧 Logo */}
-                    <a href="/" className="text-customWhite2 text-2xl font-semibold mr-16">
+                    <a href="/" className="hidden sm:flex text-customWhite2 text-2xl font-semibold mr-16">
                         Coogle.AI
                     </a>
 
                     {/* 中间搜索框 */}
-                    <div className="flex-1 mx-4 flex items-center relative w-3/4">
+                    <div className="flex-1 mx-2 sm:mx-4 flex items-center relative w-3/4">
                         <input
                             ref={searchInputRef}
                             type="text"
@@ -256,7 +256,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             onKeyDown={handleKeyDown}
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                            <span className="mr-2 text-sm text-gray-400">⌘ + K</span>
+                            <span className="hidden sm:inline mr-2 text-sm text-gray-400">⌘ + K</span>
                             <button className="p-2 text-xl" onClick={() => handleSearch()}>
                                 <FontAwesomeIcon icon={faSearch}
                                                  className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
@@ -295,7 +295,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
             </div>
 
             {/*主内容区*/}
-            <div className="flex-1 mx-auto p-4 pt-24 text-customBlackText max-w-6xl">
+            <div className="flex-1 mx-auto p-4 pt-20 sm:pt-24 text-customBlackText max-w-6xl">
                 {/* 迭代搜索结果 */}
                 {searchResults.map((result, index) => (
                     <div key={index}
