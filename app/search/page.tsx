@@ -142,7 +142,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         eventSource.onmessage = (event) => {
             if (event.data !== '[DONE]') {
                 const jsonData = JSON.parse(event.data);
-                if (jsonData.finish_reason === 'stop') {
+                if (jsonData.finish_reason === 'stop' || jsonData.finish_reason === 'eos') {
                     console.log('UserSuggestion: ', jsonData.generated_text);
                     const extractedArray = extractArrayFromString(jsonData.generated_text);
                     console.log("User Suggestion Array: ", extractedArray);
