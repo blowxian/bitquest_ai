@@ -265,15 +265,15 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                     </div>
 
                     {/* 右侧账号头像和下拉菜单 */}
-                    <div className="relative ml-16" ref={menuRef}>
+                    <div className="relative ml-2 sm:ml-16" ref={menuRef}>
                         <button
-                            className="text-white relative z-10 flex items-center"
+                            className="flex items-center justify-center p-2 -m-2 text-xl rounded-full focus:outline-none focus:ring"
                             onClick={toggleMenu}
                         >
                             <img
                                 src="https://imagedelivery.net/MPdwyYSWT8IY7lxgN3x3Uw/a9572d6d-2c7f-408b-2f17-65d1e09d9500/thumbnail" // 替换成您的账号头像路径
                                 alt="Your Avatar"
-                                className="w-8 h-8 rounded-full"
+                                className="w-8 h-8 rounded-full sm:w-10 sm:h-10"
                             />
                         </button>
 
@@ -295,11 +295,11 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
             </div>
 
             {/*主内容区*/}
-            <div className="flex-1 mx-auto p-4 pt-20 sm:pt-24 text-customBlackText max-w-6xl">
+            <div className="flex-1 mx-auto sm:p-4 pt-14 sm:pt-24 text-customBlackText max-w-6xl">
                 {/* 迭代搜索结果 */}
                 {searchResults.map((result, index) => (
                     <div key={index}
-                         className="px-8 py-5 sm:px-6 overflow-hidden rounded-lg bg-customWhite2 shadow mt-4">
+                         className="px-8 py-5 sm:px-6 overflow-hidden sm:rounded-lg bg-customWhite2 shadow mt-4">
                         <h2 className="text-lg font-medium text-gray-800 mb-4"><FontAwesomeIcon
                             className="text-customOrange mr-2"
                             icon={faClipboardQuestion}/> {searchParams?.get('q')}</h2>
