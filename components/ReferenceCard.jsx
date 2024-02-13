@@ -5,7 +5,7 @@ import {faArrowUpRightFromSquare} from "@fortawesome/free-solid-svg-icons";
 // Skeleton.js - 骨架图组件
 function Skeleton() {
     return (
-        <div className="bg-customWhite rounded-lg shadow p-4 m-2 w-64 overflow-y-hidden">
+        <div className="bg-customWhite rounded-lg shadow p-4 m-2 w-full sm:w-64 overflow-y-hidden">
             <div className="flex">
                 <div className="flex-none h-16 w-20 bg-gray-300 rounded-lg mr-4"></div>
                 <div className="flex-grow">
@@ -34,7 +34,7 @@ export default function ReferenceCard({data}) {
     }
 
     const imageUrl = data?.pagemap?.cse_thumbnail?.length ? data.pagemap.cse_thumbnail[0].src : "";
-    return (<div className="group relative bg-customWhite rounded-lg shadow p-4 m-2 w-64 overflow-y-hidden">
+    return (<div className="group relative bg-customWhite rounded-lg shadow p-4 m-2 w-full sm:w-64 overflow-y-hidden">
         <div className="flex">
             {imageUrl && (<img src={imageUrl} alt={data?.title}
                                className="flex-none h-16 w-20 rounded-lg object-contain mr-4"/>)}

@@ -226,7 +226,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
     function DerivedQuestionCardSkeleton() {
         return (
-            <div className="bg-customWhite shadow rounded-lg p-3 m-2 w-52">
+            <div className="bg-customWhite shadow rounded-lg p-3 m-2 w-full sm:w-64">
                 <div className="rounded bg-slate-300 h-4 w-3/4 mb-2"></div>
                 <div className="rounded bg-slate-300 h-4 w-1/2"></div>
             </div>
