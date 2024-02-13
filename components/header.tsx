@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function Header() {
     return (
-        <header className="pb-6 w-full mt-52 sm:mt-96 flex flex-col items-center">
+        <header className="pb-6 w-full mt-52 sm:mt-72 flex flex-col items-center">
             <div className="px-4 sm:px-8 h-20">
                 <a href="/" title="Make AI Search Affordable For Everyone,Everywhere">
                     <Image

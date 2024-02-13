@@ -21,7 +21,7 @@ export default function Home() {
                     <SearchBar/>
                 </Suspense>
             </div>
-            <div className="mb-32 text-center w-full sm:mb-0">
+            <div className="mb-32 text-center w-full sm:mb-2">
                 <div className="flex justify-center space-x-4 text-lg sm:text-sm">
                     <a href="https://coogle.ai/blog"
                        className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
