@@ -12,15 +12,16 @@ export default function SearchBar() {
 
     function handleSearch(e: React.KeyboardEvent<HTMLInputElement> | null) {
         if (e && e.key === "Enter" || !e) {
-            const params = new URLSearchParams(searchParams as URLSearchParams);
-            const term = inputRef.current?.value;
+            const term = inputRef.current?.value.trim(); // 使用trim()去除首尾空格
 
-            if (term) {
-                params.set('q', term);
-            } else {
-                params.delete('q');
+            // 如果term为空，则直接返回
+            if (!term) {
+                return;
             }
 
+            const params = new URLSearchParams(searchParams as URLSearchParams);
+
+            params.set('q', term);
             router.push(`/search?${params.toString()}`);
         }
     }
@@ -53,18 +54,18 @@ export default function SearchBar() {
     return (
         <div className={"w-3/4 max-w-6xl"}>
             {/* 中间搜索框 */}
-            <div className="flex-1 mx-4 flex items-center relative w-full">
+            <div className="flex-1 sm:mx-4 flex items-center relative w-full">
                 <input
                     ref={inputRef}
-                    type="text"
+                    type="search"
                     placeholder="Coooooooogle"
-                    className="bg-gray-700 text-white border border-gray-600 rounded-2xl py-8 pl-6 pr-28 w-full"
+                    className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-6 pr-28 w-full outline-none focus:ring-0 focus:border-gray-300"
                     onKeyUp={(e) => {
                         handleSearch(e);
                     }}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <span className="mr-4 text-sm text-gray-400">⌘ + K</span>
+                    <span className="hidden sm:block mr-4 text-sm text-gray-400">⌘ + K</span>
                     <button className="p-2 text-xl" onClick={() => handleSearch(null)}>
                         <FontAwesomeIcon icon={faSearch}
                                          className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
