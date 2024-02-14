@@ -3,6 +3,7 @@ import SearchBar from "@/components/searchbar";
 import {Suspense} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBlog, faCommentDots, faComments, faMessage} from "@fortawesome/free-solid-svg-icons";
+import LinkButton from "@/components/LinkButton";
 
 export async function generateMetadata() {
     return {
@@ -23,21 +24,10 @@ export default function Home() {
             </div>
             <div className="mb-32 text-center w-full sm:mb-2">
                 <div className="flex justify-center space-x-4 text-lg sm:text-sm">
-                    <a href="https://coogle.ai/blog"
-                       className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
-                       target="_blank">
-                        <span><FontAwesomeIcon icon={faBlog}/> <span className="hidden sm:inline-block">Blog</span></span>
-                    </a>
-                    <a href="https://coogle.ai/blog/forums"
-                       className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
-                       target="_blank">
-                        <span><FontAwesomeIcon icon={faComments}/> <span className="hidden sm:inline-block">Forum</span></span>
-                    </a>
-                    <a href="https://coogle.ai/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice"
-                       className="link px-5 py-4 opacity-50 hover:opacity-100 transition duration-150 ease-in-out"
-                       target="_blank">
-                        <span><FontAwesomeIcon icon={faCommentDots}/> <span className="hidden sm:inline-block">Feedback</span></span>
-                    </a>
+                    <LinkButton href="https://coogle.ai/blog" icon={faBlog} label="Blog"/>
+                    <LinkButton href="https://coogle.ai/blog/forums" icon={faComments} label="Forum"/>
+                    <LinkButton href="https://coogle.ai/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice"
+                                icon={faCommentDots} label="Feedback"/>
                 </div>
             </div>
         </main>
