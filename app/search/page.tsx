@@ -8,6 +8,7 @@ import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
 import {GoogleCustomSearchResponse} from "@/pages/api/types";
+import TopNavBar from "@/components/TopNavBar";
 
 export default function Page() {
     const [data, setData] = useState('');
@@ -236,63 +237,12 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
     return (
         <div className="flex min-h-screen">
 
-            {/*顶部菜单栏*/}
-            <div className="fixed left-1/2 transform -translate-x-1/2 p-0 sm:p-4 w-full z-50 sm:max-w-6xl">
-                <div className="bg-customBlack sm:rounded-lg p-4 w-full flex items-center justify-between shadow">
-                    {/* 左侧 Logo */}
-                    <a href="/" className="hidden sm:flex text-customWhite2 text-2xl font-semibold mr-16">
-                        Coogle.AI
-                    </a>
-
-                    {/* 中间搜索框 */}
-                    <div className="flex-1 mx-2 sm:mx-4 flex items-center relative w-3/4">
-                        <input
-                            ref={searchInputRef}
-                            type="text"
-                            placeholder="Coooooooogle"
-                            className="bg-gray-700 text-white border border-gray-600 rounded-full py-2 pl-4 pr-10 w-full"
-                            value={searchTerms}
-                            onChange={handleInputChange}
-                            onKeyDown={handleKeyDown}
-                        />
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                            <span className="hidden sm:inline mr-2 text-sm text-gray-400">⌘ + K</span>
-                            <button className="p-2 text-xl" onClick={() => handleSearch()}>
-                                <FontAwesomeIcon icon={faSearch}
-                                                 className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* 右侧账号头像和下拉菜单 */}
-                    <div className="relative ml-2 sm:ml-16" ref={menuRef}>
-                        <button
-                            className="flex items-center justify-center p-2 -m-2 text-xl rounded-full focus:outline-none focus:ring"
-                            onClick={toggleMenu}
-                        >
-                            <img
-                                src="https://imagedelivery.net/MPdwyYSWT8IY7lxgN3x3Uw/a9572d6d-2c7f-408b-2f17-65d1e09d9500/thumbnail" // 替换成您的账号头像路径
-                                alt="Your Avatar"
-                                className="w-8 h-8 rounded-full sm:w-10 sm:h-10"
-                            />
-                        </button>
-
-                        {/* 下拉菜单 */}
-                        {isMenuOpen && (
-                            <div
-                                className="absolute right-0 mt-2 py-2 w-36 bg-customWhite2 border border-gray-300 shadow-lg rounded-lg">
-                                <a
-                                    href="#"
-                                    className="block px-4 py-2 text-customBlackText hover:bg-customWhite"
-                                >
-                                    注销
-                                </a>
-                                {/* 添加更多菜单项 */}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+            {/* 使用 TopNavBar 组件 */}
+            <TopNavBar
+                searchTerms={searchTerms}
+                setSearchTerms={setSearchTerms}
+                onSearch={() => handleSearch(searchTerms)}
+            />
 
             {/*主内容区*/}
             <div className="flex-1 mx-auto sm:p-4 pt-14 sm:pt-24 text-customBlackText max-w-6xl">

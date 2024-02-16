@@ -1,8 +1,7 @@
 import Header from '@/components/header'
 import SearchBar from "@/components/searchbar";
 import {Suspense} from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBlog, faCommentDots, faComments, faMessage} from "@fortawesome/free-solid-svg-icons";
+import {faBlog, faCommentDots, faComments} from "@fortawesome/free-solid-svg-icons";
 import LinkButton from "@/components/LinkButton";
 
 export async function generateMetadata() {
@@ -23,7 +22,7 @@ export default function Home() {
                 </Suspense>
             </div>
             <div className="mb-32 text-center w-full sm:mb-2">
-                <div className="flex justify-center space-x-4 text-lg sm:text-sm">
+                <div className="flex justify-center space-x-4 text-sm">
                     <LinkButton href="https://coogle.ai/blog" icon={faBlog} label="Blog"/>
                     <LinkButton href="https://coogle.ai/blog/forums" icon={faComments} label="Forum"/>
                     <LinkButton href="https://coogle.ai/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice"
