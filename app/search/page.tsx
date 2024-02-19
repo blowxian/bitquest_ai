@@ -23,8 +23,6 @@ export default function Page() {
     const [searchTerms, setSearchTerms] = useState('');
     const router = useRouter();
 
-    let done = false;
-
     const searchResults = [
         {
             title: '',
@@ -35,21 +33,6 @@ export default function Page() {
     // const referenceData = query.items;
 
     const [derivedQuestions, setDerivedQuestions] = useState<string[]>(['', '', '', '']);
-
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const toggleMenu = useCallback(() => {
-        setIsMenuOpen(!isMenuOpen);
-    }, [isMenuOpen]);
-
-    const menuRef = useRef<HTMLDivElement>(null);
-
-    // 点击外部关闭菜单的函数
-    const handleClickOutside = (event: MouseEvent) => {
-        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-            setIsMenuOpen(false);
-        }
-    };
 
     // 创建一个 ref 来引用输入框
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -72,13 +55,10 @@ export default function Page() {
     useEffect(() => {
         // 添加事件监听器
         window.addEventListener('keydown', handleGlobalKeyDown);
-        // 添加全局点击事件监听器
-        window.addEventListener('mousedown', handleClickOutside);
 
         // 组件卸载时移除事件监听器
         return () => {
             window.removeEventListener('keydown', handleGlobalKeyDown);
-            window.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
 
@@ -196,6 +176,9 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
     const [isLoading, setIsLoading] = useState(true);
 
+    // make sure only on Google query is running at a time
+    const googleSearchDone = useRef(false)
+
     useEffect(() => {
         const keywords = searchParams?.get('q');
         setSearchTerms(keywords ? keywords : '');
@@ -204,9 +187,9 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         setDerivedQuestions(['', '', '', ''])
         setIsLoading(true);
 
-        if (keywords && !done) {
+        if (keywords && !googleSearchDone.current) {
             document.title = `${keywords} | Coogle.ai`;
-            done = true;
+            googleSearchDone.current = true;
             fetch('/api/googleSearch', {
                 method: 'POST',
                 headers: {
@@ -218,7 +201,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                 .then((data) => {
                     setQuery(data);
                     setReferenceData(data.items);
-                    done = false;
+                    googleSearchDone.current = false;
                 });
 
             fetchAndDisplayUserSuggestion();
@@ -242,6 +225,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                 searchTerms={searchTerms}
                 setSearchTerms={setSearchTerms}
                 onSearch={() => handleSearch(searchTerms)}
+                searchInputRef={searchInputRef}
             />
 
             {/*主内容区*/}
