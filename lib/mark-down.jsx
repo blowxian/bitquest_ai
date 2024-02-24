@@ -1,63 +1,63 @@
-import React, {useState, useEffect} from 'react';
-import {marked} from 'marked';
+import React, { useState, useEffect } from 'react';
+import { marked } from 'marked';
 
 const isChinese = (char) => {
     return /[\u3400-\u9FBF]/.test(char);
 };
 
-const Markdown = ({content}) => {
+const Markdown = ({ content }) => {
     const [displayedContent, setDisplayedContent] = useState('');
     const [cursorVisible, setCursorVisible] = useState(true);
 
     useEffect(() => {
-        // console.log('Markdown content: ', content);
-
-        // Clear the displayed content only if the content prop is empty
         if (content === '') {
             setDisplayedContent('<span class="cursor"></span>');
             return;
         }
 
         let displayIndex = displayedContent.replace('<span class="cursor"></span>', '').length;
-        let timer;
 
         const addCharacter = () => {
-            // console.log('dispalyIndex,content.length: ', displayIndex, content.length);
-            if (displayIndex < content.length) {
-                // 移除现有的光标
-                let updatedContent = displayedContent.replace('<span class="cursor"></span>', '');
+            let updatedContent = displayedContent.replace('<span class="cursor"></span>', '');
+            let charsAdded = 0;
+            const maxCharsToAdd = 5; // 一次添加多个字符
 
+            while (displayIndex < content.length && charsAdded < maxCharsToAdd) {
                 const currentChar = content.charAt(displayIndex);
-                if (isChinese(currentChar)) {
+                if (isChinese(currentChar) || charsAdded === 0) { // 优先添加一个中文字符
                     updatedContent += currentChar;
                     displayIndex++;
+                    charsAdded++;
                 } else {
                     let nonChineseSegment = '';
-                    while (displayIndex < content.length && !isChinese(content.charAt(displayIndex))) {
+                    while (displayIndex < content.length && !isChinese(content.charAt(displayIndex)) && charsAdded < maxCharsToAdd) {
                         nonChineseSegment += content.charAt(displayIndex++);
+                        charsAdded++;
                     }
                     updatedContent += nonChineseSegment;
                 }
+            }
 
-                // 如果光标可见，再添加光标
-                if (cursorVisible) {
-                    updatedContent += '<span class="cursor"></span>';
-                }
-                setDisplayedContent(updatedContent);
-            } else if(/<\/s>$/.test(content)) {
+            if (cursorVisible) {
+                updatedContent += '<span class="cursor"></span>';
+            }
+            setDisplayedContent(updatedContent);
+
+            if (displayIndex < content.length) {
+                requestAnimationFrame(addCharacter);
+            } else if (/<\/s>$/.test(content)) {
                 setCursorVisible(false);
-                setDisplayedContent(displayedContent.replace('<span class="cursor"></span>', ''));
-                clearInterval(timer);
+                setDisplayedContent(updatedContent.replace('<span class="cursor"></span>', ''));
             }
         };
 
-        timer = setInterval(addCharacter, 60);
+        requestAnimationFrame(addCharacter);
 
-        return () => clearInterval(timer);
+        return () => {}; // 清理函数（如果需要）
     }, [content, displayedContent, cursorVisible]);
 
     return (
-        <div dangerouslySetInnerHTML={{__html: marked(displayedContent)}}/>
+        <div dangerouslySetInnerHTML={{ __html: marked(displayedContent) }} />
     );
 };
 

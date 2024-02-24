@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 
         let buffer = '';
         let lastFlushTime = Date.now();
-        const flushInterval = 500; // 设置为 1000 毫秒（1秒）
+        const flushInterval = 100; // 设置为 1000 毫秒（1秒）
 
         // 监听流上的 'data' 事件
         response.data.on('data', (chunk) => {
