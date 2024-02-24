@@ -1,4 +1,5 @@
 import React, {useState, useRef, useCallback, useEffect} from 'react';
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const UserMenu = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,6 +27,9 @@ const UserMenu = () => {
         };
     }, []);
 
+    const { data: session, status } = useSession();
+    const loading = status === "loading";
+    console.log("session", session)
 
     return (
         <div ref={menuRef} className="relative ml-2 sm:ml-16">
@@ -38,7 +42,19 @@ const UserMenu = () => {
             </button>
             {isMenuOpen && (
                 <div className="absolute right-0 mt-2 py-2 w-48 bg-white shadow-lg rounded-lg">
-                    <a href="#" className="block px-4 py-2 text-customBlackText hover:bg-customWhite">注销</a>
+                    <div>
+                        {!session ? (
+                            <>
+                                <button className="block px-4 py-2 text-customBlackText hover:bg-customWhite w-full" onClick={() => signIn('twitter')}>Twitter</button>
+                                <button className="block px-4 py-2 text-customBlackText hover:bg-customWhite w-full" onClick={() => signIn('google')}>Google</button>
+                            </>
+                        ) : (
+                            <div>
+                                <h4  className="px-4 py-2 text-center">Hi, {session.user.name}</h4>
+                                <button className="block px-4 py-2 text-customBlackText hover:bg-customWhite w-full" onClick={() => signOut()}>Sign out</button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>
