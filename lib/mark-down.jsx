@@ -20,7 +20,7 @@ const Markdown = ({ content }) => {
         const addCharacter = () => {
             let updatedContent = displayedContent.replace('<span class="cursor"></span>', '');
             let charsAdded = 0;
-            const maxCharsToAdd = 5; // 一次添加多个字符
+            const maxCharsToAdd = 10; // 一次添加多个字符
 
             while (displayIndex < content.length && charsAdded < maxCharsToAdd) {
                 const currentChar = content.charAt(displayIndex);
@@ -32,7 +32,6 @@ const Markdown = ({ content }) => {
                     let nonChineseSegment = '';
                     while (displayIndex < content.length && !isChinese(content.charAt(displayIndex)) && charsAdded < maxCharsToAdd) {
                         nonChineseSegment += content.charAt(displayIndex++);
-                        charsAdded++;
                     }
                     updatedContent += nonChineseSegment;
                 }
