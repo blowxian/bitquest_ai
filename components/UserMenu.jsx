@@ -1,10 +1,12 @@
+'use client';
+
 import React, {useState, useRef, useCallback, useEffect} from 'react';
 import {signIn, signOut, useSession} from "next-auth/react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons";
 import {faXTwitter, faGoogle} from "@fortawesome/free-brands-svg-icons";
 
-const UserMenu = () => {
+const UserMenu = ({loginBtnHoverColorClass = ''}) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = useCallback(() => {
@@ -38,9 +40,9 @@ const UserMenu = () => {
         <div ref={menuRef} className="relative ml-2 sm:ml-16">
             {!session ? (
                 <>
-                    <button className="p-2 text-customBlackText hover:text-customWhite"
+                    <button className={`p-2 text-customBlackText ${loginBtnHoverColorClass} opacity-50 hover:opacity-100 transition duration-150 ease-in-out`}
                             onClick={() => signIn('twitter')}><FontAwesomeIcon icon={faXTwitter} /></button>
-                    <button className="p-2 text-customBlackText hover:text-customWhite"
+                    <button className={`p-2 text-customBlackText ${loginBtnHoverColorClass} opacity-50 hover:opacity-100 transition duration-150 ease-in-out`}
                             onClick={() => signIn('google')}><FontAwesomeIcon icon={faGoogle} /></button>
                 </>
             ) : (

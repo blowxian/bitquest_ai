@@ -10,7 +10,7 @@ const TopNavBar = ({searchTerms, setSearchTerms, onSearch, searchInputRef}) => {
                 <a href="/" className="hidden sm:flex text-customWhite2 text-2xl font-semibold mr-16">Coogle.AI</a>
                 <SearchInput searchTerms={searchTerms} setSearchTerms={setSearchTerms} onSearch={onSearch} searchInputRef={searchInputRef}/>
                 <SessionProvider>
-                    <UserMenu/>
+                    <UserMenu loginBtnHoverColorClass={"hover:text-customWhite"}/>
                 </SessionProvider>
             </div>
         </div>

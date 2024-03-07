@@ -1,16 +1,18 @@
 'use client';
 
-import React, {useState, useEffect, useCallback, useRef} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSearch, faClipboardQuestion} from "@fortawesome/free-solid-svg-icons";
+import {faClipboardQuestion} from "@fortawesome/free-solid-svg-icons";
 import Markdown from "@/lib/mark-down";
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
 import {GoogleCustomSearchResponse} from "@/pages/api/types";
 import TopNavBar from "@/components/TopNavBar";
+import {getDictionary} from "@/app/[lang]/dictionaries";
 
-export default function Page() {
+export default async function Page(/*{params}: { params: { lang: string } }*/) {
+    // const dict = await getDictionary(params.lang) // en
     const [data, setData] = useState('');
     const [query, setQuery] = useState<GoogleCustomSearchResponse>({
         items: [],
@@ -243,7 +245,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             <Markdown content={data}/>
                         </div>
 
-                        <h4 className='text-sm'>参考信息：</h4>
+                        <h4 className='text-sm'>参考信息{/*{dict.search.refInfo}*/}</h4>
                         <div
                             className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
                             {(referenceData?.length > 0 ? referenceData : [null, null, null, null, null]).map((data, index) => (
@@ -251,7 +253,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             ))}
                         </div>
 
-                        <h4 className='text-sm'>您还想问：</h4>
+                        <h4 className='text-sm'>您还想问{/*{dict.search.moreQs}*/}</h4>
                         <div className="flex flex-wrap justify-center pt-2">
                             {isLoading ? (
                                 // 渲染一定数量的骨架图组件

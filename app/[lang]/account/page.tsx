@@ -7,7 +7,7 @@ type DataType = {
     time: string; // 根据实际数据结构调整
 };
 
-export default function Page() {
+export default function Page({ params: { lang:string = 'en' } }) {
     const [data, setData] = useState<DataType[]>([]);
 
     useEffect(() => {

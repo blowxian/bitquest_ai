@@ -5,7 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useRef} from "react";
 
-export default function SearchBar() {
+export default function SearchBar({searchDict}) {
     const searchParams = useSearchParams();
     const router = useRouter();
     const inputRef = useRef<HTMLInputElement>(null);
@@ -58,7 +58,7 @@ export default function SearchBar() {
                 <input
                     ref={inputRef}
                     type="search"
-                    placeholder="Coooooooogle"
+                    placeholder={searchDict.placeholder}
                     className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-6 pr-28 w-full outline-none focus:ring-0 focus:border-gray-300"
                     onKeyUp={(e) => {
                         handleSearch(e);

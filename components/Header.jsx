@@ -1,14 +1,14 @@
 // 站点通用头部菜单
 import Image from "next/image";
 
-export default function Header() {
+const Header = ({headerDict}) => {
     return (
         <header className="pb-6 w-full mt-52 sm:mt-72 flex flex-col items-center">
             <div className="px-4 sm:px-8 h-20">
-                <a href="/" title="Make AI Search Affordable For Everyone,Everywhere">
+                <a href="/" title={headerDict.slogan}>
                     <Image
                         className="w-auto h-12 sm:h-16"
-                        src="/logo_final_v.svg"
+                        src="/img/logo_final_v.svg"
                         width={140}
                         height={27}
                         alt=""
@@ -16,7 +16,9 @@ export default function Header() {
                     />
                 </a>
             </div>
-            <p className="hidden sm:block text-center text-gray-400 text-sm">Make AI Search Affordable For Everyone,Everywhere</p>
+            <p className="hidden sm:block text-center text-gray-400 text-sm">{headerDict.slogan}</p>
         </header>
     )
 }
+
+export default Header;

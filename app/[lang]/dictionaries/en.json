@@ -1,0 +1,15 @@
+{
+  "header": {
+    "slogan": "Make AI Search Affordable For Everyone,Everywhere"
+  },
+  "search": {
+    "placeholder": "Coogle",
+    "refInfo": "References",
+    "moreQs": "Any other questions?"
+  },
+  "footer": {
+    "blog": "Blog",
+    "forum": "Forum",
+    "feedback": "Feedback"
+  }
+}
