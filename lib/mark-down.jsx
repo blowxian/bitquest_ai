@@ -44,7 +44,7 @@ const Markdown = ({ content }) => {
 
             if (displayIndex < content.length) {
                 requestAnimationFrame(addCharacter);
-            } else if (/<\/s>$/.test(content)) {
+            } else if (charsAdded === 0) {
                 setCursorVisible(false);
                 setDisplayedContent(updatedContent.replace('<span class="cursor"></span>', ''));
             }

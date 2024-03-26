@@ -11,8 +11,12 @@ import {GoogleCustomSearchResponse} from "@/pages/api/types";
 import TopNavBar from "@/components/TopNavBar";
 import {getDictionary} from "@/app/[lang]/dictionaries";
 
-export default async function Page(/*{params}: { params: { lang: string } }*/) {
-    // const dict = await getDictionary(params.lang) // en
+async function fetchDictionary(lang:string) {
+    return await getDictionary(lang);
+}
+
+export default function Page({params}: { params: { lang: string } }) {
+    const dict = fetchDictionary(params.lang) // en
     const [data, setData] = useState('');
     const [query, setQuery] = useState<GoogleCustomSearchResponse>({
         items: [],
@@ -93,12 +97,10 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
         eventSource.onmessage = (event) => {
             if (event.data !== '[DONE]') {
-                const jsonData = JSON.parse(event.data);
-                // console.log('Received message: ', jsonData.token.text);
-
-                partString += jsonData.token.text;
+                partString += JSON.parse(event.data).choices[0].text;
                 setData(replaceReferences(partString));
             } else {
+
                 eventSource.close();
             }
         };
@@ -122,12 +124,14 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
     const fetchAndDisplayUserSuggestion = () => {
         const eventSource = new EventSource(`/api/update?max_token=128&prompt=` + encodeURIComponent(`根据用户之前的搜索内容：“${searchParams?.get('q')}”，请提供四个紧密相关的、用户可能感兴趣的中文搜索话题或问题。请确保每个话题或问题控制在15个汉字内，并且仅回复一个格式为['话题1', '话题2', '话题3', '话题4']的列表。除此之外不需要包含任何其他信息。请仅回复一次并且确保回复仅包含这个列表。`));
 
+        let partString = '';
+
         eventSource.onmessage = (event) => {
             if (event.data !== '[DONE]') {
-                const jsonData = JSON.parse(event.data);
+                const jsonData = JSON.parse(event.data).choices[0];
+                partString += jsonData.text;
                 if (jsonData.finish_reason === 'stop' || jsonData.finish_reason === 'eos') {
-                    console.log('UserSuggestion: ', jsonData.generated_text);
-                    const extractedArray = extractArrayFromString(jsonData.generated_text);
+                    const extractedArray = extractArrayFromString(partString);
                     console.log("User Suggestion Array: ", extractedArray);
                     setDerivedQuestions(extractedArray);
                     setIsLoading(false);
