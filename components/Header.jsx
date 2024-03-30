@@ -8,7 +8,7 @@ const Header = ({headerDict}) => {
                 <a href="/" title={headerDict.slogan}>
                     <Image
                         className="w-auto h-12 sm:h-16"
-                        src="/img/logo_final_v.svg"
+                        src="/img/phindai_logo.svg"
                         width={140}
                         height={27}
                         alt=""
