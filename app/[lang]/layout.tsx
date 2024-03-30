@@ -14,8 +14,9 @@ const pathway_extreme = Pathway_Extreme({
 
 
 export const metadata: Metadata = {
-    title: 'Coogle.ai, Make AI Search Affordable For Everyone,Everywhere',
-    description: 'Coogle.ai is the leading platform for affordable AI search solutions, its affordable  and easy to use compared with perplexity alternative',
+    title: 'Phind AI cheap alternative',
+    description: 'phind alternative, ai search engine affordable for everyone',
+    keywords: ['ai search', 'phind ai','phind alternative', 'cheapest ai search', 'perplexity alternative', 'phind', 'ai', 'search', 'engine', 'cheap', 'affordable', 'everyone'],
 }
 
 export default function RootLayout({

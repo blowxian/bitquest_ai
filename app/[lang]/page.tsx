@@ -29,9 +29,9 @@ export default async function Page({params}: { params: { lang: string } }) {
             </div>
             <div className="mb-32 text-center w-full sm:mb-2">
                 <div className="flex justify-center space-x-4 text-sm">
-                    <LinkButton href="https://coogle.ai/blog" icon={faBlog} label={dict.footer.blog}/>
-                    <LinkButton href="https://coogle.ai/blog/forums" icon={faComments} label={dict.footer.forum}/>
-                    <LinkButton href="https://coogle.ai/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice"
+                    <LinkButton href="/blog" icon={faBlog} label={dict.footer.blog}/>
+                    <LinkButton href="/blog/forums" icon={faComments} label={dict.footer.forum}/>
+                    <LinkButton href="/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice"
                                 icon={faCommentDots} label={dict.footer.feedback}/>
                 </div>
             </div>

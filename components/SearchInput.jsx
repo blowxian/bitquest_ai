@@ -15,7 +15,7 @@ const SearchInput = ({searchTerms, setSearchTerms, onSearch, searchInputRef}) =>
             <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Coooooooogle"
+                placeholder="Phind"
                 value={searchTerms}
                 onChange={(e) => setSearchTerms(e.target.value)}
                 onKeyDown={handleKeyDown}
