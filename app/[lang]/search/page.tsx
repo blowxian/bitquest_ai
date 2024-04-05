@@ -9,14 +9,25 @@ import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
 import {GoogleCustomSearchResponse} from "@/pages/api/types";
 import TopNavBar from "@/components/TopNavBar";
-import {getDictionary} from "@/app/[lang]/dictionaries";
+import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
 
 async function fetchDictionary(lang:string) {
     return await getDictionary(lang);
 }
 
 export default function Page({params}: { params: { lang: string } }) {
-    const dict = fetchDictionary(params.lang) // en
+    // State to store the resolved value of the dictionary
+    const [dict, setDict] = useState<Dictionary | null>(null);
+
+
+    // Fetch the dictionary when the component mounts or when params.lang changes
+    useEffect(() => {
+        fetchDictionary(params.lang)
+            .then((result) => {
+                setDict(result);
+            });
+    }, [params.lang]);
+
     const [data, setData] = useState('');
     const [query, setQuery] = useState<GoogleCustomSearchResponse>({
         items: [],
@@ -249,7 +260,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             <Markdown content={data}/>
                         </div>
 
-                        <h4 className='text-sm'>参考信息{/*{dict.search.refInfo}*/}</h4>
+                        <h4 className='text-sm'>{dict?.search.refInfo}</h4>
                         <div
                             className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
                             {(referenceData?.length > 0 ? referenceData : [null, null, null, null, null]).map((data, index) => (
@@ -257,7 +268,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             ))}
                         </div>
 
-                        <h4 className='text-sm'>您还想问{/*{dict.search.moreQs}*/}</h4>
+                        <h4 className='text-sm'>{dict?.search.moreQs}</h4>
                         <div className="flex flex-wrap justify-center pt-2">
                             {isLoading ? (
                                 // 渲染一定数量的骨架图组件

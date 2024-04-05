@@ -7,7 +7,7 @@ import {faBlog, faCommentDots, faComments} from "@fortawesome/free-solid-svg-ico
 import LinkButton from "@/components/LinkButton";
 import {SessionProvider} from "next-auth/react";
 import UserMenu from "@/components/UserMenu";
-import {getDictionary} from './dictionaries'
+import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
 
 export default async function Page({params}: { params: { lang: string } }) {
     const dict = await getDictionary(params.lang) // en

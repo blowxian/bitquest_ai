@@ -23,8 +23,6 @@ export default NextAuth({
     // 可以添加更多配置项
     callbacks: {
         async signIn({ user, account, profile }) {
-            console.log("signIn", user, account, profile);
-
             // Check if the user exists in your database
             let dbUser = await prisma.user.findUnique({
                 where: { providerAccountId: account.providerAccountId },
