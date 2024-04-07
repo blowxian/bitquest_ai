@@ -2,8 +2,9 @@
 
 import {useSearchParams, useRouter} from 'next/navigation';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSearch} from "@fortawesome/free-solid-svg-icons";
+import {faClipboardQuestion, faSearch} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useRef} from "react";
+import HotQuestionCard from './HotQuestionCard';
 
 export default function SearchBar({searchDict}) {
     const searchParams = useSearchParams();
@@ -25,6 +26,21 @@ export default function SearchBar({searchDict}) {
             router.push(`/search?${params.toString()}`);
         }
     }
+
+    const hotQuestions = [
+        "enable scss in next.js14",
+        "What's new in NextJS 14?",
+        "Mistral 8x7B benchmarks",
+        "Quicksort explained with code examples",
+        "python read file line by line"
+    ];
+
+    const onSearch = (searchTermsInput: string = '') => {
+        if(searchTermsInput !== ''){
+            // 更新 URL，这里将触发 useSearchParams 的变化
+            router.push(`/search?q=${encodeURIComponent(searchTermsInput)}`);
+        }
+    };
 
     // 键盘事件处理函数
     const handleGlobalKeyDown = (event: KeyboardEvent) => {
@@ -71,6 +87,17 @@ export default function SearchBar({searchDict}) {
                                          className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
                     </button>
                 </div>
+            </div>
+
+
+            <div className="flex flex-wrap justify-center pt-2">
+                {hotQuestions.map((question, index) => (
+                    <HotQuestionCard
+                        key={index}
+                        searchTerm={question}
+                        onSearch={onSearch}
+                    />
+                ))}
             </div>
         </div>
     )
