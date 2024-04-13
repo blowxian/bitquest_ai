@@ -7,6 +7,7 @@ WORKDIR /app
 
 # Argument for environment with a default value
 ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
 
 # Copy package.json and package-lock.json to work directory
 COPY package*.json ./
@@ -15,21 +16,17 @@ COPY prisma ./prisma/
 # Install dependencies
 RUN npm install
 
-# Copy your Prisma schema file to the Docker image
-COPY prisma/schema.prisma ./prisma/
+RUN npm install prisma --save-dev
 
-# Install Prisma CLI as a development dependency
-RUN npm install @prisma/cli --save-dev
+# Copy local code to the container
+COPY . .
 
 # Generate Prisma Client. This step ensures that the client is generated
 # for the environment specified by the base image.
 RUN npx prisma generate
 
-# Copy local code to the container
-COPY . .
-
 # Build the Next.js application
-RUN npm run build
+RUN if [ "$NODE_ENV" = "production" ] || [ "$NODE_ENV" = "staging" ]; then npm run build; else echo "Skipping build for development"; fi
 
 # Inform Docker that the container is listening on port 3000
 EXPOSE 3000
