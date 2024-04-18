@@ -16,8 +16,6 @@ COPY prisma ./prisma/
 # Install dependencies
 RUN npm install
 
-RUN npm install prisma --save-dev
-
 # Copy local code to the container
 COPY . .
 
