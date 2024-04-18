@@ -24,7 +24,7 @@ COPY . .
 RUN npx prisma generate
 
 # Build the Next.js application
-RUN if [ "$NODE_ENV" = "production" ] || [ "$NODE_ENV" = "test" ]; then npm run build; else echo "Skipping build for development"; fi
+RUN if [ "$NODE_ENV" = "production" ]; then npm run build; else echo "Skipping build for development"; fi
 
 # Inform Docker that the container is listening on port 3000
 EXPOSE 3000
