@@ -14,8 +14,8 @@ const pathway_extreme = Pathway_Extreme({
 
 
 export const metadata: Metadata = {
-    title: 'phind ai cheap alternative',
-    description: 'phind alternative, ai search engine affordable for everyone',
+    title: 'meta ai search engine',
+    description: 'meta ai ：your key to smart and efficient ai searches. join us for a quick, accurate, and reliable ai search experience.',
     keywords: ['ai search', 'phind ai','phind alternative', 'cheapest ai search', 'perplexity alternative', 'phind', 'ai', 'search', 'engine', 'cheap', 'affordable', 'everyone'],
 }
 
