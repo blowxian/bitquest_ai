@@ -5,7 +5,11 @@
   "search": {
     "placeholder": "Phind",
     "refInfo": "संदर्भ",
-    "moreQs": "कोई और प्रश्न?"
+    "moreQs": "कोई और प्रश्न?",
+    "searchPrompt": "निम्नलिखित कई खोज परिणामों को मिलाएं, अपने ज्ञान को संयोजित करके उपयोगकर्ता जो चाहता है उसका उत्तर उत्पन्न करें, और प्रत्येक खोज परिणाम के संदर्भ भागों को उत्तर में चिह्नित करें।",
+    "searchResultPrefix": "खोज परिणाम ${index}: ${snippet}",
+    "detailedAnswerRequest": "ऊपर दिए गए खोज परिणामों और आपके ज्ञान के आधार पर, कृपया ${searchTerms} के बारे में एक व्यापक हिंदी उत्तर प्रदान करें, Markdown प्रारूप में संरचनात्मक आउटपुट का उपयोग करें और उत्तर में संदर्भित भागों को स्पष्ट रूप से चिह्नित करें। प्रारूप के रूप में: संबंधित जानकारी का हवाला देने के बाद [[Ref X]] जोड़ें, जहां X खोज परिणाम संख्या है।",
+    "userSuggestionPrompt": "Based on the user's previous search content: \"{searchTerms}\", please provide four closely related and potentially interesting search topics or questions in Hindi. Ensure each Hindi topic or question is controlled within 15 characters, and only reply with a list formatted as ['विषय1', 'विषय2', 'विषय3', 'विषय4']. No other information should be included. Please reply only once and ensure the reply contains only this list."
   },
   "footer": {
     "blog": "ब्लॉग",
