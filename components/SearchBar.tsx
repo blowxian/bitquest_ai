@@ -2,7 +2,7 @@
 
 import {useSearchParams, useRouter} from 'next/navigation';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faClipboardQuestion, faSearch} from "@fortawesome/free-solid-svg-icons";
+import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useRef} from "react";
 import HotQuestionCard from './HotQuestionCard';
 
@@ -74,7 +74,7 @@ export default function SearchBar({searchDict}) {
                 <input
                     ref={inputRef}
                     type="search"
-                    placeholder={searchDict.placeholder}
+                    placeholder={searchDict?.placeholder}
                     className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-6 pr-28 w-full outline-none focus:ring-0 focus:border-gray-300"
                     onKeyUp={(e) => {
                         handleSearch(e);
