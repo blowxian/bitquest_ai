@@ -227,7 +227,7 @@ export default function Page({params}: { params: { lang: string } }) {
         setIsLoading(true);
 
         if (keywords && dict && !googleSearchDone.current) {
-            document.title = `${keywords} | Coogle.ai`;
+            document.title = `${keywords} | phind ai alternative`;
             googleSearchDone.current = true;
             fetch('/api/googleSearch', {
                 method: 'POST',
