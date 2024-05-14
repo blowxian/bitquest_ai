@@ -1,19 +1,25 @@
-// pages/api/stream.js
 import axios from 'axios';
+import { notifyFeishu } from '../../lib/notify';
 
-export default async function handler(req, res) {
-    // 配置 OpenAI 请求
-    const togetherAIRequest = axios.create({
-        baseURL: 'https://api.together.xyz',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.API_BEARER_TOKEN}`
-        },
-        responseType: 'stream' // 重要：设置响应类型为流
-    });
+const tokens = ['cc06736ef1f11f2e5e739383f8979dd0c3aa6048a8e11ef28aaca83dd751e125', '0a44bf308754e4f61b9ff196bb2c2ff4392094aaeb96c347a6b4e1e320fa0cdf', '43d8345f27283b0b7a389354f55e60269a2d458f8ada529ac26d32f36dcfb002']; // 替换为你的实际 token
+let currentTokenIndex = 0;
 
+const togetherAIRequest = axios.create({
+    baseURL: 'https://api.together.xyz',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${tokens[currentTokenIndex]}`,
+    },
+    responseType: 'stream', // 重要：设置响应类型为流
+});
+
+async function handler(req, res) {
     try {
-        console.log(req.query.max_token ? +req.query.max_token : 2048);
+        await notifyFeishu(`Token ${tokens[currentTokenIndex]} 正在使用，使用详情如下：
+            model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+            prompt: "{}<human>: " + ${req.query.prompt} + "\\n\\n<expert>:",
+        `);
+
         // 向 TogetherAI 发送请求
         const response = await togetherAIRequest.post('/inference', {
             // TogetherAI API 请求体
@@ -37,7 +43,7 @@ export default async function handler(req, res) {
 
         let buffer = '';
         let lastFlushTime = Date.now();
-        const flushInterval = 100; // 设置为 1000 毫秒（1秒）
+        const flushInterval = 100; // 设置为 100 毫秒
 
         // 监听流上的 'data' 事件
         response.data.on('data', (chunk) => {
@@ -47,7 +53,7 @@ export default async function handler(req, res) {
             // 将数据块添加到缓冲区
             buffer += chunkAsString;
 
-            // 检查距离上次 flush 是否已过 1000 毫秒
+            // 检查距离上次 flush 是否已过 100 毫秒
             if (Date.now() - lastFlushTime >= flushInterval) {
                 console.log('Flushing buffer...');
                 // 如果是，则 flush 缓冲区并重置计时器
@@ -56,10 +62,6 @@ export default async function handler(req, res) {
                 buffer = '';  // 清空缓冲区
                 lastFlushTime = Date.now();  // 更新上次 flush 时间
             }
-
-            // 也可以将数据块直接传输给客户端
-            /*res.write(chunkAsString);
-            res.flush;*/
         });
 
         // 当流结束时，结束响应
@@ -72,8 +74,25 @@ export default async function handler(req, res) {
             console.log('Stream ended');
             res.end();
         });
+
     } catch (error) {
         console.error('Error communicating with TogetherAI:', error);
+
+        // 检查是否是 token 用完的错误
+        if (error.response && error.response.status === 429) {
+            await notifyFeishu(`Token ${tokens[currentTokenIndex]} 已用完，切换到下一个 Token`);
+
+            // 切换到下一个 token
+            currentTokenIndex = (currentTokenIndex + 1) % tokens.length;
+            togetherAIRequest.defaults.headers['Authorization'] = `Bearer ${tokens[currentTokenIndex]}`;
+
+            // 重新调用 handler 函数，传递相同的请求和响应对象
+            handler(req, res);
+            return;
+        }
+
         res.status(500).send('Internal Server Error');
     }
 }
+
+export default handler;
