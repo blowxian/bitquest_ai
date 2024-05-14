@@ -5,7 +5,11 @@
   "search": {
     "placeholder": "Phind",
     "refInfo": "参考信息",
-    "moreQs": "您还想问"
+    "moreQs": "您还想问",
+    "searchPrompt": "合并以下多个搜索结果，结合你的知识，生成用户想要的答案，并在回复中标注各条搜索结果的引用部分。",
+    "searchResultPrefix": "搜索结果${index}：${snippet}",
+    "detailedAnswerRequest": "结合上述搜索结果和你的知识，请提供关于${searchTerms}的综合性中文答案，用 Markdown 格式结构化输出，并在回复中明确标注引用的部分。格式为：在引用相关信息后加上[[Ref X]]，其中X是搜索结果的序号。",
+    "userSuggestionPrompt": "根据用户之前的搜索内容：“{searchTerms}”，请提供四个紧密相关的、用户可能感兴趣的中文搜索话题或问题。请确保每个话题或问题控制在15个汉字内，并且仅回复一个格式为['话题1', '话题2', '话题3', '话题4']的列表。除此之外不需要包含任何其他信息。请仅回复一次并且确保回复仅包含这个列表。"
   },
   "footer": {
     "blog": "博客",

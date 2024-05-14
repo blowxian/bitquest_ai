@@ -9,14 +9,25 @@ import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
 import {GoogleCustomSearchResponse} from "@/pages/api/types";
 import TopNavBar from "@/components/TopNavBar";
-import {getDictionary} from "@/app/[lang]/dictionaries";
+import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
 
 async function fetchDictionary(lang:string) {
     return await getDictionary(lang);
 }
 
 export default function Page({params}: { params: { lang: string } }) {
-    const dict = fetchDictionary(params.lang) // en
+    // State to store the resolved value of the dictionary
+    const [dict, setDict] = useState<Dictionary | null>(null);
+
+
+    // Fetch the dictionary when the component mounts or when params.lang changes
+    useEffect(() => {
+        fetchDictionary(params.lang)
+            .then((result) => {
+                setDict(result);
+            });
+    }, [params.lang]);
+
     const [data, setData] = useState('');
     const [query, setQuery] = useState<GoogleCustomSearchResponse>({
         items: [],
@@ -85,13 +96,25 @@ export default function Page({params}: { params: { lang: string } }) {
         }).join('');
     }
 
-    const fetchAndSummarizeData = (googleSearchRes: GoogleCustomSearchResponse) => {
-        const eventSource = new EventSource(`/api/update?prompt=` + encodeURIComponent(`合并以下多个搜索结果，结合你的知识，生成用户想要的答案，并在回复中标注各条搜索结果的引用部分。
+    const constructSummarizePrompt = (searchTerms, searchResults, dictTexts) => {
+        // 格式化搜索结果
+        const formattedResults = searchResults.map((result, index) =>
+            `${dictTexts.searchResultPrefix.replace('${index}', index + 1).replace('${snippet}', result.snippet)}`
+        ).join('\n');
 
-${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${result.snippet}`).join('\n')}
-    
-结合上述搜索结果和你的知识，请提供关于 ${googleSearchRes.queries?.request[0].searchTerms} 的综合性中文答案，用 Markdown 格式结构化输出，并在回复中明确标注引用的部分。格式为：在引用相关信息后加上[[Ref X]]，其中X是搜索结果的序号。
-`));
+        // 构建完整的提示
+        const prompt = `${dictTexts.searchPrompt}\n${formattedResults}\n${dictTexts.detailedAnswerRequest.replace('${searchTerms}', searchTerms)}`;
+
+        return prompt;
+    };
+
+    const fetchAndSummarizeData = (googleSearchRes: GoogleCustomSearchResponse) => {
+        const searchResults = query.items;  // 假设 query.items 包含从服务器加载的搜索结果
+
+        // 使用上面的函数构建完整的提示
+        const prompt = constructSummarizePrompt(searchTerms, searchResults, dict?.search);
+
+        const eventSource = new EventSource(`/api/update?prompt=` + encodeURIComponent(prompt));
 
         let partString = '';
 
@@ -121,8 +144,18 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         return matches ? matches.map(match => match.replace(/'/g, "")) : [];
     }
 
+    const constructSuggestionPrompt = (searchTerms, dictTexts) => {
+        // Using the localized prompt template and replace placeholders with actual search terms
+        const prompt = dictTexts.userSuggestionPrompt.replace('{searchTerms}', searchTerms);
+
+        return prompt;
+    };
+
     const fetchAndDisplayUserSuggestion = () => {
-        const eventSource = new EventSource(`/api/update?max_token=128&prompt=` + encodeURIComponent(`根据用户之前的搜索内容：“${searchParams?.get('q')}”，请提供四个紧密相关的、用户可能感兴趣的中文搜索话题或问题。请确保每个话题或问题控制在15个汉字内，并且仅回复一个格式为['话题1', '话题2', '话题3', '话题4']的列表。除此之外不需要包含任何其他信息。请仅回复一次并且确保回复仅包含这个列表。`));
+        // 使用上面的函数构建完整的提示
+        const prompt = constructSuggestionPrompt(searchTerms, dict?.search);
+
+        const eventSource = new EventSource(`/api/update?max_token=128&prompt=` + encodeURIComponent(prompt));
 
         let partString = '';
 
@@ -193,7 +226,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
         setDerivedQuestions(['', '', '', ''])
         setIsLoading(true);
 
-        if (keywords && !googleSearchDone.current) {
+        if (keywords && dict && !googleSearchDone.current) {
             document.title = `${keywords} | Coogle.ai`;
             googleSearchDone.current = true;
             fetch('/api/googleSearch', {
@@ -212,7 +245,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
 
             fetchAndDisplayUserSuggestion();
         }
-    }, [searchParams]);
+    }, [searchParams, dict]);
 
     function DerivedQuestionCardSkeleton() {
         return (
@@ -249,7 +282,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             <Markdown content={data}/>
                         </div>
 
-                        <h4 className='text-sm'>参考信息{/*{dict.search.refInfo}*/}</h4>
+                        <h4 className='text-sm'>{dict?.search.refInfo}</h4>
                         <div
                             className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
                             {(referenceData?.length > 0 ? referenceData : [null, null, null, null, null]).map((data, index) => (
@@ -257,7 +290,7 @@ ${googleSearchRes.items?.map((result, index) => `搜索结果${index + 1}： ${r
                             ))}
                         </div>
 
-                        <h4 className='text-sm'>您还想问{/*{dict.search.moreQs}*/}</h4>
+                        <h4 className='text-sm'>{dict?.search.moreQs}</h4>
                         <div className="flex flex-wrap justify-center pt-2">
                             {isLoading ? (
                                 // 渲染一定数量的骨架图组件

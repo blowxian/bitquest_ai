@@ -5,7 +5,7 @@ const Header = ({headerDict}) => {
     return (
         <header className="pb-6 w-full mt-52 sm:mt-72 flex flex-col items-center">
             <div className="px-4 sm:px-8 h-20">
-                <a href="/" title={headerDict.slogan}>
+                <a href="/" title={headerDict?.slogan}>
                     <Image
                         className="w-auto h-12 sm:h-16"
                         src="/img/phind_ai_alter_logo.svg"
@@ -16,7 +16,7 @@ const Header = ({headerDict}) => {
                     />
                 </a>
             </div>
-            <p className="hidden sm:block text-center text-gray-400 text-sm">{headerDict.slogan}</p>
+            <p className="hidden sm:block text-center text-gray-400 text-sm">{headerDict?.slogan}</p>
         </header>
     )
 }

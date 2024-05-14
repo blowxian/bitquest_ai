@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  phind_ai:
+    build:
+      context: .
+      args:
+        - NODE_ENV=development
+    command: npm run dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - '3000:3000'                                               # 区分于其他分支的端口
+      - '5555:5555'                                               # 测试 prisma 的端口
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://phind_admin:phind_2024@db:5432/phind_ai?schema=public
+  db:
+    image: postgres:16.2
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: phind_admin
+      POSTGRES_PASSWORD: phind_2024
+      POSTGRES_DB: phind_ai
+    volumes:
+      - ./data:/var/lib/postgresql/data                           # 持久化数据
