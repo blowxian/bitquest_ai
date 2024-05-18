@@ -1,21 +1,14 @@
-'use client';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { signIn, signOut, useSession } from "next-auth/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
+import { faXTwitter, faGoogle, faStar } from "@fortawesome/free-brands-svg-icons";
 
-import React, {useState, useRef, useCallback, useEffect} from 'react';
-import {signIn, signOut, useSession} from "next-auth/react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faRightToBracket} from "@fortawesome/free-solid-svg-icons";
-import {faXTwitter, faGoogle} from "@fortawesome/free-brands-svg-icons";
-
-const UserMenu = ({loginBtnHoverColorClass = ''}) => {
+const UserMenu = ({ loginBtnHoverColorClass = '' }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const toggleMenu = useCallback(() => {
-        setIsMenuOpen(!isMenuOpen);
-    }, [isMenuOpen]);
-
+    const toggleMenu = useCallback(() => setIsMenuOpen(!isMenuOpen), [isMenuOpen]);
     const menuRef = useRef(null);
 
-    // 点击外部关闭菜单的函数
     const handleClickOutside = (event) => {
         if (menuRef.current && !menuRef.current.contains(event.target)) {
             setIsMenuOpen(false);
@@ -23,18 +16,15 @@ const UserMenu = ({loginBtnHoverColorClass = ''}) => {
     };
 
     useEffect(() => {
-        // 添加全局点击事件监听器
         window.addEventListener('mousedown', handleClickOutside);
-
-        // 组件卸载时移除事件监听器
-        return () => {
-            window.removeEventListener('mousedown', handleClickOutside);
-        };
+        return () => window.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const {data: session, status} = useSession();
+    const { data: session, status } = useSession();
     const loading = status === "loading";
-    console.log("session", session)
+
+    // You would have to adjust this to correctly reference subscription status
+    const isPro = session && session.user && session.user.isPro;
 
     return (
         <div ref={menuRef} className="relative ml-2 sm:ml-16">
@@ -50,7 +40,7 @@ const UserMenu = ({loginBtnHoverColorClass = ''}) => {
                     <button onClick={toggleMenu}
                             className="flex items-center justify-center p-2 -m-2 text-xl rounded-full focus:outline-none focus:ring">
                         <img
-                            src={session.user.image} // 替换成您的账号头像路径
+                            src={session.user.image}
                             alt="Your Avatar"
                             className="w-8 h-8 rounded-full"
                         />
@@ -58,12 +48,15 @@ const UserMenu = ({loginBtnHoverColorClass = ''}) => {
                     {isMenuOpen && (
                         <div className="absolute right-0 mt-2 py-2 w-48 bg-white shadow-lg rounded-lg text-sm">
                             <div>
-                                <div>
-                                    <h4 className="px-4 py-2 text-center">Hi, {session.user.name}</h4>
-                                    <button className="block px-4 py-2 text-customBlackText hover:bg-customWhite w-full"
-                                            onClick={() => signOut()}>Sign out <FontAwesomeIcon icon={faRightToBracket} />
-                                    </button>
-                                </div>
+                                {!isPro ? (
+                                    <div className="block px-4 py-2 text-customBlackText hover:bg-customWhite w-full text-center"
+                                         onClick={() => signIn('pro')}>Upgrade to Pro</div>
+                                ) : (
+                                    <h4 className="px-4 py-2 text-center">Pro Member <FontAwesomeIcon icon={faStar} /></h4>
+                                )}
+                                <button className="block px-4 py-2 text-customBlackText hover:bg-customWhite w-full"
+                                        onClick={() => signOut()}>Sign out <FontAwesomeIcon icon={faRightToBracket} />
+                                </button>
                             </div>
                         </div>
                     )}

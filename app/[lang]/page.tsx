@@ -8,6 +8,7 @@ import LinkButton from "@/components/LinkButton";
 import {SessionProvider} from "next-auth/react";
 import UserMenu from "@/components/UserMenu";
 import {Dictionary, getDictionary} from "@/app/[lang]/dictionaries";
+import Overlay from '@/components/Overlay';
 
 async function fetchDictionary(lang:string) {
     return await getDictionary(lang);
@@ -25,6 +26,16 @@ export default function Page({params}: { params: { lang: string } }) {
                 setDict(result);
             });
     }, [params.lang]);
+
+    const [isOverlayVisible, setIsOverlayVisible] = useState(true);
+
+    const handleOpenOverlay = () => {
+        setIsOverlayVisible(true);
+    };
+
+    const handleCloseOverlay = () => {
+        setIsOverlayVisible(false);
+    };
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between">
@@ -49,6 +60,7 @@ export default function Page({params}: { params: { lang: string } }) {
                                 icon={faCommentDots} label={dict?.footer.feedback}/>
                 </div>
             </div>
+            {isOverlayVisible && <Overlay onClose={handleCloseOverlay} />}
         </main>
     )
 }
