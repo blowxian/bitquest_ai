@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { notifyFeishu, warnFeishu } from '../../lib/notify';
+import {notifyFeishu, warnFeishu} from '../../lib/notify';
 
-const tokens = ['cc06736ef1f11f2e5e739383f8979dd0c3aa6048a8e11ef28aaca83dd751e125', '0a44bf308754e4f61b9ff196bb2c2ff4392094aaeb96c347a6b4e1e320fa0cdf', '43d8345f27283b0b7a389354f55e60269a2d458f8ada529ac26d32f36dcfb002']; // 替换为你的实际 token
+const tokens = ['ca531b0db95f2cf62bf2313d6861023a8c8a27d89b5d61edaeb2378e2a0e0517', '008c561e5429425236f63110cd5b464565bcc2ca868b9a437cb41f50d998654b', 'dc4dfe202fe12cdfe0a6f91713b3f6d080e7de96fc803d087c5ef196e2c59207', '0a44bf308754e4f61b9ff196bb2c2ff4392094aaeb96c347a6b4e1e320fa0cdf', '43d8345f27283b0b7a389354f55e60269a2d458f8ada529ac26d32f36dcfb002', 'cc06736ef1f11f2e5e739383f8979dd0c3aa6048a8e11ef28aaca83dd751e125']; // 替换为你的实际 token
 let currentTokenIndex = 0;
 
 const togetherAIRequest = axios.create({
