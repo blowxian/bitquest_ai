@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { notifyFeishu } from '../../lib/notify';
+import { notifyFeishu, warnFeishu } from '../../lib/notify';
 
 const tokens = ['cc06736ef1f11f2e5e739383f8979dd0c3aa6048a8e11ef28aaca83dd751e125', '0a44bf308754e4f61b9ff196bb2c2ff4392094aaeb96c347a6b4e1e320fa0cdf', '43d8345f27283b0b7a389354f55e60269a2d458f8ada529ac26d32f36dcfb002']; // 替换为你的实际 token
 let currentTokenIndex = 0;
@@ -80,7 +80,7 @@ async function handler(req, res) {
 
         // 检查是否是 token 用完的错误
         if (error.response && error.response.status === 429) {
-            await notifyFeishu(`Token ${tokens[currentTokenIndex]} 已用完，切换到下一个 Token`);
+            await warnFeishu(`Token ${tokens[currentTokenIndex]} 异常，切换到下一个 Token`);
 
             // 切换到下一个 token
             currentTokenIndex = (currentTokenIndex + 1) % tokens.length;
