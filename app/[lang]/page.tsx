@@ -1,3 +1,4 @@
+// /app/[lang]/checkout/page.tsx
 'use client'
 
 import Header from '@/components/Header'
@@ -8,7 +9,6 @@ import LinkButton from "@/components/LinkButton";
 import {SessionProvider} from "next-auth/react";
 import UserMenu from "@/components/UserMenu";
 import {Dictionary, getDictionary} from "@/app/[lang]/dictionaries";
-import Overlay from '@/components/Overlay';
 
 async function fetchDictionary(lang:string) {
     return await getDictionary(lang);
@@ -27,19 +27,9 @@ export default function Page({params}: { params: { lang: string } }) {
             });
     }, [params.lang]);
 
-    const [isOverlayVisible, setIsOverlayVisible] = useState(true);
-
-    const handleOpenOverlay = () => {
-        setIsOverlayVisible(true);
-    };
-
-    const handleCloseOverlay = () => {
-        setIsOverlayVisible(false);
-    };
-
     return (
         <main className="flex min-h-screen flex-col items-center justify-between">
-            <div className="flex justify-center w-full fixed top-0 left-0">
+            <div className="flex justify-center w-full fixed top-0 left-0 z-10">
                 <div className="w-3/4 p-4 flex justify-end">
                     <SessionProvider>
                         <UserMenu/>
@@ -60,7 +50,6 @@ export default function Page({params}: { params: { lang: string } }) {
                                 icon={faCommentDots} label={dict?.footer.feedback}/>
                 </div>
             </div>
-            {isOverlayVisible && <Overlay onClose={handleCloseOverlay} />}
         </main>
     )
 }

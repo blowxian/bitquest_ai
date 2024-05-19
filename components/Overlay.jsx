@@ -1,8 +1,9 @@
 // components/Overlay.jsx
 'use client';
 
-import React, { useEffect } from 'react';
-import { loadStripe, Stripe } from '@stripe/stripe-js';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { loadStripe } from '@stripe/stripe-js';
 
 
 // loadStripe should be called outside the component's render method
@@ -14,7 +15,7 @@ const Overlay = ({ onClose }) => {
         window.open('/checkout', '_blank');
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-6 rounded-lg max-w-lg w-full relative">
                 <button
@@ -60,7 +61,8 @@ const Overlay = ({ onClose }) => {
                     立刻订阅
                 </button>
             </div>
-        </div>
+        </div>,
+        document.body // 确保是 body 或其他不受限的元素
     );
 };
 
