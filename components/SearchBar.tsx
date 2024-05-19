@@ -30,9 +30,7 @@ export default function SearchBar({searchDict}) {
     const hotQuestions = [
         "enable scss in next.js14",
         "What's new in NextJS 14?",
-        "Mistral 8x7B benchmarks",
-        "Quicksort explained with code examples",
-        "python read file line by line"
+        "Mistral 8x7B benchmarks"
     ];
 
     const onSearch = (searchTermsInput: string = '') => {
