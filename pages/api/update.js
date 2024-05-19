@@ -77,17 +77,17 @@ async function handler(req, res) {
 
     } catch (error) {
         console.error('Error communicating with TogetherAI:', error);
+        await warnFeishu(`错误详情: ${error.message || '未知错误'} - Token ${tokens[currentTokenIndex]} 发生错误`);
+
 
         // 检查是否是 token 用完的错误
         if (error.response && error.response.status === 429) {
-            await warnFeishu(`Token ${tokens[currentTokenIndex]} 异常，切换到下一个 Token`);
-
             // 切换到下一个 token
             currentTokenIndex = (currentTokenIndex + 1) % tokens.length;
             togetherAIRequest.defaults.headers['Authorization'] = `Bearer ${tokens[currentTokenIndex]}`;
 
             // 重新调用 handler 函数，传递相同的请求和响应对象
-            handler(req, res);
+            await handler(req, res);
             return;
         }
 
