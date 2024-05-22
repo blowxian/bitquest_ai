@@ -5,9 +5,19 @@ import React, { useEffect, useRef } from 'react';
 
 const CheckoutPage: React.FC = () => {
     const formRef = useRef<HTMLFormElement>(null);
+    const userIdRef = useRef<HTMLInputElement>(null);  // 创建 ref 用于隐藏的用户 ID 输入框
 
     useEffect(() => {
-        // Automatically submit the form when the component mounts
+        // 获取 URL 中的 userId 参数
+        const queryParams = new URLSearchParams(window.location.search);
+        const userId = queryParams.get('userId');
+
+        // 在隐藏的输入字段中设置用户 ID
+        if (userIdRef.current) {
+            userIdRef.current.value = userId || '';
+        }
+
+        // 在组件加载时自动提交表单
         if (formRef.current) {
             formRef.current.submit();
         }
@@ -19,6 +29,7 @@ const CheckoutPage: React.FC = () => {
                 正在跳转<span>.</span><span>.</span><span>.</span>
             </div>
             <form ref={formRef} action="/api/checkout_sessions" method="POST" style={{ display: 'none' }}>
+                <input type="hidden" ref={userIdRef} name="userId" />
                 <button type="submit" role="link">Checkout</button>
             </form>
             <style jsx>{`

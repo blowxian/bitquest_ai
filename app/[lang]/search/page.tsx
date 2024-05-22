@@ -1,3 +1,4 @@
+// /app/[lang]/search/page.tsx
 'use client';
 
 import React, {useState, useEffect, useRef} from "react";
@@ -10,8 +11,10 @@ import {useSearchParams, useRouter} from 'next/navigation';
 import {GoogleCustomSearchResponse} from "@/pages/api/types";
 import TopNavBar from "@/components/TopNavBar";
 import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
+import {SessionProvider} from '@/app/context/sessionContext';  // Adjust the import path as needed
+import Overlay from '@/components/Overlay';
 
-async function fetchDictionary(lang:string) {
+async function fetchDictionary(lang: string) {
     return await getDictionary(lang);
 }
 
@@ -185,9 +188,24 @@ export default function Page({params}: { params: { lang: string } }) {
         };
     }
 
+    const [showOverlay, setShowOverlay] = useState(false);
+
+    useEffect(() => {
+        const searchCount = parseInt(localStorage.getItem('searchCount') || '0');
+        if (searchCount >= 3) {
+            // 显示浮层
+            setShowOverlay(true);
+            localStorage.setItem('searchCount', '0');  // 重置计数
+        }
+    }, [searchParams]);
+
     const handleSearch = (searchTermsInput: string = '') => {
+        if (searchTerms || searchTermsInput) {
+            const currentCount = parseInt(localStorage.getItem('searchCount') || '0');
+            localStorage.setItem('searchCount', (currentCount + 1).toString());
+        }
         // 更新 URL，这里将触发 useSearchParams 的变化
-        router.push(`/search?q=${encodeURIComponent(searchTermsInput === '' ? searchTerms : searchTermsInput)}`);
+        router.push(`/${params.lang}/search?q=${encodeURIComponent(searchTermsInput === '' ? searchTerms : searchTermsInput)}`);
         if (searchInputRef.current) {
             searchInputRef.current.blur();
         }
@@ -260,12 +278,14 @@ export default function Page({params}: { params: { lang: string } }) {
         <div className="flex min-h-screen">
 
             {/* 使用 TopNavBar 组件 */}
-            <TopNavBar
-                searchTerms={searchTerms}
-                setSearchTerms={setSearchTerms}
-                onSearch={() => handleSearch(searchTerms)}
-                searchInputRef={searchInputRef}
-            />
+            <SessionProvider>
+                <TopNavBar
+                    searchTerms={searchTerms}
+                    setSearchTerms={setSearchTerms}
+                    onSearch={() => handleSearch(searchTerms)}
+                    searchInputRef={searchInputRef}
+                />
+            </SessionProvider>
 
             {/*主内容区*/}
             <div className="flex-1 mx-auto sm:p-4 pt-14 sm:pt-24 text-customBlackText max-w-6xl">
@@ -305,6 +325,7 @@ export default function Page({params}: { params: { lang: string } }) {
                     </div>
                 ))}
             </div>
+            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} />}
         </div>
     )
 }

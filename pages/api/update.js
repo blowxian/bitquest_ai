@@ -1,35 +1,11 @@
+// /pages/api/update.js
 import axios from 'axios';
+import Cookie from 'cookie';
+import models from '../../lib/models'; // 确保正确引入 models
 import { notifyFeishu } from '../../lib/notify';
 
 const tokens = ['cc06736ef1f11f2e5e739383f8979dd0c3aa6048a8e11ef28aaca83dd751e125', '0a44bf308754e4f61b9ff196bb2c2ff4392094aaeb96c347a6b4e1e320fa0cdf', '43d8345f27283b0b7a389354f55e60269a2d458f8ada529ac26d32f36dcfb002']; // 替换为你的实际 token
 let currentTokenIndex = 0;
-
-// 对外可以免费提供服务的模型
-const modelListFree = {
-    gemma_2b_it: 'google/gemma-2b-it',                          // $0.1/M token
-    gemma_7b_it: 'google/gemma-7b-it',                          // $0.2/M token
-    llama_3_8b: 'meta-llama/Llama-3-8b-chat-hf',                // $0.2/M token
-    qwen_4b: 'Qwen/Qwen1.5-4B-Chat',                            // $0.1/M token
-    qwen_7b: 'Qwen/Qwen1.5-7B-Chat',                            // $0.2/M token
-    qwen_14b: 'Qwen/Qwen1.5-14B-Chat',                          // $0.3/M token
-    mistral_7b_v1: 'mistralai/Mistral-7B-Instruct-v0.1',        // $0.1/M token
-    mistral_7b_v2: 'mistralai/Mistral-7B-Instruct-v0.2'         // $0.2/M token
-};
-
-// 性价比还行的模型
-const modelListPro = {
-    llama_3_70b: 'meta-llama/Llama-3-70b-chat-hf',              // $0.9/M token
-    qwen_32b: 'Qwen/Qwen1.5-32B-Chat',                          // $0.8/M token
-    qwen_72b: 'Qwen/Qwen1.5-72B-Chat',                          // $0.9/M token
-    mixtral_8x7b: 'mistralai/Mixtral-8x7B-Instruct-v0.1'        // $0.6/M token
-};
-
-// 太贵的模型
-const modelListUltra = {
-    mixtral_8x22b: 'mistralai/Mixtral-8x22B-Instruct-v0.1',     // $1.2/M token
-    qwen_110b: 'Qwen/Qwen1.5-110B-Chat',                        // $1.8/M token
-    snowflake_arctic: 'Snowflake/snowflake-arctic-instruct'     // $2.4/M token
-};
 
 const togetherAIRequest = axios.create({
     baseURL: 'https://api.together.xyz',
@@ -42,6 +18,13 @@ const togetherAIRequest = axios.create({
 
 async function handler(req, res) {
     try {
+        // 从请求中读取 cookie
+        const cookies = Cookie.parse(req.headers.cookie || '');
+        const selectedModelKey = cookies.selectedModel;
+
+        // 根据 cookie 中的模型信息或默认模型选择模型
+        const selectedModel = models[selectedModelKey] || models.gemma_2b_it; // 使用默认模型，如果 cookie 中没有有效的模型信息
+
         await notifyFeishu(`Token ${tokens[currentTokenIndex]} 正在使用，使用详情如下：
             model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
             prompt: "{}<human>: " + ${req.query.prompt} + "\\n\\n<expert>:",
@@ -50,7 +33,7 @@ async function handler(req, res) {
         // 向 TogetherAI 发送请求
         const response = await togetherAIRequest.post('/inference', {
             // TogetherAI API 请求体
-            model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+            model: selectedModel.identifier,
             prompt: "{}<human>: " + req.query.prompt + "\n\n<expert>:",
             max_tokens: req.query.max_token ? +req.query.max_token : 2048,
             stop: '[/INST],</s>',

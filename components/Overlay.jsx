@@ -3,16 +3,19 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { loadStripe } from '@stripe/stripe-js';
+import {useSessionContext} from '../app/context/sessionContext';
 
+const Overlay = ({onClose}) => {
+    const {data: session} = useSessionContext();
+    const userId = session?.user?.id;
 
-// loadStripe should be called outside the component's render method
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
-
-const Overlay = ({ onClose }) => {
     const handleSubscribeClick = () => {
-        // Open a new window or tab. Adjust URL as necessary.
-        window.open('/checkout', '_blank');
+        // 检查用户是否登录，如果登录，携带用户 ID
+        if (userId) {
+            window.open(`/checkout?userId=${userId}`, '_blank');
+        } else {
+            window.open('/checkout', '_blank'); // 如果无用户 ID，正常打开不带参数的链接
+        }
     };
 
     return ReactDOM.createPortal(

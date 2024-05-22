@@ -1,25 +1,26 @@
+// /pages/api/checkout_sessions.js
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
+        const { userId } = req.body;  // 获取 POST 请求体中的 userId
+
         try {
             // Create Checkout Sessions from body params.
             const session = await stripe.checkout.sessions.create({
                 line_items: [
                     {
-                        price_data: {
-                            currency: 'usd',
-                            product_data: {
-                                name: 'T-shirt',
-                            },
-                            unit_amount: 2000,
-                        },
+                        price: 'price_1PIQogRsqc5wnJW1xexJ5tSB',
                         quantity: 1,
                     },
                 ],
-                mode: 'payment',
-                success_url: `${req.headers.origin}/?success=true`,
-                cancel_url: `${req.headers.origin}/?canceled=true`,
+                mode: 'subscription',
+                success_url: `${req.headers.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${req.headers.origin}/checkout/canceled`,
+                automatic_tax: {enabled: true},
+                metadata: {
+                    userId: userId  // 将 userId 添加到 metadata 中
+                }
             });
             res.redirect(303, session.url);
         } catch (err) {
