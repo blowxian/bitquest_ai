@@ -19,6 +19,7 @@ export default NextAuth({
         }),
         // 可以添加更多的社交媒体登录提供者
     ],
+    session: { strategy: 'jwt' },
     // 配置数据库来存储会话、用户等信息
     // database: process.env.DATABASE_URL,
     // 可以添加更多配置项

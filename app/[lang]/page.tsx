@@ -23,19 +23,19 @@ export default function Page({params}) {
 
     return (
         <SessionProvider>
-            <main className="flex min-h-screen flex-col items-center justify-between">
-                <div className="flex justify-center w-full fixed top-0 left-0 z-10">
-                    <div className="w-3/4 p-4 flex justify-end">
-                        <UserMenu lang={params.lang}/>
-                    </div>
+            <div className="flex justify-center w-full fixed top-0 left-0 z-10">
+                <div className="w-3/4 p-4 flex justify-end">
+                    <UserMenu lang={params.lang}/>
                 </div>
-                <div className="w-full items-center justify-between flex flex-col sm:px-8">
+            </div>
+            <main className="flex flex-col items-center justify-center min-h-screen w-full pt-24"> {/* 添加 pt-24 来防止内容被遮挡 */}
+                <div className="w-full items-center justify-center flex flex-col sm:px-8">
                     <Header headerDict={dict?.header}/>
                     <Suspense fallback={<div>Loading...</div>}>
                         <SearchBar searchDict={dict?.search} lang={params.lang}/>
                     </Suspense>
                 </div>
-                <div className="mb-32 text-center w-full sm:mb-2">
+                <div className="text-center w-full mt-8">
                     <div className="flex justify-center space-x-4 text-sm">
                         <LinkButton href="/blog" icon={faBlog} label={dict?.footer.blog}/>
                         <LinkButton href="/blog/forums/" icon={faComments} label={dict?.footer.forum}/>
@@ -47,4 +47,3 @@ export default function Page({params}) {
         </SessionProvider>
     );
 }
-

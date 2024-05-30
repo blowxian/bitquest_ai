@@ -1,9 +1,9 @@
-// 站点通用头部菜单
+// /components/Header.jsx
 import Image from "next/image";
 
 const Header = ({headerDict}) => {
     return (
-        <header className="pb-6 w-full mt-52 sm:mt-72 flex flex-col items-center">
+        <header className="pb-6 w-full flex flex-col items-center">
             <div className="px-4 sm:px-8 h-20">
                 <a href="/" title={headerDict?.slogan}>
                     <Image

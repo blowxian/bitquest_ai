@@ -6,15 +6,18 @@ import React, { useEffect, useRef } from 'react';
 const CheckoutPage: React.FC = () => {
     const formRef = useRef<HTMLFormElement>(null);
     const userIdRef = useRef<HTMLInputElement>(null);  // 创建 ref 用于隐藏的用户 ID 输入框
+    const planRef = useRef<HTMLInputElement>(null);    // 创建 ref 用于隐藏的 plan 输入框
 
     useEffect(() => {
-        // 获取 URL 中的 userId 参数
+        // 获取 URL 中的 userId 和 plan 参数
         const queryParams = new URLSearchParams(window.location.search);
         const userId = queryParams.get('userId');
+        const plan = queryParams.get('plan');
 
-        // 在隐藏的输入字段中设置用户 ID
-        if (userIdRef.current) {
+        // 在隐藏的输入字段中设置用户 ID 和 plan
+        if (userIdRef.current && planRef.current) {
             userIdRef.current.value = userId || '';
+            planRef.current.value = plan || '';
         }
 
         // 在组件加载时自动提交表单
@@ -26,10 +29,11 @@ const CheckoutPage: React.FC = () => {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
             <div className="redirecting">
-                正在跳转<span>.</span><span>.</span><span>.</span>
+                Redirecting&nbsp;<span>.</span><span>.</span><span>.</span>
             </div>
             <form ref={formRef} action="/api/checkout_sessions" method="POST" style={{ display: 'none' }}>
                 <input type="hidden" ref={userIdRef} name="userId" />
+                <input type="hidden" ref={planRef} name="plan" />
                 <button type="submit" role="link">Checkout</button>
             </form>
             <style jsx>{`
