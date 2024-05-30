@@ -2,9 +2,9 @@
 import axios from 'axios';
 import Cookie from 'cookie';
 import models from '../../lib/models'; // 确保正确引入 models
-import { notifyFeishu } from '../../lib/notify';
+import {notifyFeishu, warnFeishu} from '../../lib/notify';
 
-const tokens = ['cc06736ef1f11f2e5e739383f8979dd0c3aa6048a8e11ef28aaca83dd751e125', '0a44bf308754e4f61b9ff196bb2c2ff4392094aaeb96c347a6b4e1e320fa0cdf', '43d8345f27283b0b7a389354f55e60269a2d458f8ada529ac26d32f36dcfb002']; // 替换为你的实际 token
+const tokens = ['ca531b0db95f2cf62bf2313d6861023a8c8a27d89b5d61edaeb2378e2a0e0517', '008c561e5429425236f63110cd5b464565bcc2ca868b9a437cb41f50d998654b', 'dc4dfe202fe12cdfe0a6f91713b3f6d080e7de96fc803d087c5ef196e2c59207', '0a44bf308754e4f61b9ff196bb2c2ff4392094aaeb96c347a6b4e1e320fa0cdf', '43d8345f27283b0b7a389354f55e60269a2d458f8ada529ac26d32f36dcfb002', 'cc06736ef1f11f2e5e739383f8979dd0c3aa6048a8e11ef28aaca83dd751e125']; // 替换为你的实际 token
 let currentTokenIndex = 0;
 
 const togetherAIRequest = axios.create({
@@ -23,10 +23,10 @@ async function handler(req, res) {
         const selectedModelKey = cookies.selectedModel;
 
         // 根据 cookie 中的模型信息或默认模型选择模型
-        const selectedModel = models[selectedModelKey] || models.gemma_2b_it; // 使用默认模型，如果 cookie 中没有有效的模型信息
+        const selectedModel = models[selectedModelKey] || models.mistral_7b_v2; // 使用默认模型，如果 cookie 中没有有效的模型信息
 
         await notifyFeishu(`Token ${tokens[currentTokenIndex]} 正在使用，使用详情如下：
-            model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+            model: selectedModel.identifier,
             prompt: "{}<human>: " + ${req.query.prompt} + "\\n\\n<expert>:",
         `);
 
@@ -87,17 +87,17 @@ async function handler(req, res) {
 
     } catch (error) {
         console.error('Error communicating with TogetherAI:', error);
+        await warnFeishu(`错误详情: ${error.message || '未知错误'} - Token ${tokens[currentTokenIndex]} 发生错误`);
+
 
         // 检查是否是 token 用完的错误
         if (error.response && error.response.status === 429) {
-            await notifyFeishu(`Token ${tokens[currentTokenIndex]} 已用完，切换到下一个 Token`);
-
             // 切换到下一个 token
             currentTokenIndex = (currentTokenIndex + 1) % tokens.length;
             togetherAIRequest.defaults.headers['Authorization'] = `Bearer ${tokens[currentTokenIndex]}`;
 
             // 重新调用 handler 函数，传递相同的请求和响应对象
-            handler(req, res);
+            await handler(req, res);
             return;
         }
 
