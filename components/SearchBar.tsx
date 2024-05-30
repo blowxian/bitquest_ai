@@ -9,6 +9,7 @@ import HotQuestionCard from './HotQuestionCard';
 import {useSessionContext} from '@/app/context/sessionContext';
 import models from '@/lib/models';
 import Cookie from 'js-cookie';
+import Overlay from './Overlay'; // Ensure Overlay is imported
 
 export default function SearchBar({searchDict, lang}) {
     const searchParams = useSearchParams();
@@ -18,6 +19,8 @@ export default function SearchBar({searchDict, lang}) {
     const {data: session, status} = useSessionContext();
     const loading = status === "loading";
     const [isPro, setIsPro] = useState(false);
+    const [selectedModel, setSelectedModel] = useState('');
+    const [showOverlay, setShowOverlay] = useState(false);
 
     useEffect(() => {
         if (!loading && session) {
@@ -49,13 +52,26 @@ export default function SearchBar({searchDict, lang}) {
         console.log("Updated isPro:", isPro);  // This logs the updated state after changes
     }, [isPro]); // Dependency array includes isPro
 
+
     const getAvailableModels = () => {
-        // 如果是 Pro 用户，返回 free 和 pro 层级的模型
-        if (isPro) {
-            return Object.entries(models).filter(([key, value]) => value.tier === 'free' || value.tier === 'pro');
+        return Object.entries(models).map(([key, model]) => ({
+            key,
+            name: `${model.name || model.identifier.split('/')[1]}${!isPro && model.tier === 'pro' ? ' (Pro)' : ''}`
+        }));
+    };
+
+    const handleModelSelection = (e) => {
+        const newModelKey = e.target.value;
+        const modelTier = models[newModelKey].tier;
+
+        if (modelTier === 'pro' && !isPro) {
+            setShowOverlay(true);
+            e.target.value = selectedModel; // Prevent change
+            return;
         }
-        // 否则，只返回 free 层级的模型
-        return Object.entries(models).filter(([key, value]) => value.tier === 'free');
+
+        setSelectedModel(newModelKey);
+        Cookie.set('selectedModel', newModelKey, { expires: 30 });
     };
 
 
@@ -123,9 +139,11 @@ export default function SearchBar({searchDict, lang}) {
             <div className="flex-1 sm:mx-4 flex items-center relative w-full">
                 <div className="relative flex items-center">
                     <select
-                        className="bg-gray-700 text-white appearance-none rounded-l-full pl-10 pr-1.5 py-2 h-20 outline-none absolute top-[-2.5rem] left-0 w-[7.5rem] overflow-hidden">
-                        {getAvailableModels().map(([key, model]) => (
-                            <option key={key} value={key}>{model.identifier.split('/')[1]}</option>
+                        value={selectedModel}
+                        onChange={handleModelSelection}
+                        className="bg-gray-700 text-white appearance-none rounded-l-full pl-10 pr-1.5 py-2 h-20 outline-none absolute top-[-2.5rem] left-0 w-[11.5rem] overflow-hidden">
+                        {getAvailableModels().map(({key, name}) => (
+                            <option key={key} value={key}>{name}</option>
                         ))}
                     </select>
                     <FontAwesomeIcon
@@ -138,7 +156,7 @@ export default function SearchBar({searchDict, lang}) {
                     ref={inputRef}
                     type="search"
                     placeholder={searchDict?.placeholder}
-                    className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-32 pr-28 w-full outline-none focus:ring-0"
+                    className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-[11.5rem] pr-28 w-full outline-none focus:ring-0"
                     onKeyUp={(e) => {
                         handleSearch(e);
                     }}
@@ -151,8 +169,7 @@ export default function SearchBar({searchDict, lang}) {
                     </button>
                 </div>
             </div>
-
-
+            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={lang?.toLowerCase() || 'en'} />}
             <div className="flex flex-wrap justify-center pt-2">
                 {hotQuestions.map((question, index) => (
                     <HotQuestionCard

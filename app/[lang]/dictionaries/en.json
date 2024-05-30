@@ -11,6 +11,34 @@
     "detailedAnswerRequest": "Based on the above search results and your knowledge, please provide a comprehensive English answer about ${searchTerms} in Markdown format and clearly mark the referenced parts. Format as: add [[Ref X]] after citing relevant information, where X is the search result number.",
     "userSuggestionPrompt": "Based on the user's previous search content: \"{searchTerms}\", provide four closely related and potentially interesting English search topics or questions. Ensure each topic or question is controlled within 15 characters, and only reply with a list formatted as ['Topic1', 'Topic2', 'Topic3', 'Topic4']. No other information should be included. Please reply only once and ensure the reply contains only this list."
   },
+  "overlay": {
+    "title": "Pro Subscription",
+    "models": {
+      "llama_70b": {
+        "name": "Llama Apex",
+        "description": "Llama Apex delivers advanced language understanding and generation capabilities, optimized for tasks requiring high efficiency and exceptional quality."
+      },
+      "qwen_32b": {
+        "name": "Qwen Nexus",
+        "description": "Qwen Nexus balances cost and performance perfectly, suited for diverse complex tasks with efficient contextual understanding."
+      },
+      "qwen_72b": {
+        "name": "Qwen Summit",
+        "description": "Qwen Summit handles more complex tasks with high precision and detailed responses, ideal for high-demand applications."
+      },
+      "mixtral_8x7b": {
+        "name": "Mixtral Octaweave",
+        "description": "Mixtral Octaweave leverages the synergistic effects of multiple models to deliver powerful composite performance, suitable for a wide range of business and research applications."
+      }
+    },
+    "subscriptionInfo": {
+      "monthly": "$8 billed monthly",
+      "yearly": "$40 billed annually",
+      "save": "Save $56"
+    },
+    "subscribeMonthlyButton": "Subscribe Monthly",
+    "subscribeYearlyButton": "Subscribe Yearly"
+  },
   "footer": {
     "blog": "Blog",
     "forum": "Forum",

@@ -11,6 +11,34 @@
     "detailedAnswerRequest": "ऊपर दिए गए खोज परिणामों और आपके ज्ञान के आधार पर, कृपया ${searchTerms} के बारे में एक व्यापक हिंदी उत्तर प्रदान करें, Markdown प्रारूप में संरचनात्मक आउटपुट का उपयोग करें और उत्तर में संदर्भित भागों को स्पष्ट रूप से चिह्नित करें। प्रारूप के रूप में: संबंधित जानकारी का हवाला देने के बाद [[Ref X]] जोड़ें, जहां X खोज परिणाम संख्या है।",
     "userSuggestionPrompt": "Based on the user's previous search content: \"{searchTerms}\", please provide four closely related and potentially interesting search topics or questions in Hindi. Ensure each Hindi topic or question is controlled within 15 characters, and only reply with a list formatted as ['विषय1', 'विषय2', 'विषय3', 'विषय4']. No other information should be included. Please reply only once and ensure the reply contains only this list."
   },
+  "overlay": {
+    "title": "प्रो सदस्यता",
+    "models": {
+      "llama_70b": {
+        "name": "लामा एपेक्स",
+        "description": "लामा एपेक्स उन्नत भाषा समझने और जनरेशन क्षमताओं को प्रदान करता है, जिसे उच्च दक्षता और असाधारण गुणवत्ता की आवश्यकता वाले कार्यों के लिए अनुकूलित किया गया है।"
+      },
+      "qwen_32b": {
+        "name": "क्वेन नेक्सस",
+        "description": "क्वेन नेक्सस लागत और प्रदर्शन को पूर्णतः संतुलित करता है, जो विविध जटिल कार्यों के लिए उपयुक्त है जिसमें कुशल संदर्भिक समझ आवश्यक होती है।"
+      },
+      "qwen_72b": {
+        "name": "क्वेन समिट",
+        "description": "क्वेन समिट अधिक जटिल कार्यों को उच्च परिशुद्धता और विस्तृत प्रतिक्रियाओं के साथ संभालता है, जो उच्च मांग वाले अनुप्रयोगों के लिए आदर्श है।"
+      },
+      "mixtral_8x7b": {
+        "name": "मिक्सट्रल ऑक्टावीव",
+        "description": "मिक्सट्रल ऑक्टावीव कई मॉडलों के सहक्रियात्मक प्रभावों का उपयोग करके शक्तिशाली समग्र प्रदर्शन प्रदान करता है, जो व्यापार और अनुसंधान अनुप्रयोगों की व्यापक श्रेणी के लिए उपयुक्त है।"
+      }
+    },
+    "subscriptionInfo": {
+      "monthly": "प्रति माह $8 बिल किया गया",
+      "yearly": "प्रति वर्ष $40 बिल किया गया",
+      "save": "$56 की बचत करें"
+    },
+    "subscribeMonthlyButton": "मासिक सदस्यता लें",
+    "subscribeYearlyButton": "वार्षिक सदस्यता लें"
+  },
   "footer": {
     "blog": "ब्लॉग",
     "forum": "मंच",

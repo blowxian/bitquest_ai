@@ -7,7 +7,7 @@ import {faXTwitter, faGoogle} from "@fortawesome/free-brands-svg-icons";
 import Overlay from '@/components/Overlay';
 import {useSessionContext} from '@/app/context/sessionContext';
 
-const UserMenu = ({loginBtnHoverColorClass = ''}) => {
+const UserMenu = ({loginBtnHoverColorClass = '', lang = 'en'}) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = useCallback(() => setIsMenuOpen(!isMenuOpen), [isMenuOpen]);
     const menuRef = useRef(null);
@@ -87,7 +87,7 @@ const UserMenu = ({loginBtnHoverColorClass = ''}) => {
                         onClick={() => signIn('google')}><FontAwesomeIcon icon={faGoogle}/></button>
                 </>
             )}
-            {isOverlayVisible && <Overlay onClose={handleCloseOverlay}/>}
+            {isOverlayVisible && <Overlay onClose={handleCloseOverlay} lang={lang?.toLowerCase() || 'en'} />}
         </div>
     );
 };

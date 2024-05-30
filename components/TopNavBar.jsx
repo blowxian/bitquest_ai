@@ -7,11 +7,14 @@ import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {useSessionContext} from "@/app/context/sessionContext";
 import models from '@/lib/models';
 import Cookie from 'js-cookie';
+import Overlay from './Overlay'; // 引入 Overlay 组件
 
-const TopNavBar = ({searchTerms, setSearchTerms, onSearch, searchInputRef}) => {
+const TopNavBar = ({searchTerms, setSearchTerms, onSearch, searchInputRef, lang}) => {
     const {data: session, status} = useSessionContext();
     const loading = status === "loading";
     const [isPro, setIsPro] = useState(false);
+    const [selectedModel, setSelectedModel] = useState('');
+    const [showOverlay, setShowOverlay] = useState(false); // 新增状态控制 Overlay 的显示
 
     useEffect(() => {
         if (!loading && session) {
@@ -42,18 +45,24 @@ const TopNavBar = ({searchTerms, setSearchTerms, onSearch, searchInputRef}) => {
     }, []);
 
     const getAvailableModels = () => {
-        // 如果是 Pro 用户，返回 free 和 pro 层级的模型
-        if (isPro) {
-            return Object.entries(models).filter(([key, value]) => value.tier === 'free' || value.tier === 'pro');
-        }
-        // 否则，只返回 free 层级的模型
-        return Object.entries(models).filter(([key, value]) => value.tier === 'free');
+        return Object.entries(models).map(([key, value]) => ({
+            key,
+            name: `${value.name || value.identifier.split('/')[1]}${!isPro && value.tier === 'pro' ? ' (Pro)' : ''}`
+        }));
     };
 
     const handleModelChange = (event) => {
-        const selectedModel = event.target.value;
-        Cookie.set('selectedModel', selectedModel, { expires: 30 }); // Cookie 过期时间为 7 天
-        // 其他可能的处理逻辑
+        const newSelectedModel = event.target.value;
+        const modelTier = models[newSelectedModel].tier;
+
+        if (modelTier === 'pro' && !isPro) {
+            setShowOverlay(true);
+            event.target.value = selectedModel; // 保持选择不变
+            return;
+        }
+
+        setSelectedModel(newSelectedModel);
+        Cookie.set('selectedModel', newSelectedModel, { expires: 30 });
     };
 
     return (
@@ -62,21 +71,23 @@ const TopNavBar = ({searchTerms, setSearchTerms, onSearch, searchInputRef}) => {
                 <a href="/" className="hidden sm:flex text-customWhite2 text-2xl font-semibold mr-16">Phind AI</a>
                 <div className="relative">
                     <select
-                        className="bg-customBlack text-white appearance-none pl-0 pr-[1.5rem] py-2 h-10 w-[6rem] overflow-hidden outline-none"
+                        value={selectedModel}
+                        className="bg-customBlack text-white appearance-none pl-0 pr-0 py-2 h-10 w-[9.5rem] overflow-hidden outline-none"
                         onChange={handleModelChange}>
-                        {getAvailableModels().map(([key, model]) => (
-                            <option key={key} value={key}>{model.identifier.split('/')[1]}</option>
+                        {getAvailableModels().map((model) => (
+                            <option key={model.key} value={model.key}>{model.name}</option>
                         ))}
                     </select>
                     <FontAwesomeIcon
                         icon={faChevronDown}
-                        className="text-white inset-y-0 pointer-events-none absolute left-[5rem] top-3"
+                        className="text-white inset-y-0 pointer-events-none absolute left-[8.5rem] top-3"
                     />
                 </div>
                 <SearchInput searchTerms={searchTerms} setSearchTerms={setSearchTerms} onSearch={onSearch}
                              searchInputRef={searchInputRef}/>
-                <UserMenu loginBtnHoverColorClass={"hover:text-customWhite"}/>
+                <UserMenu loginBtnHoverColorClass={"hover:text-customWhite"} lang={lang?.toLowerCase() || 'en'}/>
             </div>
+            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={lang?.toLowerCase() || 'en'} />}
         </div>
     );
 };

@@ -26,7 +26,7 @@ export default function Page({params}) {
             <main className="flex min-h-screen flex-col items-center justify-between">
                 <div className="flex justify-center w-full fixed top-0 left-0 z-10">
                     <div className="w-3/4 p-4 flex justify-end">
-                        <UserMenu/>
+                        <UserMenu lang={params.lang}/>
                     </div>
                 </div>
                 <div className="w-full items-center justify-between flex flex-col sm:px-8">

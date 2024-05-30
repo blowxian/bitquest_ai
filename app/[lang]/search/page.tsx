@@ -284,6 +284,7 @@ export default function Page({params}: { params: { lang: string } }) {
                     setSearchTerms={setSearchTerms}
                     onSearch={() => handleSearch(searchTerms)}
                     searchInputRef={searchInputRef}
+                    lang={params.lang?.toLowerCase() || 'en'}
                 />
             </SessionProvider>
 
@@ -325,7 +326,7 @@ export default function Page({params}: { params: { lang: string } }) {
                     </div>
                 ))}
             </div>
-            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} />}
+            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={params.lang?.toLowerCase() || 'en'} />}
         </div>
     )
 }

@@ -11,6 +11,34 @@
     "detailedAnswerRequest": "结合上述搜索结果和你的知识，请提供关于${searchTerms}的综合性中文答案，用 Markdown 格式结构化输出，并在回复中明确标注引用的部分。格式为：在引用相关信息后加上[[Ref X]]，其中X是搜索结果的序号。",
     "userSuggestionPrompt": "根据用户之前的搜索内容：“{searchTerms}”，请提供四个紧密相关的、用户可能感兴趣的中文搜索话题或问题。请确保每个话题或问题控制在15个汉字内，并且仅回复一个格式为['话题1', '话题2', '话题3', '话题4']的列表。除此之外不需要包含任何其他信息。请仅回复一次并且确保回复仅包含这个列表。"
   },
+  "overlay": {
+    "title": "Pro 订阅",
+    "models": {
+      "llama_70b": {
+        "name": "Llama Apex",
+        "description": "Llama Apex 提供高级语言理解和生成能力，专为需要高效率和卓越质量的任务优化。"
+      },
+      "qwen_32b": {
+        "name": "Qwen Nexus",
+        "description": "Qwen Nexus 完美平衡成本和性能，适合需要高效上下文理解的各种复杂任务。"
+      },
+      "qwen_72b": {
+        "name": "Qwen Summit",
+        "description": "Qwen Summit 处理更复杂的任务，提供高精度和详细的回应，非常适合高需求的应用场景。"
+      },
+      "mixtral_8x7b": {
+        "name": "Mixtral Octaweave",
+        "description": "Mixtral Octaweave 利用多个模型的协同效应，提供强大的综合性能，适合广泛的商业和研究应用。"
+      }
+    },
+    "subscriptionInfo": {
+      "monthly": "每月 $8",
+      "yearly": "每年 $40",
+      "save": "节省 $56"
+    },
+    "subscribeMonthlyButton": "按月订阅",
+    "subscribeYearlyButton": "按年订阅"
+  },
   "footer": {
     "blog": "博客",
     "forum": "论坛",
