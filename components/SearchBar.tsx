@@ -141,14 +141,14 @@ export default function SearchBar({searchDict, lang}) {
                     <select
                         value={selectedModel}
                         onChange={handleModelSelection}
-                        className="bg-gray-700 text-white appearance-none rounded-l-full pl-10 pr-1.5 py-2 h-20 outline-none absolute top-[-2.5rem] left-0 w-[11.5rem] overflow-hidden">
+                        className="bg-customWhite sm:bg-gray-700 bg-opacity-0 text-sm sm:text-base text-customBlackText sm:text-white appearance-none rounded-l-full pl-10 pr-1.5 py-2 h-20 outline-none absolute top-[-6.5rem] sm:top-[-2.5rem] left-0 w-[11.5rem] overflow-hidden">
                         {getAvailableModels().map(({key, name}) => (
                             <option key={key} value={key}>{name}</option>
                         ))}
                     </select>
                     <FontAwesomeIcon
                         icon={faChevronDown}
-                        className="text-gray-400 absolute inset-y-0 pointer-events-none top-[-0.5rem] h-4 left-[1rem]"
+                        className="text-gray-400 text-xs sm:text-base absolute inset-y-0 pointer-events-none top-[-4.4rem] sm:top-[-0.5rem] h-4 left-[1rem]"
                     />
                 </div>
 
@@ -156,7 +156,7 @@ export default function SearchBar({searchDict, lang}) {
                     ref={inputRef}
                     type="search"
                     placeholder={searchDict?.placeholder}
-                    className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-[11.5rem] pr-28 w-full outline-none focus:ring-0"
+                    className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-[2.5rem] sm:pl-[11.5rem] sm:pr-28 w-full outline-none focus:ring-0"
                     onKeyUp={(e) => {
                         handleSearch(e);
                     }}

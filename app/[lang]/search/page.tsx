@@ -289,7 +289,7 @@ export default function Page({params}: { params: { lang: string } }) {
             </SessionProvider>
 
             {/*主内容区*/}
-            <div className="flex-1 mx-auto sm:p-4 pt-14 sm:pt-24 text-customBlackText max-w-6xl">
+            <div className="flex-1 mx-auto sm:p-4 pt-20 sm:pt-24 text-customBlackText max-w-6xl">
                 {/* 迭代搜索结果 */}
                 {searchResults.map((result, index) => (
                     <div key={index}

@@ -11,7 +11,7 @@ const SearchInput = ({searchTerms, setSearchTerms, onSearch, searchInputRef}) =>
     };
 
     return (
-        <div className="flex-1 mx-2 sm:mx-4 flex items-center relative w-3/4">
+        <div className="flex-1 mx-4 sm:mx-4 flex items-center absolute sm:relative top-12 sm:top-0 w-5/6">
             <input
                 ref={searchInputRef}
                 type="text"

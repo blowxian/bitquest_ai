@@ -67,7 +67,7 @@ const TopNavBar = ({searchTerms, setSearchTerms, onSearch, searchInputRef, lang}
 
     return (
         <div className="fixed left-1/2 transform -translate-x-1/2 p-0 sm:p-4 w-full z-20 sm:max-w-6xl">
-            <div className="bg-customBlack sm:rounded-lg p-4 w-full flex items-center justify-between shadow">
+            <div className="bg-customBlack sm:rounded-lg pt-0 pb-14 px-4 sm:p-4 w-full flex items-center justify-between shadow">
                 <a href="/" className="hidden sm:flex text-customWhite2 text-2xl font-semibold mr-16">Phind AI</a>
                 <div className="relative">
                     <select
