@@ -12,6 +12,8 @@ ENV NODE_ENV=${NODE_ENV}
 COPY package*.json ./
 COPY prisma ./prisma/
 
+RUN npm cache clean --force
+
 # Install dependencies
 RUN npm install
 

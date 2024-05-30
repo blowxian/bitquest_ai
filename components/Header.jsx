@@ -8,7 +8,7 @@ const Header = ({headerDict}) => {
                 <a href="/" title={headerDict?.slogan}>
                     <Image
                         className="w-auto h-12 sm:h-16"
-                        src="/img/phind_ai_alter_logo.svg"
+                        src="/img/coogle_ai_logo.svg"
                         width={140}
                         height={27}
                         alt=""
@@ -16,7 +16,8 @@ const Header = ({headerDict}) => {
                     />
                 </a>
             </div>
-            <p className="hidden sm:block text-center text-gray-400 text-sm">{headerDict?.slogan}</p>
+            <h1 className="text-xl">phind ai cheap alternative</h1>
+            <h2 className="hidden sm:block text-center text-gray-400 text-xs mt-2">Make AI Search Affordable For Everyone,Everywhere</h2>
         </header>
     )
 }
