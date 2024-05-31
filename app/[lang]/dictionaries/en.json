@@ -16,19 +16,19 @@
     "models": {
       "llama_70b": {
         "name": "Llama Apex",
-        "description": "Llama Apex delivers advanced language understanding and generation capabilities, optimized for tasks requiring high efficiency and exceptional quality."
+        "description": "Advanced language understanding and generation."
       },
       "qwen_32b": {
         "name": "Qwen Nexus",
-        "description": "Qwen Nexus balances cost and performance perfectly, suited for diverse complex tasks with efficient contextual understanding."
+        "description": "Balanced cost and performance for complex tasks."
       },
       "qwen_72b": {
         "name": "Qwen Summit",
-        "description": "Qwen Summit handles more complex tasks with high precision and detailed responses, ideal for high-demand applications."
+        "description": "High precision for demanding applications."
       },
       "mixtral_8x7b": {
         "name": "Mixtral Octaweave",
-        "description": "Mixtral Octaweave leverages the synergistic effects of multiple models to deliver powerful composite performance, suitable for a wide range of business and research applications."
+        "description": "Synergistic models for business and research."
       }
     },
     "subscriptionInfo": {
