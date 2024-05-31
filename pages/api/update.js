@@ -26,7 +26,7 @@ async function handler(req, res) {
         const selectedModel = models[selectedModelKey] || models.mistral_7b_v2; // 使用默认模型，如果 cookie 中没有有效的模型信息
 
         await notifyFeishu(`Token ${tokens[currentTokenIndex]} 正在使用，使用详情如下：
-            model: selectedModel.identifier,
+            model: ${selectedModel.identifier},
             prompt: "{}<human>: " + ${req.query.prompt} + "\\n\\n<expert>:",
         `);
 

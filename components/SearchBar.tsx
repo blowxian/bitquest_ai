@@ -134,7 +134,7 @@ export default function SearchBar({searchDict, lang}) {
     }, []);
 
     return (
-        <div className={"w-3/4 max-w-6xl"}>
+        <div className={"w-3/4 max-w-6xl mt-3"}>
             {/* 中间搜索框 */}
             <div className="flex-1 sm:mx-4 flex items-center relative w-full">
                 <div className="relative flex items-center">
