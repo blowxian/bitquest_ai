@@ -8,7 +8,7 @@ import Markdown from "@/lib/mark-down";
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams, useRouter} from 'next/navigation';
-import {GoogleCustomSearchResponse} from "@/pages/api/types";
+import {SearchResponse} from "@/pages/api/types";
 import TopNavBar from "@/components/TopNavBar";
 import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
 import {SessionProvider} from '@/app/context/sessionContext';  // Adjust the import path as needed
@@ -32,12 +32,9 @@ export default function Page({params}: { params: { lang: string } }) {
     }, [params.lang]);
 
     const [data, setData] = useState('');
-    const [query, setQuery] = useState<GoogleCustomSearchResponse>({
+    const [query, setQuery] = useState<SearchResponse>({
         items: [],
-        queries: {
-            request: [],
-            nextPage: [],
-        },
+        nextPageToken: null
     });
     const searchParams = useSearchParams();
     const [searchTerms, setSearchTerms] = useState('');
@@ -111,7 +108,7 @@ export default function Page({params}: { params: { lang: string } }) {
         return prompt;
     };
 
-    const fetchAndSummarizeData = (googleSearchRes: GoogleCustomSearchResponse) => {
+    const fetchAndSummarizeData = (googleSearchRes: SearchResponse) => {
         const searchResults = query.items;  // 假设 query.items 包含从服务器加载的搜索结果
 
         // 使用上面的函数构建完整的提示
@@ -234,7 +231,7 @@ export default function Page({params}: { params: { lang: string } }) {
     const [isLoading, setIsLoading] = useState(true);
 
     // make sure only on Google query is running at a time
-    const googleSearchDone = useRef(false)
+    const searchServiceFinished = useRef(false)
 
     useEffect(() => {
         const keywords = searchParams?.get('q');
@@ -244,10 +241,10 @@ export default function Page({params}: { params: { lang: string } }) {
         setDerivedQuestions(['', '', '', ''])
         setIsLoading(true);
 
-        if (keywords && dict && !googleSearchDone.current) {
+        if (keywords && dict && !searchServiceFinished.current) {
             document.title = `${keywords} | phind ai alternative`;
-            googleSearchDone.current = true;
-            fetch('/api/googleSearch', {
+            searchServiceFinished.current = true;
+            fetch('/api/search_service', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -258,7 +255,7 @@ export default function Page({params}: { params: { lang: string } }) {
                 .then((data) => {
                     setQuery(data);
                     setReferenceData(data.items);
-                    googleSearchDone.current = false;
+                    searchServiceFinished.current = false;
                 });
 
             fetchAndDisplayUserSuggestion();

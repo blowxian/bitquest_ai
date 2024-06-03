@@ -1,1 +1,1 @@
-export type {GoogleCustomSearchResponse} from './GoogleCustomSearchResponseType';
+export type {SearchResponse} from './SearchResponseType';
