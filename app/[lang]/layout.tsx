@@ -16,7 +16,7 @@ const pathway_extreme = Pathway_Extreme({
 export const metadata: Metadata = {
     title: 'phind ai cheap alternative',
     description: 'phind alternative, ai search engine affordable for everyone',
-    keywords: ['ai search', 'phind ai','phind alternative', 'cheapest ai search', 'perplexity alternative', 'phind', 'ai', 'search', 'engine', 'cheap', 'affordable', 'everyone'],
+    keywords: ['ai search', 'phind ai', 'phind alternative', 'cheapest ai search', 'perplexity alternative', 'phind', 'ai', 'search', 'engine', 'cheap', 'affordable', 'everyone'],
 }
 
 export default function RootLayout({
@@ -49,6 +49,10 @@ export default function RootLayout({
             ${gaConfigScript}
           `,
             }}
+        />
+        <Script async
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4632912781955267"
+                crossOrigin="anonymous"
         />
         <body className={pathway_extreme.className}>{children}</body>
         </html>
