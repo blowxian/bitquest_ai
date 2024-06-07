@@ -13,7 +13,7 @@ import TopNavBar from "@/components/TopNavBar";
 import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
 import {SessionProvider} from '@/app/context/sessionContext';  // Adjust the import path as needed
 import Overlay from '@/components/Overlay';
-import { logEvent } from '@/lib/ga_log';
+import {logEvent} from '@/lib/ga_log';
 
 async function fetchDictionary(lang: string) {
     return await getDictionary(lang);
@@ -124,13 +124,14 @@ export default function Page({params}: { params: { lang: string } }) {
                 partString += JSON.parse(event.data).choices[0].text;
                 setData(replaceReferences(partString));
             } else {
-
+                logEvent('search', 'ai summarization', 'summarization finish', partString);
                 eventSource.close();
             }
         };
 
         eventSource.onerror = (error) => {
             console.error('fetchAndSummarizeData EventSource failed:', error);
+            logEvent('search', 'ai summarization', 'summarization error', partString);
             eventSource.close();
         };
 
@@ -169,15 +170,18 @@ export default function Page({params}: { params: { lang: string } }) {
                     console.log("User Suggestion Array: ", extractedArray);
                     setDerivedQuestions(extractedArray);
                     setIsLoading(false);
+                    logEvent('search', 'ai suggestion', 'suggestion finish with stop or eos', extractedArray.join(','));
                     eventSource.close();
                 }
             } else {
+                logEvent('search', 'ai suggestion', 'suggestion finish with [DONE]', partString);
                 eventSource.close();
             }
         }
 
         eventSource.onerror = (error) => {
             console.error('fetchAndDisplayUserSuggestion EventSource failed:', error);
+            logEvent('search', 'ai suggestion', 'suggestion error', '');
             eventSource.close();
         };
 
@@ -220,7 +224,6 @@ export default function Page({params}: { params: { lang: string } }) {
             handleSearch(); // 调用搜索处理函数
         }
     };
-
 
     useEffect(() => {
         if (query.items?.length === 0) {
@@ -327,7 +330,7 @@ export default function Page({params}: { params: { lang: string } }) {
                     </div>
                 ))}
             </div>
-            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={params.lang?.toLowerCase() || 'en'} />}
+            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={params.lang?.toLowerCase() || 'en'}/>}
         </div>
     )
 }
