@@ -13,6 +13,7 @@ import TopNavBar from "@/components/TopNavBar";
 import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
 import {SessionProvider} from '@/app/context/sessionContext';  // Adjust the import path as needed
 import Overlay from '@/components/Overlay';
+import { logEvent } from '@/lib/ga_log';
 
 async function fetchDictionary(lang: string) {
     return await getDictionary(lang);
@@ -244,6 +245,9 @@ export default function Page({params}: { params: { lang: string } }) {
         if (keywords && dict && !searchServiceFinished.current) {
             document.title = `${keywords} | phind ai alternative`;
             searchServiceFinished.current = true;
+
+            logEvent('search', 'ai search', 'search start', keywords);
+
             fetch('/api/search_service', {
                 method: 'POST',
                 headers: {

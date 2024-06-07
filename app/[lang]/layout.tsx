@@ -1,3 +1,5 @@
+// /app/[lang]/layout.tsx
+
 import type {Metadata} from 'next'
 import Script from "next/script";
 import './globals.css'
