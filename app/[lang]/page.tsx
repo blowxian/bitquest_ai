@@ -2,7 +2,7 @@
 'use client'
 
 import React, {Suspense, useEffect, useState} from "react";
-import {faBlog, faCommentDots, faComments} from "@fortawesome/free-solid-svg-icons";
+import {faBlog, faCommentDots, faComments, faLock, faShieldHalved} from "@fortawesome/free-solid-svg-icons";
 import Header from '@/components/Header';
 import SearchBar from "@/components/SearchBar";
 import LinkButton from "@/components/LinkButton";
@@ -37,10 +37,14 @@ export default function Page({params}) {
                 </div>
                 <div className="text-center w-full mt-8">
                     <div className="flex justify-center space-x-4 text-sm">
-                        <LinkButton href="/blog" icon={faBlog} label={dict?.footer.blog}/>
+                        <LinkButton href="/blog/blog/blogs-and-articles/" icon={faBlog} label={dict?.footer.blog}/>
                         <LinkButton href="/blog/forums/" icon={faComments} label={dict?.footer.forum}/>
                         <LinkButton href="/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice/"
                                     icon={faCommentDots} label={dict?.footer.feedback}/>
+                        <LinkButton href="/blog/private-policy/"
+                                    icon={faLock} label="Private Policy"/>
+                        <LinkButton href="/blog/disclaimer-for-phind-ai-com/"
+                                    icon={faShieldHalved} label="Disclaimer"/>
                     </div>
                 </div>
             </main>
