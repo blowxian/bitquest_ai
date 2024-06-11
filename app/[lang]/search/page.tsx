@@ -191,7 +191,7 @@ export default function Page({params}: { params: { lang: string } }) {
     }
 
     const [showOverlay, setShowOverlay] = useState(false);
-
+/*
     useEffect(() => {
         const searchCount = parseInt(localStorage.getItem('searchCount') || '0');
         if (searchCount >= 3) {
@@ -199,13 +199,13 @@ export default function Page({params}: { params: { lang: string } }) {
             setShowOverlay(true);
             localStorage.setItem('searchCount', '0');  // 重置计数
         }
-    }, [searchParams]);
+    }, [searchParams]);*/
 
     const handleSearch = (searchTermsInput: string = '') => {
-        if (searchTerms || searchTermsInput) {
+        /*if (searchTerms || searchTermsInput) {
             const currentCount = parseInt(localStorage.getItem('searchCount') || '0');
             localStorage.setItem('searchCount', (currentCount + 1).toString());
-        }
+        }*/
         // 更新 URL，这里将触发 useSearchParams 的变化
         router.push(`/${params.lang}/search?q=${encodeURIComponent(searchTermsInput === '' ? searchTerms : searchTermsInput)}`);
         if (searchInputRef.current) {
