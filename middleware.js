@@ -33,7 +33,7 @@ export function middleware(request) {
 export const config = {
     matcher: [
         // Skip all internal paths (_next)
-        '/((?!_next|api|sentry-example-page|sentry-example-api|img|favicon).*)',
+        '/((?!_next|api|sentry-example-page|sentry-example-api|img|favicon|ads).*)',
         // Optional: only run on root (/) URL
         // '/'
     ],
