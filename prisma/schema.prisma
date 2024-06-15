@@ -11,6 +11,8 @@ datasource db {
 
 model Search {
   id          Int      @id @default(autoincrement())
+  userId      Int?     // 可以为 null，以允许一些匿名搜索
+  user        User?    @relation(fields: [userId], references: [id])
   query       String
   resultCount Int
   createdAt   DateTime @default(now())
@@ -29,6 +31,7 @@ model User {
   providerAccountId String         @unique
   reports           Report[]
   subscriptions     Subscription[]
+  searches          Search[]       // 添加这一行来引用用户的搜索记录
 }
 
 model Subscription {

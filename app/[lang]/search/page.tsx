@@ -215,18 +215,6 @@ export default function Page({params}: { params: { lang: string } }) {
         }
     };
 
-    // 更新状态变量以匹配输入框的内容
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerms(event.target.value);
-    };
-
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        // 检查是否同时按下了 'Enter' 键和 'Meta' 键（Mac 的 Command 键）或 'Control' 键（Windows/Linux）
-        if (event.key === 'Enter') {
-            handleSearch(); // 调用搜索处理函数
-        }
-    };
-
     useEffect(() => {
         if (query.items?.length === 0) {
             return;
