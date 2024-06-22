@@ -17,6 +17,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - NODE_ENV=development
       - DATABASE_URL=postgresql://phind_admin:phind_2024@db:5432/phind_ai?schema=public
+    container_name: phind_ai_dev
   db:
     image: postgres:16.2
     ports:
@@ -27,3 +28,7 @@ services:
       POSTGRES_DB: phind_ai
     volumes:
       - ./data:/var/lib/postgresql/data                           # 持久化数据
+    container_name: phind_ai_dev_db
+networks:
+  phind_ai_dev:
+    driver: bridge
