@@ -4,7 +4,8 @@ import Cookie from 'cookie';
 import models from '../../lib/models'; // 确保正确引入 models
 import {notifyFeishu, warnFeishu} from '../../lib/notify';
 
-const tokens = ['ca531b0db95f2cf62bf2313d6861023a8c8a27d89b5d61edaeb2378e2a0e0517', '008c561e5429425236f63110cd5b464565bcc2ca868b9a437cb41f50d998654b', 'dc4dfe202fe12cdfe0a6f91713b3f6d080e7de96fc803d087c5ef196e2c59207', '0a44bf308754e4f61b9ff196bb2c2ff4392094aaeb96c347a6b4e1e320fa0cdf', '43d8345f27283b0b7a389354f55e60269a2d458f8ada529ac26d32f36dcfb002', 'cc06736ef1f11f2e5e739383f8979dd0c3aa6048a8e11ef28aaca83dd751e125']; // 替换为你的实际 token
+const tokens = ['caa739ec6eff69a35a92a3480fb75211dcd536f38ddf461d37f988ddfcaebea5', '8a1fd0bb0a7cb217a3593e46ac3e7433df409196910e738ddc99d8dfe5673772',
+'b3fccfe123c9c8579c0f02aac21800726fdc2a2e1b8def105e6feeed2068f32d','fe8475870ee898afcf4c5ec02d60b9306129d655f3d0e81575f427773d2f5de1','f03e5aff63a0bdf5c3e1be4239bbd14d20105d2812e31cd6b41e4e2a78117e0e']; // 替换为你的实际 token
 let currentTokenIndex = 0;
 
 const togetherAIRequest = axios.create({
@@ -25,18 +26,16 @@ async function handler(req, res) {
         // 根据 cookie 中的模型信息或默认模型选择模型
         const selectedModel = models[selectedModelKey] || models.mistral_7b_v2; // 使用默认模型，如果 cookie 中没有有效的模型信息
 
-        await notifyFeishu(`Token ${tokens[currentTokenIndex]} 正在使用，使用详情如下：
-            model: ${selectedModel.identifier},
-            prompt: "{}<human>: " + ${req.query.prompt} + "\\n\\n<expert>:",
-        `);
-
         // 向 TogetherAI 发送请求
         const response = await togetherAIRequest.post('/inference', {
             // TogetherAI API 请求体
             model: selectedModel.identifier,
-            prompt: "{}<human>: " + req.query.prompt + "\n\n<expert>:",
-            max_tokens: req.query.max_token ? +req.query.max_token : 2048,
-            stop: '[/INST],</s>',
+            messages: [
+                {"role": "system", "content": req.query.system_prompt},
+                {"role": "user", "content": req.query.query}
+            ],
+            max_tokens: req.query.max_token ? +req.query.max_token : 1024,
+            stop: '[/INST],</s>,<|im_end|>,[End],[end],\nReferences:\n,\nSources:\n,End.',
             temperature: 0.7,
             top_p: 0.7,
             top_k: 50,
@@ -58,7 +57,7 @@ async function handler(req, res) {
         // 监听流上的 'data' 事件
         response.data.on('data', (chunk) => {
             const chunkAsString = chunk.toString('utf-8');
-            console.log('Received chunk: ', chunkAsString);
+            // console.log('Received chunk: ', chunkAsString);
 
             // 将数据块添加到缓冲区
             buffer += chunkAsString;
@@ -66,6 +65,7 @@ async function handler(req, res) {
             // 检查距离上次 flush 是否已过 100 毫秒
             if (Date.now() - lastFlushTime >= flushInterval) {
                 console.log('Flushing buffer...');
+                console.log(`Current token is: ${tokens[currentTokenIndex]}`);
                 // 如果是，则 flush 缓冲区并重置计时器
                 res.write(buffer);
                 res.flush();  // 确保调用 flush 方法
@@ -86,7 +86,7 @@ async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('Error communicating with TogetherAI:', error);
+        // console.error('Error communicating with TogetherAI:', error);
         await warnFeishu(`错误详情: ${error.message || '未知错误'} - Token ${tokens[currentTokenIndex]} 发生错误`);
 
 

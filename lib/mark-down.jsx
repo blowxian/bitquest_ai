@@ -1,11 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { marked } from 'marked';
+import React, {useState, useEffect} from 'react';
+import {marked} from 'marked';
 
 const isChinese = (char) => {
     return /[\u3400-\u9FBF]/.test(char);
 };
 
-const Markdown = ({ content }) => {
+const replaceReferences = (text, referenceData) => {
+    const parts = text.split(/\[citation:(\d+)\]/g);
+    // console.log(parts);
+    return parts.map((part, index) => {
+        if ((index % 2) === 1) {
+            const refNumber = parseInt(part, 10) - 1;
+            const refLink = referenceData ? referenceData[refNumber]?.link : '';
+            if (refLink) {
+                // 转换为 Markdown 链接格式
+                return ` [<span class="text-blue-600 hover:text-blue-800 visited:text-purple-600 text-xs">[${refNumber + 1}]</span>](${encodeURI(refLink)})`;
+            }
+            return ``;
+        }
+        return part;
+    }).join('');
+}
+
+const Markdown = ({content, referenceData}) => {
     const [displayedContent, setDisplayedContent] = useState('');
     const [cursorVisible, setCursorVisible] = useState(true);
 
@@ -37,9 +54,12 @@ const Markdown = ({ content }) => {
                 }
             }
 
-            if (cursorVisible) {
+            if (displayIndex >= content.length) {
+                setCursorVisible(false);
+            } else if (cursorVisible) {
                 updatedContent += '<span class="cursor"></span>';
             }
+
             setDisplayedContent(updatedContent);
 
             if (displayIndex < content.length) {
@@ -52,11 +72,20 @@ const Markdown = ({ content }) => {
 
         requestAnimationFrame(addCharacter);
 
-        return () => {}; // 清理函数（如果需要）
-    }, [content, displayedContent, cursorVisible]);
+        return () => {
+        }; // 清理函数（如果需要）
+    }, [content]);
+
+    /*console.log(`****** content ******
+    ${content}
+    `);
+    console.log(`****** displayedContent ******
+    ${displayedContent}
+    `);*/
 
     return (
-        <div dangerouslySetInnerHTML={{ __html: marked(displayedContent) }} />
+        <div
+            dangerouslySetInnerHTML={{__html: marked(referenceData?.length > 0 ? replaceReferences(displayedContent, referenceData) : (displayedContent))}}/>
     );
 };
 

@@ -19,7 +19,7 @@ services:
       - DATABASE_URL=postgresql://phind_admin:phind_2024@db:5432/phind_ai?schema=public
     container_name: phind_ai_dev
   db:
-    image: postgres:16.2
+    image: postgres:alpine
     ports:
       - "5432:5432"
     environment:

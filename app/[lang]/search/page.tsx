@@ -14,9 +14,14 @@ import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
 import {SessionProvider} from '@/app/context/sessionContext';  // Adjust the import path as needed
 import Overlay from '@/components/Overlay';
 import {logEvent} from '@/lib/ga_log';
+import {notifyFeishu} from '@/lib/notify';
 
 async function fetchDictionary(lang: string) {
     return await getDictionary(lang);
+}
+
+async function notfiyFeishu(message: string) {
+    await notifyFeishu(message);
 }
 
 export default function Page({params}: { params: { lang: string } }) {
@@ -80,51 +85,45 @@ export default function Page({params}: { params: { lang: string } }) {
         };
     }, []);
 
-    const replaceReferences = (text: string) => {
-        const parts = text.split(/\[\[Ref (\d+)\]\]/g);
-        return parts.map((part, index) => {
-            if ((index % 2) === 1) {
-                const refNumber = parseInt(part, 10) - 1;
-                // @ts-ignore
-                const refLink = referenceData ? referenceData[refNumber]?.link : '';
-                if (refLink) {
-                    // 转换为 Markdown 链接格式
-                    return ` [<span class="text-blue-600 hover:text-blue-800 visited:text-purple-600 text-xs">[${refNumber + 1}]</span>](${refLink})`;
-                }
-                return ``;
-            }
-            return part;
-        }).join('');
-    }
-
-    const constructSummarizePrompt = (searchTerms, searchResults, dictTexts) => {
+    const constructSummarizePrompt = (searchResults, dictTexts) => {
         // 格式化搜索结果
         const formattedResults = searchResults.map((result, index) =>
             `${dictTexts.searchResultPrefix.replace('${index}', index + 1).replace('${snippet}', result.snippet)}`
-        ).join('\n');
+        ).join('\n\n');
 
         // 构建完整的提示
-        const prompt = `${dictTexts.searchPrompt}\n${formattedResults}\n${dictTexts.detailedAnswerRequest.replace('${searchTerms}', searchTerms)}`;
+        const systemPrompt = `${dictTexts.searchPrompt.replace('${context}', formattedResults)}`;
 
-        return prompt;
+        return systemPrompt;
     };
 
     const fetchAndSummarizeData = (googleSearchRes: SearchResponse) => {
         const searchResults = query.items;  // 假设 query.items 包含从服务器加载的搜索结果
 
         // 使用上面的函数构建完整的提示
-        const prompt = constructSummarizePrompt(searchTerms, searchResults, dict?.search);
+        const system_prompt = constructSummarizePrompt(searchResults, dict?.search);
 
-        const eventSource = new EventSource(`/api/update?prompt=` + encodeURIComponent(prompt));
+        const eventSource = new EventSource(`/api/update?system_prompt=` + encodeURIComponent(system_prompt) + `&query=` + encodeURIComponent(searchTerms));
 
         let partString = '';
 
         eventSource.onmessage = (event) => {
             if (event.data !== '[DONE]') {
                 partString += JSON.parse(event.data).choices[0].text;
-                setData(replaceReferences(partString));
+                setData(partString);
             } else {
+                setData(partString);
                 logEvent('search', 'ai summarization', 'summarization finish', partString);
+                notfiyFeishu(`
+                ****** 搜索内容 ******
+                ${searchTerms}
+                
+                ****** 搜索提示词 ******
+                ${system_prompt}
+                
+                ****** 搜索总结 ******
+                ${partString}
+                `);
                 eventSource.close();
             }
         };
@@ -192,22 +191,7 @@ export default function Page({params}: { params: { lang: string } }) {
 
     const [showOverlay, setShowOverlay] = useState(false);
 
-    /*
-    useEffect(() => {
-        const searchCount = parseInt(localStorage.getItem('searchCount') || '0');
-        if (searchCount >= 3) {
-            // 显示浮层
-            setShowOverlay(true);
-            localStorage.setItem('searchCount', '0');  // 重置计数
-        }
-    }, [searchParams]);
-    */
-
     const handleSearch = (searchTermsInput: string = '') => {
-        /*if (searchTerms || searchTermsInput) {
-            const currentCount = parseInt(localStorage.getItem('searchCount') || '0');
-            localStorage.setItem('searchCount', (currentCount + 1).toString());
-        }*/
         // 更新 URL，这里将触发 useSearchParams 的变化
         router.push(`/${params.lang}/search?q=${encodeURIComponent(searchTermsInput === '' ? searchTerms : searchTermsInput)}`);
         if (searchInputRef.current) {
@@ -294,7 +278,7 @@ export default function Page({params}: { params: { lang: string } }) {
 
                         {/* Markdown 渲染 */}
                         <div className="prose mt-2 max-w-none pb-4">
-                            <Markdown content={data}/>
+                            <Markdown content={data} referenceData={referenceData}/>
                         </div>
 
                         <h4 className='text-sm'>{dict?.search.refInfo}</h4>
