@@ -147,16 +147,16 @@ export default function Page({params}: { params: { lang: string } }) {
 
     const constructSuggestionPrompt = (searchTerms, dictTexts) => {
         // Using the localized prompt template and replace placeholders with actual search terms
-        const prompt = dictTexts.userSuggestionPrompt.replace('{searchTerms}', searchTerms);
+        const prompt = dictTexts.userSuggestionPrompt.replace('${searchTerms}', searchTerms);
 
         return prompt;
     };
 
     const fetchAndDisplayUserSuggestion = () => {
         // 使用上面的函数构建完整的提示
-        const prompt = constructSuggestionPrompt(searchTerms, dict?.search);
+        const system_prompt = constructSuggestionPrompt(searchTerms, dict?.search);
 
-        const eventSource = new EventSource(`/api/update?max_token=128&prompt=` + encodeURIComponent(prompt));
+        const eventSource = new EventSource(`/api/update?max_token=128&system_prompt=` + encodeURIComponent(system_prompt) + `&query=` + encodeURIComponent(searchTerms));
 
         let partString = '';
 

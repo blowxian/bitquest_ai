@@ -54,12 +54,9 @@ const Markdown = ({content, referenceData}) => {
                 }
             }
 
-            if (displayIndex >= content.length) {
-                setCursorVisible(false);
-            } else if (cursorVisible) {
+            if (cursorVisible) {
                 updatedContent += '<span class="cursor"></span>';
             }
-
             setDisplayedContent(updatedContent);
 
             if (displayIndex < content.length) {
@@ -74,14 +71,14 @@ const Markdown = ({content, referenceData}) => {
 
         return () => {
         }; // 清理函数（如果需要）
-    }, [content]);
+    }, [content, displayedContent, cursorVisible]);
 
-    /*console.log(`****** content ******
+    console.log(`****** content ******
     ${content}
     `);
     console.log(`****** displayedContent ******
     ${displayedContent}
-    `);*/
+    `);
 
     return (
         <div
