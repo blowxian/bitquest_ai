@@ -102,6 +102,11 @@ export default function Page({params}: { params: { lang: string } }) {
 
         // 使用上面的函数构建完整的提示
         const system_prompt = constructSummarizePrompt(searchResults, dict?.search);
+        notfiyFeishu(`
+                ****** 搜索内容 ******
+                ${searchTerms}
+        `);
+
 
         const eventSource = new EventSource(`/api/update?system_prompt=` + encodeURIComponent(system_prompt) + `&query=` + encodeURIComponent(searchTerms));
 
@@ -115,9 +120,6 @@ export default function Page({params}: { params: { lang: string } }) {
                 setData(partString);
                 logEvent('search', 'ai summarization', 'summarization finish', partString);
                 notfiyFeishu(`
-                ****** 搜索内容 ******
-                ${searchTerms}
-                
                 ****** 搜索提示词 ******
                 ${system_prompt}
                 
