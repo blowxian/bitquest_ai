@@ -15,6 +15,7 @@ function normalizeResults(data, source) {
     } else if (source === 'SEARXNG') {
         return {
             items: data.results.slice(0, 6).map(result => ({
+                domain: result.parsed_url.slice(1,2),
                 title: result.title,
                 snippet: result.content,
                 link: result.url

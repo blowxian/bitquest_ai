@@ -40,7 +40,11 @@ export default function ReferenceCard({data}) {
                                className="flex-none h-16 w-20 rounded-lg object-contain mr-4"/>)}
             <div className={`flex-grow ${!imageUrl ? 'w-full' : ''}`}>
                 <h3 className="text-xs font-semibold">
-                    {data?.title}
+                    <img
+                        className="h-4 w-4 float-left mr-2"
+                        alt={data.domain}
+                        src={`https://www.google.com/s2/favicons?domain=${data.domain}&sz=${16}`}
+                    /> {data?.title}
                 </h3>
             </div>
         </div>
@@ -49,7 +53,8 @@ export default function ReferenceCard({data}) {
             <a href={data?.link} target="_blank"
                rel="noopener noreferrer"
                className="text-xs text-blue-600 hover:text-blue-800 visited:text-purple-600">
-                <p>{data?.snippet}&nbsp;
+                <p>
+                    {data?.snippet}&nbsp;
                     <FontAwesomeIcon icon={faArrowUpRightFromSquare} size="xs"/>
                 </p>
             </a>
