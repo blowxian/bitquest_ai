@@ -52,10 +52,6 @@ export default function RootLayout({
           `,
             }}
         />
-        <Script async
-                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4632912781955267"
-                crossOrigin="anonymous"
-        />
         <body className={pathway_extreme.className}>{children}</body>
         </html>
     )
