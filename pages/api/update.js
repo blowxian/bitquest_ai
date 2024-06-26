@@ -2,7 +2,7 @@
 import axios from 'axios';
 import Cookie from 'cookie';
 import models from '../../lib/models'; // 确保正确引入 models
-import {warnFeishu} from '../../lib/notify';
+import {warnFeishu} from '../../lib/feishu';
 
 const tokens = ['caa739ec6eff69a35a92a3480fb75211dcd536f38ddf461d37f988ddfcaebea5', '8a1fd0bb0a7cb217a3593e46ac3e7433df409196910e738ddc99d8dfe5673772',
 'b3fccfe123c9c8579c0f02aac21800726fdc2a2e1b8def105e6feeed2068f32d','fe8475870ee898afcf4c5ec02d60b9306129d655f3d0e81575f427773d2f5de1','f03e5aff63a0bdf5c3e1be4239bbd14d20105d2812e31cd6b41e4e2a78117e0e']; // 替换为你的实际 token

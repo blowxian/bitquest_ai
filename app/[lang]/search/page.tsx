@@ -14,7 +14,7 @@ import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
 import {SessionProvider} from '@/app/context/sessionContext';  // Adjust the import path as needed
 import Overlay from '@/components/Overlay';
 import {logEvent} from '@/lib/ga_log';
-import {notifyFeishu} from '@/lib/notify';
+import {notifyFeishu, recordToFeishu} from '@/lib/feishu';
 
 async function fetchDictionary(lang: string) {
     return await getDictionary(lang);
@@ -22,6 +22,10 @@ async function fetchDictionary(lang: string) {
 
 async function notfiyFeishu(message: string) {
     await notifyFeishu(message);
+}
+
+async function logToFeishu(appToken, tableId, recordId, recordData) {
+    return await recordToFeishu(appToken, tableId, recordId, recordData);
 }
 
 export default function Page({params}: { params: { lang: string } }) {
@@ -107,6 +111,9 @@ export default function Page({params}: { params: { lang: string } }) {
                 ${searchTerms}
         `);
 
+        const add_record_promise = logToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", "", {
+            "搜索内容": searchTerms
+        });
 
         const eventSource = new EventSource(`/api/update?system_prompt=` + encodeURIComponent(system_prompt) + `&query=` + encodeURIComponent(searchTerms));
 
@@ -126,6 +133,15 @@ export default function Page({params}: { params: { lang: string } }) {
                 ****** 搜索总结 ******
                 ${partString}
                 `);
+
+                add_record_promise.then(add_record_response => {
+                    console.log(add_record_response);
+                    logToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", add_record_response.data.record.record_id, {
+                        "搜索提示词": system_prompt,
+                        "搜索总结": partString
+                    })
+                });
+
                 eventSource.close();
             }
         };
@@ -247,9 +263,10 @@ export default function Page({params}: { params: { lang: string } }) {
 
     function DerivedQuestionCardSkeleton() {
         return (
-            <div className="bg-customWhite shadow rounded-lg p-3 m-2 w-full sm:w-64">
-                <div className="rounded bg-slate-300 h-4 w-3/4 mb-2"></div>
-                <div className="rounded bg-slate-300 h-4 w-1/2"></div>
+            <div className="w-full sm:w-1/4 px-1">
+                <div className="bg-customWhite shadow rounded-lg p-3 m-2 w-full">
+                    <div className="rounded bg-slate-300 h-4 w-3/4 mb-2"></div>
+                </div>
             </div>
         );
     }
@@ -286,7 +303,7 @@ export default function Page({params}: { params: { lang: string } }) {
                         <h4 className='text-sm'>{dict?.search.refInfo}</h4>
                         <div
                             className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
-                            {(referenceData?.length > 0 ? referenceData : [null, null, null, null, null]).map((data, index) => (
+                            {(referenceData?.length > 0 ? referenceData : [null, null, null, null, null, null, null, null]).map((data, index) => (
                                 <ReferenceCard key={index} data={data}/>
                             ))}
                         </div>
