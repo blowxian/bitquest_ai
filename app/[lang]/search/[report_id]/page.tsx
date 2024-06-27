@@ -3,7 +3,7 @@ import {SessionProvider} from "@/app/context/sessionContext";
 import TopNavBar from "@/components/TopNavBar";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faClipboardQuestion} from "@fortawesome/free-solid-svg-icons";
-import Markdown from "@/lib/mark-down";
+import {marked} from 'marked';
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import React from "react";
@@ -23,6 +23,23 @@ export async function loader({ params, fetch }) {
     return {
         props: { report, dictionary, lang: params.lang },
     };
+}
+
+const replaceReferences = (text, referenceData) => {
+    const parts = text.split(/\[citation:(\d+)\]/g);
+    // console.log(parts);
+    return parts.map((part, index) => {
+        if ((index % 2) === 1) {
+            const refNumber = parseInt(part, 10) - 1;
+            const refLink = referenceData ? referenceData[refNumber]?.link : '';
+            if (refLink) {
+                // 转换为 Markdown 链接格式
+                return ` [<span class="text-blue-600 hover:text-blue-800 visited:text-purple-600 text-xs">[${refNumber + 1}]</span>](${encodeURI(refLink)})`;
+            }
+            return ``;
+        }
+        return part;
+    }).join('');
 }
 
 function ReportPage({ report, dictionary, lang }) {
@@ -50,7 +67,8 @@ function ReportPage({ report, dictionary, lang }) {
                         {"这是个问题"}
                     </h2>
                     <div className="prose mt-2 max-w-none pb-4">
-                        <Markdown content={'这是搜索总结'} referenceData={[]}/>
+                        <div
+                            dangerouslySetInnerHTML={{__html: marked(Array(8).fill(null)?.length > 0 ? replaceReferences('这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结', Array(8).fill(null)) : ('这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结'))}}/>
                     </div>
                     <h4 className='text-sm'>{dictionary?.search.refInfo}</h4>
                     <div className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
