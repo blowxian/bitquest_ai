@@ -6,7 +6,7 @@ import {faArrowUpRightFromSquare} from "@fortawesome/free-solid-svg-icons";
 function Skeleton() {
     return (
         <div className="w-full sm:w-1/4 px-1">
-            <div className="bg-customWhite rounded-lg shadow p-4 m-2 w-full overflow-y-hidden">
+            <div className="bg-customWhite rounded-lg shadow p-4 my-2 w-full overflow-y-hidden">
                 <div className="flex">
                     <div className="flex-none h-3 w-3 bg-gray-300 rounded-sm mr-4 mt-3"></div>
                     <div className="flex-grow">
