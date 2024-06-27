@@ -1,4 +1,6 @@
 // /components/TopNavBar.jsx
+'use client'
+
 import React, {useEffect, useState} from 'react';
 import SearchInput from './SearchInput';
 import UserMenu from './UserMenu';
