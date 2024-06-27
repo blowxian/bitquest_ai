@@ -264,8 +264,8 @@ export default function Page({params}: { params: { lang: string } }) {
     function DerivedQuestionCardSkeleton() {
         return (
             <div className="w-full sm:w-1/4 px-1">
-                <div className="bg-customWhite shadow rounded-lg p-3 m-2 w-full">
-                    <div className="rounded bg-slate-300 h-4 w-3/4 mb-2"></div>
+                <div className="bg-customWhite shadow rounded-lg p-4 m-2 w-full">
+                    <div className="rounded bg-slate-300 h-4 w-3/4"></div>
                 </div>
             </div>
         );
