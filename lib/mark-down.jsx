@@ -75,12 +75,12 @@ const Markdown = ({content, referenceData}) => {
         }; // 清理函数（如果需要）
     }, [content, displayedContent, cursorVisible]);
 
-    console.log(`****** content ******
+    /*console.log(`****** content ******
     ${content}
     `);
     console.log(`****** displayedContent ******
     ${displayedContent}
-    `);
+    `);*/
 
     return (
         <div

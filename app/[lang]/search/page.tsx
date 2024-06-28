@@ -23,10 +23,12 @@ function Page({params}: { params: { lang: string } }) {
     const [searchTerms, setSearchTerms] = useState('');
     const [referenceData, setReferenceData] = useState(['', '', '', '', '', '', '', '']);
     const [derivedQuestions, setDerivedQuestions] = useState<string[]>(['', '', '', '']);
+    const [isFinalized, setIsFinalized] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [feishuRecordId, setFeishuRecordId] = useState('');
     const [showOverlay, setShowOverlay] = useState(false);
-    const searchParams = useSearchParams();
-    const searchInputRef = useRef<HTMLInputElement>(null);
+    const searchParams = useSearchParams();const searchInputRef = useRef<HTMLInputElement>(null as unknown as HTMLInputElement);
+    const router = useRouter();  // Add this line
 
     useEffect(() => {
         const fetchDictionary = async () => {
@@ -55,6 +57,17 @@ function Page({params}: { params: { lang: string } }) {
             processSearchResults();
         }
     }, [query]);
+
+    useEffect(() => {
+        if (isFinalized && !isLoading && feishuRecordId) {
+            const assembledData = {
+                data: data,
+                referenceData: referenceData,
+                derivedQuestions: derivedQuestions
+            };
+            createReport(assembledData);
+        }
+    }, [isFinalized, isLoading, feishuRecordId]);
 
     const handleGlobalKeyDown = (event: KeyboardEvent) => {
         if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
@@ -121,7 +134,7 @@ function Page({params}: { params: { lang: string } }) {
             }
         };
         eventSource.onerror = (error) => {
-            console.error('EventSource failed:', error);
+            console.error('fetchAndDisplayUserSuggestion EventSource failed:', error);
             eventSource.close();
         };
     };
@@ -137,21 +150,62 @@ function Page({params}: { params: { lang: string } }) {
             }
         };
         eventSource.onerror = (error) => {
-            console.error('EventSource failed:', error);
+            console.error('handleEventSource EventSource failed:', error);
             eventSource.close();
         };
     };
 
     const finalizeData = (partString, eventSource, system_prompt, add_record_promise) => {
         setData(partString);
+        setIsFinalized(true); // 设置状态
         logEvent('search', 'ai summarization', 'summarization finish', partString);
         add_record_promise.then(add_record_response => {
+            setFeishuRecordId(add_record_response.data.record.record_id);
             recordToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", add_record_response.data.record.record_id, {
                 "搜索提示词": system_prompt,
-                "搜索总结": partString
+                "搜索总结": partString,
+                "发布链接": {
+                    text: `${add_record_response.data.record.record_id}`,
+                    link: `http://localhost:3000/search/publish?recordId=${add_record_response.data.record.record_id}`
+                }
             })
         });
         eventSource.close();
+    };
+
+    const createReport = async (assembledData) => {
+        try {
+            /*const response = await fetch('/api/report', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    userId: null, // 或者填写用户ID
+                    title: searchTerms,
+                    content: JSON.stringify(assembledData)
+                }),
+            });
+            const result = await response.json();
+
+            console.log('Report created:', result);*/
+
+            recordToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", feishuRecordId, {
+                "搜索结构数据": JSON.stringify({
+                    data: data,
+                    referenceData: referenceData,
+                    derivedQuestions: derivedQuestions
+                })
+            });
+        } catch (error) {
+            console.error('Error create feishu record:', error);
+        }
+    };
+
+    const handleSearch = (searchTermsInput: string = '') => {
+        // 更新 URL，这里将触发 useSearchParams 的变化
+        router.push(`/${params.lang}/search?q=${encodeURIComponent(searchTermsInput === '' ? searchTerms : searchTermsInput)}`);
+        if (searchInputRef.current) {
+            searchInputRef.current.blur();
+        }
     };
 
     return (
@@ -184,7 +238,7 @@ function Page({params}: { params: { lang: string } }) {
                         {isLoading ? [...Array(4)].map((_, index) => <DerivedQuestionCardSkeleton
                             key={index}/>) : derivedQuestions.map((question, index) => <DerivedQuestionCard key={index}
                                                                                                             question={question}
-                                                                                                            onSearch={() => performSearch(question)}/>)}
+                                                                                                            onSearch={() => handleSearch(question)}/>)}
                     </div>
                 </div>
             </div>

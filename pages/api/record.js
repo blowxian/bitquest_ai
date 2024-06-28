@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
-        const { appToken, tableId, recordId, recordData } = req.body;
+        const {appToken, tableId, recordId, recordData} = req.body;
 
         try {
             // 获取访问令牌
@@ -17,10 +17,10 @@ export default async function handler(req, res) {
             let recordResponse;
 
             // 添加记录到飞书多维表格
-            if(!recordId){
+            if (!recordId) {
                 recordResponse = await axios.post(
                     `https://open.feishu.cn/open-apis/bitable/v1/apps/${appToken}/tables/${tableId}/records`,
-                    { fields: recordData },
+                    {fields: recordData},
                     {
                         headers: {
                             Authorization: `Bearer ${accessToken}`,
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
             } else {
                 recordResponse = await axios.put(
                     `https://open.feishu.cn/open-apis/bitable/v1/apps/${appToken}/tables/${tableId}/records${recordId ? '/' + recordId : ''}`,
-                    { fields: recordData },
+                    {fields: recordData},
                     {
                         headers: {
                             Authorization: `Bearer ${accessToken}`,
@@ -41,9 +41,34 @@ export default async function handler(req, res) {
 
             res.status(200).json(recordResponse.data);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({error: error.message});
+        }
+    } else if (req.method === 'GET') {
+        const {appToken, tableId, recordId} = req.query;
+
+        try {
+            // 获取访问令牌
+            const tokenResponse = await axios.post('https://open.feishu.cn/open-apis/auth/v3/app_access_token/internal', {
+                app_id: process.env.FEISHU_BITABLE_APP_ID,
+                app_secret: process.env.FEISHU_BITABLE_APP_SECRET,
+            });
+            const accessToken = tokenResponse.data.app_access_token;
+
+            // 获取飞书多维表格中的记录
+            const recordResponse = await axios.get(
+                `https://open.feishu.cn/open-apis/bitable/v1/apps/${appToken}/tables/${tableId}/records/${recordId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+
+            res.status(200).json(recordResponse.data);
+        } catch (error) {
+            res.status(500).json({error: error.message});
         }
     } else {
-        res.status(405).json({ message: 'Method not allowed' });
+        res.status(405).json({message: 'Method not allowed'});
     }
 }

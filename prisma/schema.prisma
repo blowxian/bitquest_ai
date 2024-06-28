@@ -1,6 +1,6 @@
 // /prisma/schema.prisma
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
 }
 
@@ -11,13 +11,13 @@ datasource db {
 
 model Search {
   id          Int      @id @default(autoincrement())
-  userId      Int?     // 可以为 null，以允许一些匿名搜索
+  userId      Int? // 可以为 null，以允许一些匿名搜索
   user        User?    @relation(fields: [userId], references: [id])
   query       String
   resultCount Int
   createdAt   DateTime @default(now())
   results     Json
-  reportId    Int?
+  reportId    String?
   report      Report?  @relation(fields: [reportId], references: [id])
 }
 
@@ -31,7 +31,7 @@ model User {
   providerAccountId String         @unique
   reports           Report[]
   subscriptions     Subscription[]
-  searches          Search[]       // 添加这一行来引用用户的搜索记录
+  searches          Search[] // 添加这一行来引用用户的搜索记录
 }
 
 model Subscription {
@@ -45,12 +45,12 @@ model Subscription {
 }
 
 model Report {
-  id        Int      @id @default(autoincrement())
-  userId    Int
+  id        String   @id @default(uuid())
+  userId    Int?
   title     String
   content   String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
   searches  Search[]
 }
 

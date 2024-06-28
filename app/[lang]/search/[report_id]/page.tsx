@@ -6,24 +6,8 @@ import {faClipboardQuestion} from "@fortawesome/free-solid-svg-icons";
 import {marked} from 'marked';
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
+import {getDictionary} from "@/app/[lang]/dictionaries";
 import React from "react";
-
-export async function loader({ params, fetch }) {
-    // API 请求获取报告和字典数据
-    const reportResponse = await fetch(`/api/report?id=${params.report_id}`);
-    const dictionaryResponse = await fetch(`/api/dictionary?lang=${params.lang}`);
-
-    if (!reportResponse.ok) {
-        throw new Error(`Failed to fetch report, status: ${reportResponse.status}`);
-    }
-
-    const report = await reportResponse.json();
-    const dictionary = await dictionaryResponse.json();
-
-    return {
-        props: { report, dictionary, lang: params.lang },
-    };
-}
 
 const replaceReferences = (text, referenceData) => {
     const parts = text.split(/\[citation:(\d+)\]/g);
@@ -42,11 +26,27 @@ const replaceReferences = (text, referenceData) => {
     }).join('');
 }
 
-function ReportPage({ report, dictionary, lang }) {
-    // 客户端逻辑和事件处理
-    const handleSearch = () => {
-        // 实现搜索逻辑
-    };
+async function ReportPage({params}) {
+    // API 请求获取报告和字典数据
+    const reportResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/report?id=${params.report_id}`, {
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        }
+    });
+
+    if (reportResponse.status === 404) {
+        // throw new Error('ReportNotFound');
+    } else if (!reportResponse.ok) {
+        // throw new Error(`Failed to fetch report, status: ${reportResponse.status}`);
+    }
+
+    const report = await reportResponse.json();
+    console.log('report: ', report, 'reportData:', report.content, 'lang: ', params.lang);
+
+    const reportData = JSON.parse(report.content);
+    const dictionary = await getDictionary(params.lang);
 
     return (
         <div className="flex min-h-screen">
@@ -56,7 +56,7 @@ function ReportPage({ report, dictionary, lang }) {
                     setSearchTerms={null}
                     onSearch={null}
                     searchInputRef={null}
-                    lang={lang?.toLowerCase() || 'en'}
+                    lang={params.lang?.toLowerCase() || 'en'}
                 />
             </SessionProvider>
 
@@ -64,22 +64,22 @@ function ReportPage({ report, dictionary, lang }) {
                 <div className="px-8 py-5 sm:px-6 overflow-hidden sm:rounded-lg bg-customWhite2 shadow mt-4">
                     <h2 className="text-lg font-medium text-gray-800 mb-4">
                         <FontAwesomeIcon className="text-customOrange mr-2" icon={faClipboardQuestion}/>
-                        {"这是个问题"}
+                        {report.title}
                     </h2>
                     <div className="prose mt-2 max-w-none pb-4">
                         <div
-                            dangerouslySetInnerHTML={{__html: marked(Array(8).fill(null)?.length > 0 ? replaceReferences('这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结', Array(8).fill(null)) : ('这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结这是搜索总结'))}}/>
+                            dangerouslySetInnerHTML={{__html: marked(replaceReferences(reportData.data, reportData.referenceData))}}/>
                     </div>
                     <h4 className='text-sm'>{dictionary?.search.refInfo}</h4>
                     <div className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
-                        {Array(8).fill(null).map((_, index) => (
-                            <ReferenceCard key={index} data={null}/>
+                        {reportData.referenceData.map((data, index) => (
+                            <ReferenceCard key={index} data={data}/>
                         ))}
                     </div>
                     <h4 className='text-sm'>{dictionary?.search.moreQs}</h4>
                     <div className="flex flex-wrap justify-center pt-2">
-                        {Array(1).fill(null).map((_, index) => (
-                            <DerivedQuestionCard key={index} question={null} onSearch={null}/>
+                        {reportData.derivedQuestions.map((question, index) => (
+                            <DerivedQuestionCard key={index} question={question} onSearch={null}/>
                         ))}
                     </div>
                 </div>

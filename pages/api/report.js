@@ -1,5 +1,8 @@
 // pages/api/reports.js
-import { PrismaClient } from '@prisma/client';
+import {PrismaClient} from '@prisma/client';
+import pinyin from 'pinyin';
+import slugify from 'slugify';
+import { transliterate } from 'transliteration';
 
 const prisma = new PrismaClient();
 
@@ -23,33 +26,35 @@ export default async function handler(req, res) {
 
 async function createReport(req, res) {
     try {
-        const { userId, title, content } = req.body;
+        const {userId, title, content} = req.body;
+        const id = createSlug(title);
         const report = await prisma.report.create({
             data: {
+                id,
                 userId, // 可以为 null 如果匿名
                 title,
                 content,
             },
         });
-        return res.status(200).json({ url: `/reports/${report.id}`, reportId: report.id });
+        return res.status(200).json({url: `/search/${report.id}`, reportId: report.id});
     } catch (error) {
         console.error('Request error', error);
-        res.status(500).json({ error: 'Error creating report' });
+        res.status(500).json({error: 'Error creating report'});
     }
 }
 
 async function getReports(req, res) {
     try {
-        const { id } = req.query;
+        const {id} = req.query;
         if (id) {
             // 获取单个报告
             const report = await prisma.report.findUnique({
-                where: { id: parseInt(id) },
+                where: {id: id},
             });
             if (report) {
                 return res.status(200).json(report);
             }
-            return res.status(404).json({ error: 'Report not found' });
+            return res.status(404).json({error: 'Report not found'});
         } else {
             // 获取所有报告
             const reports = await prisma.report.findMany();
@@ -57,15 +62,15 @@ async function getReports(req, res) {
         }
     } catch (error) {
         console.error('Request error', error);
-        res.status(500).json({ error: 'Error fetching reports' });
+        res.status(500).json({error: 'Error fetching reports'});
     }
 }
 
 async function updateReport(req, res) {
     try {
-        const { id, userId, title, content } = req.body;
+        const {id, userId, title, content} = req.body;
         const report = await prisma.report.update({
-            where: { id: parseInt(id) },
+            where: {id: id},
             data: {
                 userId,
                 title,
@@ -75,6 +80,34 @@ async function updateReport(req, res) {
         return res.status(200).json(report);
     } catch (error) {
         console.error('Request error', error);
-        res.status(500).json({ error: 'Error updating report' });
+        res.status(500).json({error: 'Error updating report'});
     }
 }
+
+const isChinese = (text) => {
+    return /[\u4e00-\u9fa5]/.test(text);
+};
+
+const createSlug = (text) => {
+    let processedText;
+
+    if (isChinese(text)) {
+        // 将中文字符转换成拼音
+        const pinyinArray = pinyin(text, {
+            style: pinyin.STYLE_NORMAL, // 普通风格，无音标
+            heteronym: false           // 禁用多音字
+        });
+        // 将二维数组转换成字符串
+        processedText = pinyinArray.flat().join(' ');
+    } else {
+        // 将其他语言字符进行音译
+        processedText = transliterate(text);
+    }
+
+    // 使用 slugify 生成 slug
+    return slugify(processedText, {
+        lower: true,
+        remove: /[*+~.()'"!:@]/g,
+        strict: true
+    });
+};
