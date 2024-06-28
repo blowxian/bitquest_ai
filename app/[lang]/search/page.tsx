@@ -175,19 +175,6 @@ function Page({params}: { params: { lang: string } }) {
 
     const createReport = async (assembledData) => {
         try {
-            /*const response = await fetch('/api/report', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    userId: null, // 或者填写用户ID
-                    title: searchTerms,
-                    content: JSON.stringify(assembledData)
-                }),
-            });
-            const result = await response.json();
-
-            console.log('Report created:', result);*/
-
             recordToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", feishuRecordId, {
                 "搜索结构数据": JSON.stringify({
                     data: data,
@@ -214,7 +201,7 @@ function Page({params}: { params: { lang: string } }) {
                 <TopNavBar
                     searchTerms={searchTerms}
                     setSearchTerms={setSearchTerms}
-                    onSearch={() => performSearch(searchTerms)}
+                    onSearch={() => handleSearch(searchTerms)}
                     searchInputRef={searchInputRef}
                     lang={params.lang?.toLowerCase() || 'en'}
                 />
