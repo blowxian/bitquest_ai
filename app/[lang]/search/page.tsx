@@ -1,12 +1,12 @@
 'use client'
 // Import statements
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faClipboardQuestion} from "@fortawesome/free-solid-svg-icons";
 import Markdown from "@/lib/mark-down";
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
-import {useSearchParams, useRouter} from 'next/navigation';
+import {useSearchParams} from 'next/navigation';
 import {SearchResponse} from "@/pages/api/types";
 import TopNavBar from "@/components/TopNavBar";
 import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
@@ -20,15 +20,13 @@ function Page({params}: { params: { lang: string } }) {
     const [isDictionaryLoaded, setIsDictionaryLoaded] = useState(false); // 新增状态用于追踪字典是否加载完成
     const [data, setData] = useState('');
     const [query, setQuery] = useState<SearchResponse>({items: [], nextPageToken: null});
-    const [searchTerms, setSearchTerms] = useState('');
     const [referenceData, setReferenceData] = useState(['', '', '', '', '', '', '', '']);
     const [derivedQuestions, setDerivedQuestions] = useState<string[]>(['', '', '', '']);
     const [isFinalized, setIsFinalized] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [feishuRecordId, setFeishuRecordId] = useState('');
     const [showOverlay, setShowOverlay] = useState(false);
-    const searchParams = useSearchParams();const searchInputRef = useRef<HTMLInputElement>(null as unknown as HTMLInputElement);
-    const router = useRouter();  // Add this line
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         const fetchDictionary = async () => {
@@ -40,14 +38,8 @@ function Page({params}: { params: { lang: string } }) {
     }, [params.lang]);
 
     useEffect(() => {
-        window.addEventListener('keydown', handleGlobalKeyDown);
-        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-    }, []);
-
-    useEffect(() => {
         const keywords = searchParams?.get('q');
         if (keywords && isDictionaryLoaded) {
-            setSearchTerms(keywords);
             performSearch(keywords);
         }
     }, [searchParams, isDictionaryLoaded]);
@@ -69,14 +61,6 @@ function Page({params}: { params: { lang: string } }) {
         }
     }, [isFinalized, isLoading, feishuRecordId]);
 
-    const handleGlobalKeyDown = (event: KeyboardEvent) => {
-        if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-            event.preventDefault();
-            searchInputRef.current?.focus();
-            searchInputRef.current?.select();
-        }
-    };
-
     const performSearch = async (keywords: string) => {
         setData('');
         setReferenceData(['', '', '', '', '', '', '', '']);
@@ -97,9 +81,9 @@ function Page({params}: { params: { lang: string } }) {
     const processSearchResults = () => {
         const system_prompt = constructSummarizePrompt(query.items, dict?.search);
         const add_record_promise = recordToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", "", {
-            "搜索内容": searchTerms
+            "搜索内容": searchParams?.get('q')
         });
-        const eventSource = new EventSource(`/api/update?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchTerms)}`);
+        const eventSource = new EventSource(`/api/update?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchParams?.get('q'))}`);
         handleEventSource(eventSource, system_prompt, add_record_promise);
     };
 
@@ -187,23 +171,12 @@ function Page({params}: { params: { lang: string } }) {
         }
     };
 
-    const handleSearch = (searchTermsInput: string = '') => {
-        // 更新 URL，这里将触发 useSearchParams 的变化
-        router.push(`/${params.lang}/search?q=${encodeURIComponent(searchTermsInput === '' ? searchTerms : searchTermsInput)}`);
-        if (searchInputRef.current) {
-            searchInputRef.current.blur();
-        }
-    };
-
     return (
         <div className="flex min-h-screen">
             <SessionProvider>
                 <TopNavBar
-                    searchTerms={searchTerms}
-                    setSearchTerms={setSearchTerms}
-                    onSearch={() => handleSearch(searchTerms)}
-                    searchInputRef={searchInputRef}
-                    lang={params.lang?.toLowerCase() || 'en'}
+                    lang={params.lang?.toLowerCase()}
+                    searchTerms={searchParams?.get('q')}
                 />
             </SessionProvider>
             <div className="flex-1 mx-auto sm:p-4 pt-20 sm:pt-24 text-customBlackText max-w-6xl">
@@ -224,8 +197,7 @@ function Page({params}: { params: { lang: string } }) {
                     <div className="flex flex-wrap justify-center pt-2">
                         {isLoading ? [...Array(4)].map((_, index) => <DerivedQuestionCardSkeleton
                             key={index}/>) : derivedQuestions.map((question, index) => <DerivedQuestionCard key={index}
-                                                                                                            question={question}
-                                                                                                            onSearch={() => handleSearch(question)}/>)}
+                                                                                                            question={question}/>)}
                     </div>
                 </div>
             </div>

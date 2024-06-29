@@ -11,7 +11,7 @@ import models from '@/lib/models';
 import Cookie from 'js-cookie';
 import Overlay from './Overlay'; // 引入 Overlay 组件
 
-const TopNavBar = ({searchTerms, setSearchTerms, onSearch, searchInputRef, lang}) => {
+const TopNavBar = ({lang = 'en', searchTerms = ''}) => {
     const {data: session, status} = useSessionContext();
     const loading = status === "loading";
     const [isPro, setIsPro] = useState(false);
@@ -20,23 +20,14 @@ const TopNavBar = ({searchTerms, setSearchTerms, onSearch, searchInputRef, lang}
 
     useEffect(() => {
         if (!loading && session) {
-            console.log('session@SearchBar: ', session);
-
             // 确保 session 数据存在且已加载
             if (status === 'authenticated' && session) {
                 // @ts-ignore
                 const proStatus = session.user?.subscriptions?.some(sub => new Date(sub.endDate) > new Date());
                 setIsPro(proStatus || false);
-
-                console.log("session:", session);
-                console.log("isPro:", isPro);
             }
         }
     }, [session, loading]);
-
-    useEffect(() => {
-        console.log("Updated isPro:", isPro);  // This logs the updated state after changes
-    }, [isPro]); // Dependency array includes isPro
 
     useEffect(() => {
         const savedModel = Cookie.get('selectedModel');
@@ -85,11 +76,10 @@ const TopNavBar = ({searchTerms, setSearchTerms, onSearch, searchInputRef, lang}
                         className="text-white inset-y-0 pointer-events-none absolute left-[8.5rem] top-3"
                     />
                 </div>
-                <SearchInput searchTerms={searchTerms} setSearchTerms={setSearchTerms} onSearch={onSearch}
-                             searchInputRef={searchInputRef}/>
-                <UserMenu loginBtnHoverColorClass={"hover:text-customWhite"} lang={lang?.toLowerCase() || 'en'}/>
+                <SearchInput lang={lang?.toLowerCase()} searchTerms={searchTerms}/>
+                <UserMenu loginBtnHoverColorClass={"hover:text-customWhite"} lang={lang?.toLowerCase()}/>
             </div>
-            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={lang?.toLowerCase() || 'en'} />}
+            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={lang?.toLowerCase()} />}
         </div>
     );
 };

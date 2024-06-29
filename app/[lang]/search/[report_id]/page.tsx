@@ -11,7 +11,7 @@ import React from "react";
 
 const replaceReferences = (text, referenceData) => {
     const parts = text.split(/\[citation:(\d+)\]/g);
-    // console.log(parts);
+
     return parts.map((part, index) => {
         if ((index % 2) === 1) {
             const refNumber = parseInt(part, 10) - 1;
@@ -37,9 +37,9 @@ async function ReportPage({params}) {
     });
 
     if (reportResponse.status === 404) {
-        // throw new Error('ReportNotFound');
+        throw new Error('ReportNotFound');
     } else if (!reportResponse.ok) {
-        // throw new Error(`Failed to fetch report, status: ${reportResponse.status}`);
+        throw new Error(`Failed to fetch report, status: ${reportResponse.status}`);
     }
 
     const report = await reportResponse.json();
@@ -52,11 +52,8 @@ async function ReportPage({params}) {
         <div className="flex min-h-screen">
             <SessionProvider>
                 <TopNavBar
-                    searchTerms=""
-                    setSearchTerms={null}
-                    onSearch={null}
-                    searchInputRef={null}
                     lang={params.lang?.toLowerCase() || 'en'}
+                    searchTerms={report.title}
                 />
             </SessionProvider>
 
@@ -79,7 +76,7 @@ async function ReportPage({params}) {
                     <h4 className='text-sm'>{dictionary?.search.moreQs}</h4>
                     <div className="flex flex-wrap justify-center pt-2">
                         {reportData.derivedQuestions.map((question, index) => (
-                            <DerivedQuestionCard key={index} question={question} onSearch={null}/>
+                            <DerivedQuestionCard key={index} question={question}/>
                         ))}
                     </div>
                 </div>
