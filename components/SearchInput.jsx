@@ -1,9 +1,10 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSearch} from '@fortawesome/free-solid-svg-icons';
 import {useRouter, useSearchParams} from 'next/navigation';
 
 const SearchInput = ({lang = 'en', searchTerms = ''}) => {
+    const [isIMEActive, setIMEActive] = useState(false);
     const searchInputRef = useRef(null);
     const searchParams = useSearchParams();
     const router = useRouter();  // Add this line
@@ -11,8 +12,28 @@ const SearchInput = ({lang = 'en', searchTerms = ''}) => {
     useEffect(() => {
         searchInputRef.current.value = searchTerms || searchParams?.get('q');
 
+        const handleCompositionStart = () => {
+            setIMEActive(true);
+        };
+        const handleCompositionEnd = () => {
+            setIMEActive(false);
+        };
+        const handleGlobalKeyDown = (event) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+                event.preventDefault();
+                searchInputRef.current?.focus();
+                searchInputRef.current?.select();
+            }
+        };
+
+        window.addEventListener('compositionstart', handleCompositionStart);
+        window.addEventListener('compositionend', handleCompositionEnd);
         window.addEventListener('keydown', handleGlobalKeyDown);
-        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+        return () => {
+            window.removeEventListener('compositionstart', handleCompositionStart);
+            window.removeEventListener('compositionend', handleCompositionEnd);
+            window.removeEventListener('keydown', handleGlobalKeyDown);
+        };
     }, []);
 
     const handleSearch = () => {
@@ -23,16 +44,8 @@ const SearchInput = ({lang = 'en', searchTerms = ''}) => {
         router.push(`/${lang}/search?q=${encodeURIComponent(searchInputRef.current.value)}`);
     };
 
-    const handleGlobalKeyDown = (event) => {
-        if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-            event.preventDefault();
-            searchInputRef.current?.focus();
-            searchInputRef.current?.select();
-        }
-    };
-
     const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !isIMEActive) {
             handleSearch();
         }
     };

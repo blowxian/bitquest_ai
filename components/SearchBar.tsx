@@ -14,13 +14,54 @@ import Overlay from './Overlay'; // Ensure Overlay is imported
 export default function SearchBar({searchDict, lang}) {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const inputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null as unknown as HTMLInputElement);
 
     const {data: session, status} = useSessionContext();
     const loading = status === "loading";
     const [isPro, setIsPro] = useState(false);
     const [selectedModel, setSelectedModel] = useState('');
     const [showOverlay, setShowOverlay] = useState(false);
+    const [isIMEActive, setIMEActive] = useState(false);
+
+    useEffect(() => {
+        const savedModel = Cookie.get('selectedModel');
+        if (savedModel) {
+            const modelSelectElement = document.querySelector('select');
+            if (modelSelectElement) {
+                modelSelectElement.value = savedModel;
+            }
+        }
+
+        const handleCompositionStart = () => {
+            setIMEActive(true);
+        };
+        const handleCompositionEnd = () => {
+            setIMEActive(false);
+        };
+        // 键盘事件处理函数
+        const handleGlobalKeyDown = (event: KeyboardEvent) => {
+
+            // 检查是否按下了 'K' 键，同时按下了 'Meta' 键（Mac）或 'Control' 键（Windows/Linux）
+            if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+                event.preventDefault(); // 阻止默认行为
+
+                const searchInput = inputRef.current;
+                if (searchInput) {
+                    searchInput.focus(); // 聚焦到输入框
+                    searchInput.select(); // 全选输入框内容
+                }
+            }
+        };
+
+        window.addEventListener('compositionstart', handleCompositionStart);
+        window.addEventListener('compositionend', handleCompositionEnd);
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        return () => {
+            window.removeEventListener('compositionstart', handleCompositionStart);
+            window.removeEventListener('compositionend', handleCompositionEnd);
+            window.removeEventListener('keydown', handleGlobalKeyDown);
+        };
+    }, []);
 
     useEffect(() => {
         if (!loading && session) {
@@ -38,25 +79,10 @@ export default function SearchBar({searchDict, lang}) {
         }
     }, [session, loading]);
 
-    useEffect(() => {
-        const savedModel = Cookie.get('selectedModel');
-        if (savedModel) {
-            const modelSelectElement = document.querySelector('select');
-            if (modelSelectElement) {
-                modelSelectElement.value = savedModel;
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        console.log("Updated isPro:", isPro);  // This logs the updated state after changes
-    }, [isPro]); // Dependency array includes isPro
-
-
     const getAvailableModels = () => {
         return Object.entries(models).map(([key, model]) => ({
             key,
-            name: `${model.name || model.identifier.split('/')[1]}${!isPro && model.tier === 'pro' ? ' (Pro)' : ''}`
+            name: `${model.name}${!isPro && model.tier === 'pro' ? ' (Pro)' : ''}`
         }));
     };
 
@@ -76,7 +102,7 @@ export default function SearchBar({searchDict, lang}) {
 
 
     function handleSearch(e: React.KeyboardEvent<HTMLInputElement> | null) {
-        if (e && e.key === "Enter" || !e) {
+        if ((e && e.key === "Enter" && !isIMEActive) || !e) {
             const term = inputRef.current?.value.trim();
             if (!term) {
                 return;
@@ -108,31 +134,6 @@ export default function SearchBar({searchDict, lang}) {
         }
     };
 
-    // 键盘事件处理函数
-    const handleGlobalKeyDown = (event: KeyboardEvent) => {
-
-        // 检查是否按下了 'K' 键，同时按下了 'Meta' 键（Mac）或 'Control' 键（Windows/Linux）
-        if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-            event.preventDefault(); // 阻止默认行为
-
-            const searchInput = inputRef.current;
-            if (searchInput) {
-                searchInput.focus(); // 聚焦到输入框
-                searchInput.select(); // 全选输入框内容
-            }
-        }
-    };
-
-    useEffect(() => {
-        // 添加事件监听器
-        window.addEventListener('keydown', handleGlobalKeyDown);
-
-        // 组件卸载时移除事件监听器
-        return () => {
-            window.removeEventListener('keydown', handleGlobalKeyDown);
-        };
-    }, []);
-
     return (
         <div className={"w-3/4 max-w-6xl mt-3"}>
             {/* 中间搜索框 */}
@@ -157,7 +158,7 @@ export default function SearchBar({searchDict, lang}) {
                     type="search"
                     placeholder={searchDict?.placeholder}
                     className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-[2.5rem] sm:pl-[11.5rem] sm:pr-28 w-full outline-none focus:ring-0"
-                    onKeyUp={(e) => {
+                    onKeyDown={(e) => {
                         handleSearch(e);
                     }}
                 />
