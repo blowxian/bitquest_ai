@@ -4,7 +4,6 @@ import React, {useEffect, useState} from 'react';
 import {useRouter, useSearchParams} from 'next/navigation';
 import axios from 'axios';
 import Header from "@/components/Header";
-import {recordToFeishu} from '@/lib/feishu';
 
 const PublishPage = () => {
     const router = useRouter();
@@ -43,6 +42,18 @@ const PublishPage = () => {
             console.log('Report created:', reportData);
 
             if (reportResponse.status === 200) {
+                // TODO：添加至 google indexing
+
+                const res = await fetch('/api/indexing/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: process.env.NEXT_PUBLIC_BASE_URL + "/en" + reportData.url }),
+                });
+
+                console.log('google indexing res: ', res);
+
                 // 成功后跳转至发布后的页面
                 router.push(reportData.url);
             } else {
