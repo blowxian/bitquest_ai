@@ -28,7 +28,7 @@ const replaceReferences = (text, referenceData) => {
 
 async function ReportPage({params}) {
     // API 请求获取报告和字典数据
-    const reportResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/report?id=${params.report_id}`, {
+    const reportResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/report?id=${encodeURIComponent(params.report_id)}`, {
         headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',
@@ -53,7 +53,7 @@ async function ReportPage({params}) {
             <SessionProvider>
                 <TopNavBar
                     lang={params.lang?.toLowerCase() || 'en'}
-                    searchTerms={report.title}
+                    searchTerms={''}
                 />
             </SessionProvider>
 

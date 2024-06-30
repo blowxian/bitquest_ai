@@ -1,54 +1,50 @@
+// pages/api/updateGoogleIndex.js
 import { google } from 'googleapis';
 import path from 'path';
-import axios from 'axios';
-
-const SCOPES = ['https://www.googleapis.com/auth/indexing'];
-const CREDENTIALS_PATH = path.join(process.cwd(), 'google-credentials.json');
-
-console.log('Current working directory:', process.cwd());
-console.log('Credentials path:', path.join(process.cwd(), 'credentials.json'));
-
-async function getAuthenticatedClient() {
-    const auth = new google.auth.GoogleAuth({
-        keyFile: CREDENTIALS_PATH,
-        scopes: SCOPES,
-    });
-
-    const authClient = await auth.getClient();
-    return authClient;
-}
+import fs from 'fs';
 
 export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        const { url } = req.body;
+    if (req.method !== 'POST') {
+        return res.status(405).json({ message: 'Method not allowed' });
+    }
 
-        if (!url) {
-            return res.status(400).json({ error: 'URL is required' });
-        }
+    const { url, type } = req.body;
 
-        const authClient = await getAuthenticatedClient();
+    if (!url || !type) {
+        return res.status(400).json({ message: 'URL and type are required' });
+    }
 
-        const endpoint = 'https://indexing.googleapis.com/v3/urlNotifications:publish';
-        const requestBody = {
-            url: url,
-            type: 'URL_UPDATED',
-        };
+    try {
+        // Load the service account key JSON file.
+        const keyFile = path.join(process.cwd(), 'google-credentials.json');
+        const key = JSON.parse(fs.readFileSync(keyFile, 'utf8'));
 
-        try {
-            const response = await axios.post(endpoint, requestBody, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${authClient.credentials.access_token}`,
-                },
-            });
+        // Set up a JWT auth client
+        const jwtClient = new google.auth.JWT(
+            key.client_email,
+            null,
+            key.private_key,
+            ['https://www.googleapis.com/auth/indexing'],
+            null
+        );
 
-            console.log('Google Indexing API response:', response.data);
+        // Authenticate request
+        await jwtClient.authorize();
 
-            res.status(200).json(response.data);
-        } catch (error) {
-            res.status(500).json({ error: error });
-        }
-    } else {
-        res.status(405).json({ error: 'Method not allowed' });
+        // Initialize the Indexing API service
+        const indexing = google.indexing({ version: 'v3', auth: jwtClient });
+
+        // Make the API request
+        const response = await indexing.urlNotifications.publish({
+            requestBody: {
+                url: url,
+                type: type // 'URL_UPDATED' or 'URL_DELETED'
+            }
+        });
+
+        res.status(200).json({ message: 'Successfully updated Google Index', data: response.data });
+    } catch (error) {
+        console.error('Error updating Google Index:', error);
+        res.status(500).json({ message: 'Error updating Google Index', error: error.message });
     }
 }

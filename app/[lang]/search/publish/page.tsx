@@ -14,15 +14,19 @@ const PublishPage = () => {
 
     const fetchDataAndCreateRecord = async () => {
         try {
-            if (!recordId) return;
+            if (!recordId) {
+                setError('No recordId provided');
+                setLoading(false);
+                return;
+            }
             // 获取记录
-            const recordResponse = await axios.get('/api/record', {
-                params: {
-                    appToken: "PWCWbe2x2aMfQts2fNpcmOWOnVh",
-                    tableId: "tbl5OB8eWTBgwrDc",
-                    recordId: recordId
-                }
-            });
+            const params = new URLSearchParams({
+                appToken: "PWCWbe2x2aMfQts2fNpcmOWOnVh",
+                tableId: "tbl5OB8eWTBgwrDc",
+                recordId: recordId
+            }).toString();
+
+            const recordResponse = await axios.get(`/api/record?${params}`);
 
             const recordData = recordResponse.data;
             console.log(recordData);
@@ -42,14 +46,12 @@ const PublishPage = () => {
             console.log('Report created:', reportData);
 
             if (reportResponse.status === 200) {
-                // TODO：添加至 google indexing
-
                 const res = await fetch('/api/indexing/google', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ url: process.env.NEXT_PUBLIC_BASE_URL + "/en" + reportData.url }),
+                    body: JSON.stringify({ url: process.env.NEXT_PUBLIC_BASE_URL + "/en" + reportData.url, type: "URL_UPDATED"}),
                 });
 
                 console.log('google indexing res: ', res);

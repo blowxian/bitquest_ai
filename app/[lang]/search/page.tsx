@@ -83,7 +83,7 @@ function Page({params}: { params: { lang: string } }) {
         const add_record_promise = recordToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", "", {
             "搜索内容": searchParams?.get('q')
         });
-        const eventSource = new EventSource(`/api/update?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchParams?.get('q'))}`);
+        const eventSource = new EventSource(`/api/update?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchParams?.get('q') ?? '')}`);
         handleEventSource(eventSource, system_prompt, add_record_promise);
     };
 
@@ -150,7 +150,7 @@ function Page({params}: { params: { lang: string } }) {
                 "搜索总结": partString,
                 "发布链接": {
                     text: `${add_record_response.data.record.record_id}`,
-                    link: `http://localhost:3000/search/publish?recordId=${add_record_response.data.record.record_id}`
+                    link: `${process.env.NEXT_PUBLIC_BASE_URL}/search/publish?recordId=${add_record_response.data.record.record_id}`
                 }
             })
         });
