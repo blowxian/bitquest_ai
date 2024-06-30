@@ -43,4 +43,14 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Google Credentials
 google-credentials.json
+
+# Staging
+.env.staging
+docker-compose.staging.yml
+
+# Production
+.env.production
+docker-compose.production.yml
