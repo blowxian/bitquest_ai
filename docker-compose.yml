@@ -15,7 +15,6 @@ services:
       - '5555:5555'                                               # 测试 prisma 的端口
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - NODE_ENV=development
       - DATABASE_URL=postgresql://phind_admin:phind_2024@db:5432/phind_ai?schema=public
     container_name: phind_ai_dev
   db:
