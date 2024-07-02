@@ -8,7 +8,7 @@ import Header from "@/components/Header";
 const PublishPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const recordId = searchParams.get('recordId'); // 获取 recordId 参数
+    const recordId = searchParams ? searchParams.get('recordId') : null; // 确保 searchParams 不是 null
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
