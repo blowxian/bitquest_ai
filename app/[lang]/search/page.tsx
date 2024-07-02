@@ -176,7 +176,7 @@ function Page({params}: { params: { lang: string } }) {
             <SessionProvider>
                 <TopNavBar
                     lang={params.lang?.toLowerCase()}
-                    searchTerms={searchParams?.get('q')}
+                    searchTerms={searchParams?.get('q') || undefined}
                 />
             </SessionProvider>
             <div className="flex-1 mx-auto sm:p-4 pt-20 sm:pt-24 text-customBlackText max-w-6xl">
