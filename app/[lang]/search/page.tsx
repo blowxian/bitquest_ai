@@ -27,6 +27,7 @@ function Page({params}: { params: { lang: string } }) {
     const [feishuRecordId, setFeishuRecordId] = useState('');
     const [showOverlay, setShowOverlay] = useState(false);
     const searchParams = useSearchParams();
+    const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
     useEffect(() => {
         const fetchDictionary = async () => {
@@ -150,7 +151,7 @@ function Page({params}: { params: { lang: string } }) {
                 "搜索总结": partString,
                 "发布链接": {
                     text: `${add_record_response.data.record.record_id}`,
-                    link: `${process.env.NEXT_PUBLIC_BASE_URL}/search/publish?recordId=${add_record_response.data.record.record_id}`
+                    link: `${NEXT_PUBLIC_BASE_URL}/search/publish?recordId=${add_record_response.data.record.record_id}`
                 }
             })
         });
