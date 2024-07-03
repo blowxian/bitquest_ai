@@ -4,6 +4,7 @@ import React, {useEffect, useState} from 'react';
 import {useRouter, useSearchParams} from 'next/navigation';
 import axios from 'axios';
 import Header from "@/components/Header";
+import {env} from "next-runtime-env";
 
 const PublishPage = () => {
     const router = useRouter();
@@ -51,7 +52,7 @@ const PublishPage = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ url: process.env.NEXT_PUBLIC_BASE_URL + "/en" + reportData.url, type: "URL_UPDATED"}),
+                    body: JSON.stringify({ url: env('NEXT_PUBLIC_BASE_URL') + "/en" + reportData.url, type: "URL_UPDATED"}),
                 });
 
                 console.log('google indexing res: ', res);

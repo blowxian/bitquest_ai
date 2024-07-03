@@ -14,6 +14,7 @@ import {SessionProvider} from '@/app/context/sessionContext';
 import Overlay from '@/components/Overlay';
 import {logEvent} from '@/lib/ga_log';
 import {recordToFeishu} from '@/lib/feishu';
+import { env } from 'next-runtime-env';
 
 function Page({params}: { params: { lang: string } }) {
     const [dict, setDict] = useState<Dictionary | null>(null);
@@ -150,7 +151,7 @@ function Page({params}: { params: { lang: string } }) {
                 "搜索总结": partString,
                 "发布链接": {
                     text: `${add_record_response.data.record.record_id}`,
-                    link: `${process.env.NEXT_PUBLIC_BASE_URL}/search/publish?recordId=${add_record_response.data.record.record_id}`
+                    link: `${env('NEXT_PUBLIC_BASE_URL')}/search/publish?recordId=${add_record_response.data.record.record_id}`
                 }
             })
         });

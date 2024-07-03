@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "env-cmd -f .env.local next dev",
     "build": "next build",
     "start": "next start",
     "build:staging": "env-cmd -f .env.staging next build",
@@ -33,6 +33,7 @@
     "next": "^14.2.4",
     "next-auth": "^4.24.7",
     "next-i18next": "^15.3.0",
+    "next-runtime-env": "^3.2.2",
     "oas": "^24.3.5",
     "openai": "^4.38.2",
     "pg": "^8.11.5",

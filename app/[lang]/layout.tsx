@@ -5,7 +5,8 @@ import Script from "next/script";
 import './globals.css'
 import {Pathway_Extreme} from 'next/font/google'
 import {config} from '@fortawesome/fontawesome-svg-core';
-import '@fortawesome/fontawesome-svg-core/styles.css'; // Import the CSS
+import '@fortawesome/fontawesome-svg-core/styles.css';
+import {PublicEnvScript} from "next-runtime-env"; // Import the CSS
 config.autoAddCss = false; // Tell Font Awesome to skip adding the CSS automatically
 
 const pathway_extreme = Pathway_Extreme({
@@ -36,6 +37,9 @@ export default function RootLayout({
 
     return (
         <html lang="en">
+        <head>
+            <PublicEnvScript/>
+        </head>
         <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${gaIds[0]}`}
             strategy="afterInteractive"
