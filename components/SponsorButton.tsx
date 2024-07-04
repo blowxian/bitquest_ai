@@ -7,7 +7,7 @@ import { logEvent } from '@/lib/ga_log';
 const getUserInfo = () => {
     const userAgent = navigator.userAgent;
     const deviceType = /Mobi|Android/i.test(userAgent) ? 'Mobile' : 'Desktop';
-    const language = navigator.language || navigator.userLanguage;
+    const language = navigator.language;
     const platform = navigator.platform;
     const timestamp = new Date().toISOString();
     const pageUrl = window.location.href;
