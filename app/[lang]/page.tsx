@@ -2,9 +2,7 @@
 'use client'
 
 import React, {Suspense, useEffect, useState} from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faArrowUpRightFromSquare,
     faBlog,
     faCommentDots,
     faComments,
@@ -16,7 +14,8 @@ import SearchBar from "@/components/SearchBar";
 import LinkButton from "@/components/LinkButton";
 import UserMenu from "@/components/UserMenu";
 import {Dictionary, getDictionary} from '@/app/[lang]/dictionaries';
-import {SessionProvider} from '../context/sessionContext';  // Adjust the import path as needed
+import {SessionProvider} from '../context/sessionContext';
+import SponsorButton from "@/components/SponsorButton";  // Adjust the import path as needed
 
 async function fetchDictionary(lang: string) {
     return await getDictionary(lang);
@@ -42,14 +41,7 @@ export default function Page({params}) {
                     <Suspense fallback={<div>Loading...</div>}>
                         <SearchBar searchDict={dict?.search} lang={params.lang}/>
                     </Suspense>
-                    <div className="bg-[#F7EDE8] flex items-center justify-center mt-5 w-3/4">
-                        <button className="bg-[#737E91] text-xs text-gray-300 hover:text-white transition duration-150 ease-in-out py-2 px-4 rounded-lg shadow">
-                            <a href="https://monica.im?utm=phind-ai-gas" className="hidden md:block" target={"_blank"} rel="sponsored">Start Your Free
-                                Trial of GPT-4o, Claude3 Opus, and Gemini Pro in One App <FontAwesomeIcon className={'ml-1'} icon={faArrowUpRightFromSquare} /></a>
-                            <a href="https://app.adjust.com/1euq8c9j" className="block md:hidden" target={"_blank"} rel="sponsored">Start Your Free Trial
-                                of GPT-4o, Claude3 Opus, and Gemini Pro in One App <FontAwesomeIcon className={'ml-1'} icon={faArrowUpRightFromSquare} /></a>
-                        </button>
-                    </div>
+                    <SponsorButton />
                 </div>
                 <div className="text-center w-full mt-8">
                     <div className="flex justify-center space-x-4 text-sm">
