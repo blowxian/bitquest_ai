@@ -27,6 +27,7 @@ function Page({params}: { params: { lang: string } }) {
     const [isLoading, setIsLoading] = useState(true);
     const [feishuRecordId, setFeishuRecordId] = useState('');
     const [showOverlay, setShowOverlay] = useState(false);
+    const [userIp, setUserIp] = useState('');
     const searchParams = useSearchParams();
 
     useEffect(() => {
@@ -37,6 +38,15 @@ function Page({params}: { params: { lang: string } }) {
         };
         fetchDictionary();
     }, [params.lang]);
+
+    useEffect(() => {
+        const fetchUserIp = async () => {
+            const response = await fetch('/api/get_client_ip');
+            const data = await response.json();
+            setUserIp(data.ip);
+        };
+        fetchUserIp();
+    }, []);
 
     useEffect(() => {
         const keywords = searchParams?.get('q');
@@ -82,7 +92,8 @@ function Page({params}: { params: { lang: string } }) {
     const processSearchResults = () => {
         const system_prompt = constructSummarizePrompt(query.items, dict?.search);
         const add_record_promise = recordToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", "", {
-            "搜索内容": searchParams?.get('q')
+            "搜索内容": searchParams?.get('q'),
+            "用户IP": userIp                      // 添加用户IP信息
         });
         const eventSource = new EventSource(`/api/update?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchParams?.get('q') ?? '')}`);
         handleEventSource(eventSource, system_prompt, add_record_promise);
