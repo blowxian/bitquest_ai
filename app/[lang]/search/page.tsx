@@ -73,11 +73,23 @@ function Page({params}: { params: { lang: string } }) {
     }, [isFinalized, isLoading, feishuRecordId]);
 
     const performSearch = async (keywords: string) => {
+        const searchCount = parseInt(localStorage.getItem('searchCount') || '0');
+
+        // 检查搜索计数并显示浮层，如果满足条件则禁止搜索
+        if (searchCount >= 10) {
+            setShowOverlay(true);
+            return;
+        }
+
         setData('');
         setReferenceData(['', '', '', '', '', '', '', '']);
         setDerivedQuestions(['', '', '', '']);
         setIsLoading(true);
         document.title = `${keywords} | phind ai alternative`;
+
+        // 更新搜索计数
+        localStorage.setItem('searchCount', (searchCount + 1).toString());
+
         const response = await fetch('/api/search_service', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -183,6 +195,12 @@ function Page({params}: { params: { lang: string } }) {
         }
     };
 
+    const handleOverlayClose = () => {
+        setShowOverlay(false);
+        localStorage.setItem('searchCount', '0'); // 清零搜索计数
+    };
+
+
     return (
         <div className="flex min-h-screen">
             <SessionProvider>
@@ -213,7 +231,7 @@ function Page({params}: { params: { lang: string } }) {
                     </div>
                 </div>
             </div>
-            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={params.lang?.toLowerCase() || 'en'}/>}
+            {showOverlay && <Overlay onClose={handleOverlayClose} lang={params.lang?.toLowerCase() || 'en'} />}
         </div>
     );
 }

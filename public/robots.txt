@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /en/search/*
+Allow: /zh/search/*
+Allow: /hi/search/*
+Disallow: /en/search?q=*
+Disallow: /zh/search?q=*
+Disallow: /hi/search?q=*
