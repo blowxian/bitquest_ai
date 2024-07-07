@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     title: 'phind ai cheap alternative',
     description: 'phind alternative, ai search engine affordable for everyone',
     keywords: ['ai search', 'phind ai', 'phind alternative', 'cheapest ai search', 'perplexity alternative', 'phind', 'ai', 'search', 'engine', 'cheap', 'affordable', 'everyone'],
+    robots: "index, follow",
 }
 
 export default function RootLayout({
