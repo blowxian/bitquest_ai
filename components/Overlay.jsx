@@ -21,7 +21,7 @@ const Overlay = ({ onClose, lang = 'en' }) => {
 
         loadDict();
 
-        logEvent('pricing_show', 'commercial', 'pro popup', partString);
+        logEvent('pricing_show', 'commercial', 'pro popup', 'show popup');
     }, [lang]); // 当语言变更时重新加载字典
 
     const handleMonthlySubscribe = () => {
