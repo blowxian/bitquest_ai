@@ -28,6 +28,7 @@ function Page({params}: { params: { lang: string } }) {
     const [feishuRecordId, setFeishuRecordId] = useState('');
     const [showOverlay, setShowOverlay] = useState(false);
     const [userIp, setUserIp] = useState('');
+    const [isSearching, setIsSearching] = useState(false); // 新增状态变量
     const searchParams = useSearchParams();
 
     useEffect(() => {
@@ -50,7 +51,7 @@ function Page({params}: { params: { lang: string } }) {
 
     useEffect(() => {
         const keywords = searchParams?.get('q');
-        if (keywords && isDictionaryLoaded) {
+        if (keywords && isDictionaryLoaded && !isSearching) {
             performSearch(keywords);
         }
     }, [searchParams, isDictionaryLoaded]);
@@ -81,6 +82,7 @@ function Page({params}: { params: { lang: string } }) {
             return;
         }
 
+        setIsSearching(true); // 开始搜索时设置状态
         setData('');
         setReferenceData(['', '', '', '', '', '', '', '']);
         setDerivedQuestions(['', '', '', '']);
@@ -99,6 +101,7 @@ function Page({params}: { params: { lang: string } }) {
         setQuery(data);
         setReferenceData(data.items);
         fetchAndDisplayUserSuggestion(keywords);
+        setIsSearching(false); // 搜索完成时重置状态
     };
 
     const processSearchResults = () => {
