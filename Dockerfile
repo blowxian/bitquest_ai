@@ -1,45 +1,35 @@
-# Use the official lightweight Node.js 18 image.
+# 使用官方的 Node.js 18 镜像作为基础镜像
 FROM node:18 as builder
 
-# Set the working directory in the container
+# 设置工作目录
 WORKDIR /app
 
-# Argument for environment with a default value
-ARG NODE_ENV=development
-ENV NODE_ENV=${NODE_ENV}
-
-# Copy package.json and package-lock.json to work directory
+# 复制 package.json 和 package-lock.json
 COPY package*.json ./
-COPY prisma ./prisma/
 
-RUN npm cache clean --force
-
-# Install dependencies
+# 安装依赖
 RUN npm install
 
-# Copy local code to the container
+# 复制应用代码
 COPY . .
 
-# Generate Prisma Client
+# 生成 Prisma 客户端
 RUN npx prisma generate
 
-# Build the Next.js application
-RUN if [ "$NODE_ENV" = "production" ]; then \
-      npm run build && ls -la .next; \
-    fi
+# 构建 Next.js 应用
+RUN npm run build
 
-# 第二阶段：专门为生产环境准备
+# 仅包含生产环境的依赖项
 FROM node:18 as production
-WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-EXPOSE 3000
-CMD ["npm", "run", "start"]
 
-# 第三阶段：专门为开发环境准备
-FROM node:18 as development
+# 设置工作目录
 WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
+
+# 从构建阶段复制文件
+COPY --from=builder /app ./
+
+# 暴露应用的端口
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+
+# 启动应用
+CMD ["npm", "start"]
