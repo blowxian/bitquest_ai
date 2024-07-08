@@ -1,6 +1,6 @@
 {
-  "name": "bitquest_ai",
-  "version": "0.1.0",
+  "name": "coogle_ai",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "env-cmd -f .env.local next dev",
@@ -20,11 +20,7 @@
     "@stripe/react-stripe-js": "^2.7.1",
     "@stripe/stripe-js": "^3.4.1",
     "api": "^2.6.0",
-    "autoprefixer": "^10.4.19",
     "axios": "^1.7.1",
-    "env-cmd": "^10.1.0",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "14.0.4",
     "formatjs": "^0.1.1",
     "googleapis": "^140.0.1",
     "js-cookie": "^3.0.5",
@@ -38,7 +34,6 @@
     "openai": "^4.38.2",
     "pg": "^8.11.5",
     "pinyin": "^3.1.0",
-    "postcss": "^8.4.38",
     "prisma": "^5.12.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -47,18 +42,23 @@
     "rehype-react": "^8.0.0",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
-    "remark-preset-lint-recommended": "^6.1.3",
     "remark-rehype": "^11.1.0",
     "slugify": "^1.6.6",
     "stripe": "^15.6.0",
-    "tailwindcss": "^3.4.3",
     "transliteration": "^2.3.5",
-    "typescript": "^5.4.5",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.79",
-    "@types/react-dom": "^18.2.25"
+    "@types/react-dom": "^18.2.25",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.0.4",
+    "postcss": "^8.4.38",
+    "remark-preset-lint-recommended": "^6.1.3",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5",
+    "env-cmd": "^10.1.0"
   }
 }
