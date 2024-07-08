@@ -25,8 +25,7 @@ const getUserInfo = () => {
 const SponsorButton = () => {
     const handleClick = (linkType) => {
         const userInfo = getUserInfo();
-        logEvent('click', 'PromotionButton', linkType, JSON.stringify(userInfo));
-        console.log('User Info:', userInfo);
+        logEvent('click_sponsor_btn', 'ads', linkType, JSON.stringify(userInfo));
     };
 
     return (

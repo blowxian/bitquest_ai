@@ -4,7 +4,8 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useSessionContext } from '@/app/context/sessionContext';
-import { getDictionary } from '@/app/[lang]/dictionaries'; // Adjust the import path as needed
+import { getDictionary } from '@/app/[lang]/dictionaries';
+import {logEvent} from "@/lib/ga_log"; // Adjust the import path as needed
 
 const Overlay = ({ onClose, lang = 'en' }) => {
     const { data: session } = useSessionContext();
@@ -19,6 +20,8 @@ const Overlay = ({ onClose, lang = 'en' }) => {
         };
 
         loadDict();
+
+        logEvent('pricing_show', 'commercial', 'pro popup', partString);
     }, [lang]); // 当语言变更时重新加载字典
 
     const handleMonthlySubscribe = () => {
