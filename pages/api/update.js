@@ -4,8 +4,8 @@ import Cookie from 'cookie';
 import models from '../../lib/models'; // 确保正确引入 models
 import {warnFeishu} from '../../lib/feishu';
 
-const tokens = ['caa739ec6eff69a35a92a3480fb75211dcd536f38ddf461d37f988ddfcaebea5', '8a1fd0bb0a7cb217a3593e46ac3e7433df409196910e738ddc99d8dfe5673772',
-'b3fccfe123c9c8579c0f02aac21800726fdc2a2e1b8def105e6feeed2068f32d','fe8475870ee898afcf4c5ec02d60b9306129d655f3d0e81575f427773d2f5de1','f03e5aff63a0bdf5c3e1be4239bbd14d20105d2812e31cd6b41e4e2a78117e0e']; // 替换为你的实际 token
+const tokens = ['8c7bf4c91e7e88de0448fae9a285794b5712ea876c8b2c5c503553ead74cf6e5', 'd2b108b4b2d13ba6da964db40eaef61ad3e308c9c09b7e653373c88a5a689d6b',
+'d830cb423a3348e817f4826908b92f28e192372b6624717ef65d775d61c95fd4','96be3b7b845c00454ebcef8037a5399e45c6e29aa482ad6b9772dae5e1f385bb','25b30f26ec6ee6883fd7f6b372e03dfa5fca333cf14546bc7a7266141cea805b']; // 替换为你的实际 token
 let currentTokenIndex = 0;
 
 const togetherAIRequest = axios.create({
