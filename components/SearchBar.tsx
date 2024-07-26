@@ -3,7 +3,7 @@
 
 import {useRouter, useSearchParams} from 'next/navigation';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faAlignJustify, faChevronDown, faSearch} from "@fortawesome/free-solid-svg-icons";
+import {faArrowUpRightFromSquare, faChevronDown, faMarker, faSearch} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useRef, useState} from "react";
 import HotQuestionCard from './HotQuestionCard';
 import {useSessionContext} from '@/app/context/sessionContext';
@@ -171,10 +171,12 @@ export default function SearchBar({searchDict, lang}) {
                         <FontAwesomeIcon icon={faSearch}
                                          className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
                     </button>
-                    <a className="p-2 text-xl" href="https://aiparagraphgenerator.net" target="_blank"
+                    <a className="p-2 text-xl text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"
+                       href="https://aiparagraphgenerator.net" target="_blank"
                        data-tooltip-id="my-tooltip" data-tooltip-content="Generate paragraphs with AI">
-                        <FontAwesomeIcon icon={faAlignJustify}
-                                         className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
+                        <FontAwesomeIcon icon={faMarker}/>
+                        <span className="hidden lg:inline"> Gen with AI </span>
+                        <FontAwesomeIcon className="text-xs align-top" icon={faArrowUpRightFromSquare}/>
                     </a>
                 </div>
                 <ReactTooltip id="my-tooltip" variant="light"/>
