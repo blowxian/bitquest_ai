@@ -1,15 +1,17 @@
 // /components/SearchBar.tsx
 'use client';
 
-import {useSearchParams, useRouter} from 'next/navigation';
+import {useRouter, useSearchParams} from 'next/navigation';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSearch, faChevronDown} from "@fortawesome/free-solid-svg-icons";
+import {faAlignJustify, faChevronDown, faSearch} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useRef, useState} from "react";
 import HotQuestionCard from './HotQuestionCard';
 import {useSessionContext} from '@/app/context/sessionContext';
 import models from '@/lib/models';
 import Cookie from 'js-cookie';
 import Overlay from './Overlay'; // Ensure Overlay is imported
+import {Tooltip as ReactTooltip} from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'
 
 export default function SearchBar({searchDict, lang}) {
     const searchParams = useSearchParams();
@@ -164,13 +166,20 @@ export default function SearchBar({searchDict, lang}) {
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <span className="hidden sm:block mr-4 text-sm text-gray-400">⌘ + K</span>
-                    <button className="p-2 text-xl" onClick={() => handleSearch(null)}>
+                    <button className="p-2 text-xl" onClick={() => handleSearch(null)}
+                            data-tooltip-id="my-tooltip" data-tooltip-content="Search with AI">
                         <FontAwesomeIcon icon={faSearch}
                                          className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
                     </button>
+                    <a className="p-2 text-xl" href="https://aiparagraphgenerator.net" target="_blank"
+                       data-tooltip-id="my-tooltip" data-tooltip-content="Generate paragraphs with AI">
+                        <FontAwesomeIcon icon={faAlignJustify}
+                                         className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
+                    </a>
                 </div>
+                <ReactTooltip id="my-tooltip" variant="light"/>
             </div>
-            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={lang?.toLowerCase() || 'en'} />}
+            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={lang?.toLowerCase() || 'en'}/>}
             <div className="flex flex-wrap justify-center pt-2">
                 {hotQuestions.map((question, index) => (
                     <HotQuestionCard
