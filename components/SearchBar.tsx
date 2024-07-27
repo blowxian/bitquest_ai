@@ -136,6 +136,12 @@ export default function SearchBar({searchDict, lang}) {
         }
     };
 
+    const handleAIGenerateClick = () => {
+        const term = inputRef.current?.value.trim();
+        const aiGenerateUrl = term ? `https://aiparagraphgenerator.net?keywords=${encodeURIComponent(term)}` : 'https://aiparagraphgenerator.net';
+        window.open(aiGenerateUrl, '_blank');
+    };
+
     return (
         <div className={"w-3/4 max-w-6xl mt-3"}>
             {/* 中间搜索框 */}
@@ -164,20 +170,22 @@ export default function SearchBar({searchDict, lang}) {
                         handleSearch(e);
                     }}
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <div
+                    className="absolute inset-y-0 right-0 flex items-center overflow-hidden rounded-full sm:rounded-2xl">
                     <span className="hidden sm:block mr-4 text-sm text-gray-400">⌘ + K</span>
-                    <button className="p-2 text-xl" onClick={() => handleSearch(null)}
+                    <button className="p-3 text-xl" onClick={() => handleSearch(null)}
                             data-tooltip-id="my-tooltip" data-tooltip-content="Search with AI">
                         <FontAwesomeIcon icon={faSearch}
                                          className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
                     </button>
-                    <a className="p-2 text-xl text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"
-                       href="https://aiparagraphgenerator.net" target="_blank"
-                       data-tooltip-id="my-tooltip" data-tooltip-content="Generate paragraphs with AI">
-                        <FontAwesomeIcon icon={faMarker}/>
-                        <span className="hidden lg:inline"> Gen with AI </span>
+                    <button
+                        className="py-8 p-3 text-xl text-customWhite2 bg-customOrange transition duration-150 ease-in-out"
+                        onClick={handleAIGenerateClick}
+                        data-tooltip-id="my-tooltip" data-tooltip-content="Generate paragraphs with AI">
+                        <FontAwesomeIcon icon={faMarker}/>&nbsp;
+                        <span className="hidden lg:inline">Gen with AI </span>
                         <FontAwesomeIcon className="text-xs align-top" icon={faArrowUpRightFromSquare}/>
-                    </a>
+                    </button>
                 </div>
                 <ReactTooltip id="my-tooltip" variant="light"/>
             </div>
