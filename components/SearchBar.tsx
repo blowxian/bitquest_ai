@@ -24,6 +24,7 @@ export default function SearchBar({searchDict, lang}) {
     const [selectedModel, setSelectedModel] = useState('');
     const [showOverlay, setShowOverlay] = useState(false);
     const [isIMEActive, setIMEActive] = useState(false);
+    const aiGenerateLinkRef = useRef<HTMLAnchorElement>(null);
 
     useEffect(() => {
         const savedModel = Cookie.get('selectedModel');
@@ -102,8 +103,7 @@ export default function SearchBar({searchDict, lang}) {
         Cookie.set('selectedModel', newModelKey, { expires: 30 });
     };
 
-
-    function handleSearch(e: React.KeyboardEvent<HTMLInputElement> | null) {
+    const handleSearch = (e: React.KeyboardEvent<HTMLInputElement> | null) => {
         if ((e && e.key === "Enter" && !isIMEActive) || !e) {
             const term = inputRef.current?.value.trim();
             if (!term) {
@@ -121,7 +121,7 @@ export default function SearchBar({searchDict, lang}) {
             params.set('q', term);
             router.push(`/${lang}/search?${params.toString()}`);
         }
-    }
+    };
 
     const hotQuestions = [
         "enable scss in next.js14",
@@ -136,10 +136,12 @@ export default function SearchBar({searchDict, lang}) {
         }
     };
 
-    const handleAIGenerateClick = () => {
+    const updateAIGenerateLink = () => {
         const term = inputRef.current?.value.trim();
-        const aiGenerateUrl = term ? `https://aiparagraphgenerator.net?keywords=${encodeURIComponent(term)}` : 'https://aiparagraphgenerator.net';
-        window.open(aiGenerateUrl, '_blank');
+        if (aiGenerateLinkRef.current) {
+            const aiGenerateUrl = term ? `https://aiparagraphgenerator.net?keywords=${encodeURIComponent(term)}` : 'https://aiparagraphgenerator.net';
+            aiGenerateLinkRef.current.href = aiGenerateUrl;
+        }
     };
 
     return (
@@ -168,7 +170,9 @@ export default function SearchBar({searchDict, lang}) {
                     className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-[2.5rem] sm:pl-[11.5rem] sm:pr-28 w-full outline-none focus:ring-0"
                     onKeyDown={(e) => {
                         handleSearch(e);
+                        updateAIGenerateLink(); // Update link on key down
                     }}
+                    onInput={updateAIGenerateLink} // Update link on input change
                 />
                 <div
                     className="absolute inset-y-0 right-0 flex items-center overflow-hidden rounded-full sm:rounded-2xl">
@@ -178,14 +182,16 @@ export default function SearchBar({searchDict, lang}) {
                         <FontAwesomeIcon icon={faSearch}
                                          className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
                     </button>
-                    <button
+                    <a
+                        ref={aiGenerateLinkRef}
                         className="py-8 p-3 text-xl text-customWhite2 bg-customOrange transition duration-150 ease-in-out"
-                        onClick={handleAIGenerateClick}
+                        href="https://aiparagraphgenerator.net"
+                        target="_blank"
                         data-tooltip-id="my-tooltip" data-tooltip-content="Generate paragraphs with AI">
                         <FontAwesomeIcon icon={faMarker}/>&nbsp;
                         <span className="hidden lg:inline">Gen with AI </span>
                         <FontAwesomeIcon className="text-xs align-top" icon={faArrowUpRightFromSquare}/>
-                    </button>
+                    </a>
                 </div>
                 <ReactTooltip id="my-tooltip" variant="light"/>
             </div>
