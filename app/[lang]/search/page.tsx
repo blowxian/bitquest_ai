@@ -1,6 +1,6 @@
 'use client'
 // Import statements
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faClipboardQuestion} from "@fortawesome/free-solid-svg-icons";
 import Markdown from "@/lib/mark-down";
@@ -9,12 +9,12 @@ import DerivedQuestionCard from "@/components/DerivedQuestionCard";
 import {useSearchParams} from 'next/navigation';
 import {SearchResponse} from "@/pages/api/types";
 import TopNavBar from "@/components/TopNavBar";
-import {getDictionary, Dictionary} from "@/app/[lang]/dictionaries";
+import {Dictionary, getDictionary} from "@/app/[lang]/dictionaries";
 import {SessionProvider} from '@/app/context/sessionContext';
 import Overlay from '@/components/Overlay';
 import {logEvent} from '@/lib/ga_log';
 import {recordToFeishu} from '@/lib/feishu';
-import { env } from 'next-runtime-env';
+import {env} from 'next-runtime-env';
 
 function Page({params}: { params: { lang: string } }) {
     const [dict, setDict] = useState<Dictionary | null>(null);
@@ -229,12 +229,16 @@ function Page({params}: { params: { lang: string } }) {
                     <h4 className='text-sm'>{dict?.search.moreQs}</h4>
                     <div className="flex flex-wrap justify-center pt-2">
                         {isLoading ? [...Array(4)].map((_, index) => <DerivedQuestionCardSkeleton
-                            key={index}/>) : derivedQuestions.map((question, index) => <DerivedQuestionCard key={index}
-                                                                                                            question={question}/>)}
+                            key={index}/>) : derivedQuestions.map((question, index) =>
+                            <DerivedQuestionCard
+                                key={index}
+                                question={question}
+                                lang={params.lang?.toLowerCase()}
+                            />)}
                     </div>
                 </div>
             </div>
-            {showOverlay && <Overlay onClose={handleOverlayClose} lang={params.lang?.toLowerCase() || 'en'} />}
+            {showOverlay && <Overlay onClose={handleOverlayClose} lang={params.lang?.toLowerCase() || 'en'}/>}
         </div>
     );
 }
