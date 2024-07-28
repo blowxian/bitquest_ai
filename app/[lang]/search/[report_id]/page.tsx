@@ -76,7 +76,8 @@ async function ReportPage({params}) {
                     <h4 className='text-sm'>{dictionary?.search.moreQs}</h4>
                     <div className="flex flex-wrap justify-center pt-2">
                         {reportData.derivedQuestions.map((question, index) => (
-                            <DerivedQuestionCard key={index} question={question}/>
+                            <DerivedQuestionCard key={index} question={question}
+                                                 lang={params.lang?.toLowerCase() || 'en'}/>
                         ))}
                     </div>
                 </div>
