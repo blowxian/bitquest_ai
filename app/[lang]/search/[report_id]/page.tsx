@@ -75,10 +75,12 @@ async function ReportPage({params}) {
                     </div>
                     <h4 className='text-sm'>{dictionary?.search.moreQs}</h4>
                     <div className="flex flex-wrap justify-center pt-2">
-                        {reportData.derivedQuestions.map((question, index) => (
-                            <DerivedQuestionCard key={index} question={question}
-                                                 lang={params.lang?.toLowerCase() || 'en'}/>
-                        ))}
+                        {reportData.derivedQuestions
+                            .filter(question => question !== '') // 过滤掉空字符串的问题
+                            .map((question, index) => (
+                                <DerivedQuestionCard key={index} question={question}
+                                                     lang={params.lang?.toLowerCase() || 'en'}/>
+                            ))}
                     </div>
                 </div>
             </div>

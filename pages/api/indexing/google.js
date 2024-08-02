@@ -1,7 +1,8 @@
 // pages/api/updateGoogleIndex.js
-import { google } from 'googleapis';
+import {google} from 'googleapis';
 import path from 'path';
 import fs from 'fs';
+import {notifyFeishu} from "../../../lib/feishu";
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -41,9 +42,12 @@ export default async function handler(req, res) {
                 type: type // 'URL_UPDATED' or 'URL_DELETED'
             }
         });
+        notifyFeishu(`Google indexing successfully: ${JSON.stringify(response)}`);
 
         res.status(200).json({ message: 'Successfully updated Google Index', data: response.data });
     } catch (error) {
+        notifyFeishu(`Google indexing failed!`);
+
         console.error('Error updating Google Index:', error);
         res.status(500).json({ message: 'Error updating Google Index', error: error.message });
     }

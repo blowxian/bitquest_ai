@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSearch} from '@fortawesome/free-solid-svg-icons';
 import {useRouter, useSearchParams} from 'next/navigation';
@@ -34,7 +34,7 @@ const SearchInput = ({lang = 'en', searchTerms = ''}) => {
             window.removeEventListener('compositionend', handleCompositionEnd);
             window.removeEventListener('keydown', handleGlobalKeyDown);
         };
-    }, []);
+    }, [searchTerms]);
 
     const handleSearch = () => {
         if(!searchInputRef.current.value || (searchInputRef.current.value === searchParams?.get('q'))){

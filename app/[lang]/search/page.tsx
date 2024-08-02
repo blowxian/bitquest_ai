@@ -1,4 +1,5 @@
 'use client'
+
 // Import statements
 import React, {useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -13,8 +14,52 @@ import {Dictionary, getDictionary} from "@/app/[lang]/dictionaries";
 import {SessionProvider} from '@/app/context/sessionContext';
 import Overlay from '@/components/Overlay';
 import {logEvent} from '@/lib/ga_log';
-import {recordToFeishu} from '@/lib/feishu';
+import {notifyFeishu} from '@/lib/feishu';
 import {env} from 'next-runtime-env';
+
+const publishReportAndGoogleIndex = async (title, data, referenceData, derivedQuestions) => {
+    try {
+        const reportResponse = await fetch('/api/report', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                userId: null, // 或者填写用户ID
+                title: title,
+                content: JSON.stringify({
+                    data: data,
+                    referenceData: referenceData,
+                    derivedQuestions: derivedQuestions
+                })
+            }),
+        });
+
+        if (!reportResponse.ok) {
+            console.error('Report API request failed:', reportResponse.statusText);
+        } else {
+            const responseData = await reportResponse.json();
+
+            const res = await fetch('/api/indexing/google', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    url: env('NEXT_PUBLIC_BASE_URL') + "/en" + responseData.url,
+                    type: "URL_UPDATED"
+                }),
+            });
+
+            notifyFeishu("New report published: " + JSON.stringify({
+                url: env('NEXT_PUBLIC_BASE_URL') + "/en" + responseData.url,
+                type: "URL_UPDATED"
+            }))
+
+            console.log('Report API response: ', responseData);
+        }
+    } catch (error) {
+        console.error('Failed to call Report API:', error);
+    }
+};
 
 function Page({params}: { params: { lang: string } }) {
     const [dict, setDict] = useState<Dictionary | null>(null);
@@ -25,9 +70,7 @@ function Page({params}: { params: { lang: string } }) {
     const [derivedQuestions, setDerivedQuestions] = useState<string[]>(['', '', '', '']);
     const [isFinalized, setIsFinalized] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [feishuRecordId, setFeishuRecordId] = useState('');
     const [showOverlay, setShowOverlay] = useState(false);
-    const [userIp, setUserIp] = useState('');
     const [isSearching, setIsSearching] = useState(false); // 新增状态变量
     const searchParams = useSearchParams();
 
@@ -41,15 +84,6 @@ function Page({params}: { params: { lang: string } }) {
     }, [params.lang]);
 
     useEffect(() => {
-        const fetchUserIp = async () => {
-            const response = await fetch('/api/get_client_ip');
-            const data = await response.json();
-            setUserIp(data.ip);
-        };
-        fetchUserIp();
-    }, []);
-
-    useEffect(() => {
         const keywords = searchParams?.get('q');
         if (keywords && isDictionaryLoaded && !isSearching) {
             performSearch(keywords);
@@ -61,17 +95,6 @@ function Page({params}: { params: { lang: string } }) {
             processSearchResults();
         }
     }, [query]);
-
-    useEffect(() => {
-        if (isFinalized && !isLoading && feishuRecordId) {
-            const assembledData = {
-                data: data,
-                referenceData: referenceData,
-                derivedQuestions: derivedQuestions
-            };
-            createReport(assembledData);
-        }
-    }, [isFinalized, isLoading, feishuRecordId]);
 
     const performSearch = async (keywords: string) => {
         const searchCount = parseInt(localStorage.getItem('searchCount') || '0');
@@ -106,12 +129,8 @@ function Page({params}: { params: { lang: string } }) {
 
     const processSearchResults = () => {
         const system_prompt = constructSummarizePrompt(query.items, dict?.search);
-        const add_record_promise = recordToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", "", {
-            "搜索内容": searchParams?.get('q'),
-            "用户IP": userIp                      // 添加用户IP信息
-        });
         const eventSource = new EventSource(`/api/update?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchParams?.get('q') ?? '')}`);
-        handleEventSource(eventSource, system_prompt, add_record_promise);
+        handleEventSource(eventSource, system_prompt);
     };
 
     const constructSummarizePrompt = (searchResults, dictTexts) => {
@@ -150,14 +169,14 @@ function Page({params}: { params: { lang: string } }) {
         };
     };
 
-    const handleEventSource = (eventSource, system_prompt, add_record_promise) => {
+    const handleEventSource = (eventSource, system_prompt) => {
         let partString = '';
         eventSource.onmessage = (event) => {
             if (event.data !== '[DONE]') {
                 partString += JSON.parse(event.data).choices[0].text;
                 setData(partString);
             } else {
-                finalizeData(partString, eventSource, system_prompt, add_record_promise);
+                finalizeData(partString, eventSource, system_prompt);
             }
         };
         eventSource.onerror = (error) => {
@@ -166,36 +185,19 @@ function Page({params}: { params: { lang: string } }) {
         };
     };
 
-    const finalizeData = (partString, eventSource, system_prompt, add_record_promise) => {
+    const finalizeData = (partString, eventSource, system_prompt) => {
         setData(partString);
         setIsFinalized(true); // 设置状态
         logEvent('search', 'ai summarization', 'summarization finish', partString);
-        add_record_promise.then(add_record_response => {
-            setFeishuRecordId(add_record_response.data.record.record_id);
-            recordToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", add_record_response.data.record.record_id, {
-                "搜索提示词": system_prompt,
-                "搜索总结": partString,
-                "发布链接": {
-                    text: `${add_record_response.data.record.record_id}`,
-                    link: `${env('NEXT_PUBLIC_BASE_URL')}/search/publish?recordId=${add_record_response.data.record.record_id}`
-                }
-            })
-        });
-        eventSource.close();
-    };
+        eventSource.close();    // 调用发送报告的函数
 
-    const createReport = async (assembledData) => {
-        try {
-            recordToFeishu("PWCWbe2x2aMfQts2fNpcmOWOnVh", "tbl5OB8eWTBgwrDc", feishuRecordId, {
-                "搜索结构数据": JSON.stringify({
-                    data: data,
-                    referenceData: referenceData,
-                    derivedQuestions: derivedQuestions
-                })
+        publishReportAndGoogleIndex(searchParams?.get('q'), partString, referenceData, derivedQuestions)
+            .then(() => {
+                console.log('Report sent successfully');
+            })
+            .catch((error) => {
+                console.error('Error sending report:', error);
             });
-        } catch (error) {
-            console.error('Error create feishu record:', error);
-        }
     };
 
     const handleOverlayClose = () => {
@@ -203,13 +205,12 @@ function Page({params}: { params: { lang: string } }) {
         localStorage.setItem('searchCount', '0'); // 清零搜索计数
     };
 
-
     return (
         <div className="flex min-h-screen">
             <SessionProvider>
                 <TopNavBar
                     lang={params.lang?.toLowerCase()}
-                    searchTerms={searchParams?.get('q') || undefined}
+                    searchTerms={searchParams?.get('q') as any}
                 />
             </SessionProvider>
             <div className="flex-1 mx-auto sm:p-4 pt-20 sm:pt-24 text-customBlackText max-w-6xl">
