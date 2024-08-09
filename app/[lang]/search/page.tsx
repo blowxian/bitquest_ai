@@ -16,7 +16,17 @@ import Overlay from '@/components/Overlay';
 import {logEvent} from '@/lib/ga_log';
 import {notifyFeishu} from '@/lib/feishu';
 import {env} from 'next-runtime-env';
+import axios from "axios";
 
+async function getIPLocation(ip: any) {
+    try {
+        const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch IP location:', error);
+        return null;
+    }
+}
 const publishReportAndGoogleIndex = async (title, data, referenceData, derivedQuestions) => {
     try {
         const reportResponse = await fetch('/api/report', {
@@ -49,10 +59,22 @@ const publishReportAndGoogleIndex = async (title, data, referenceData, derivedQu
                 }),
             });
 
-            notifyFeishu("New report published: " + JSON.stringify({
-                url: env('NEXT_PUBLIC_BASE_URL') + "/en" + responseData.url,
-                type: "URL_UPDATED"
-            }))
+            // 获取用户IP地址和东八区时间
+            const ipResponse = await axios.get('https://api.ipify.org?format=json');
+            const ip = ipResponse.data.ip;
+
+            const date = new Date();
+            const options = {timeZone: 'Asia/Shanghai', hour12: false};
+            const formattedDate = date.toLocaleString('zh-CN', options);
+
+            // 获取用户IP所在位置（假设有getIPLocation函数）
+            const location = await getIPLocation(ip);
+
+            const feishuMessage = `[${formattedDate}] [${env('NEXT_PUBLIC_BASE_URL')}/en${responseData.url}] IP: ${ip}` +
+                (location ? ` [${location.city}, ${location.region}, ${location.country_name}]` : '') +
+                `, 用户搜索了[${title}]并提交了 google 索引`;
+
+            notifyFeishu(feishuMessage);
 
             console.log('Report API response: ', responseData);
         }
@@ -100,10 +122,10 @@ function Page({params}: { params: { lang: string } }) {
         const searchCount = parseInt(localStorage.getItem('searchCount') || '0');
 
         // 检查搜索计数并显示浮层，如果满足条件则禁止搜索
-        if (searchCount >= 10) {
+        /*if (searchCount >= 10) {
             setShowOverlay(true);
             return;
-        }
+        }*/
 
         setIsSearching(true); // 开始搜索时设置状态
         setData('');

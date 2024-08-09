@@ -1,4 +1,3 @@
-// pages/api/updateGoogleIndex.js
 import {google} from 'googleapis';
 import path from 'path';
 import fs from 'fs';
@@ -42,11 +41,19 @@ export default async function handler(req, res) {
                 type: type // 'URL_UPDATED' or 'URL_DELETED'
             }
         });
-        notifyFeishu(`Google indexing successfully: ${JSON.stringify(response)}`);
+
+        // Convert time to East 8th Zone (UTC+8)
+        const timestamp = new Date().toLocaleString("en-US", {timeZone: "Asia/Shanghai"});
+        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+        notifyFeishu(`[${timestamp}] [${url}] [${clientIp}]\nGoogle Indexing Success\nResponse: ${JSON.stringify(response.data)}`);
 
         res.status(200).json({ message: 'Successfully updated Google Index', data: response.data });
     } catch (error) {
-        notifyFeishu(`Google indexing failed!`);
+        const timestamp = new Date().toLocaleString("en-US", {timeZone: "Asia/Shanghai"});
+        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+        notifyFeishu(`[${timestamp}] [${url}] [${clientIp}]\nGoogle Indexing Failed\nError: ${error.message}`);
 
         console.error('Error updating Google Index:', error);
         res.status(500).json({ message: 'Error updating Google Index', error: error.message });
