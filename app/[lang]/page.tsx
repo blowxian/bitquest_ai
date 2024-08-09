@@ -2,20 +2,13 @@
 'use client'
 
 import React, {Suspense, useEffect, useState} from "react";
-import {
-    faBlog,
-    faCommentDots,
-    faComments,
-    faLock,
-    faShieldHalved
-} from "@fortawesome/free-solid-svg-icons";
+import {faBlog, faCommentDots, faComments, faLock, faShieldHalved} from "@fortawesome/free-solid-svg-icons";
 import Header from '@/components/Header';
 import SearchBar from "@/components/SearchBar";
 import LinkButton from "@/components/LinkButton";
 import UserMenu from "@/components/UserMenu";
 import {Dictionary, getDictionary} from '@/app/[lang]/dictionaries';
 import {SessionProvider} from '../context/sessionContext';
-import SponsorButton from "@/components/SponsorButton";  // Adjust the import path as needed
 
 async function fetchDictionary(lang: string) {
     return await getDictionary(lang);
@@ -41,7 +34,6 @@ export default function Page({params}) {
                     <Suspense fallback={<div>Loading...</div>}>
                         <SearchBar searchDict={dict?.search} lang={params.lang}/>
                     </Suspense>
-                    <SponsorButton />
                 </div>
                 <div className="text-center w-full mt-8">
                     <div className="flex justify-center space-x-4 text-sm">

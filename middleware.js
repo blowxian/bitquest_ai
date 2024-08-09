@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server"
-import { match } from '@formatjs/intl-localematcher'
+import {NextResponse} from "next/server"
+import {match} from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
 
 let locales = ['en', 'zh', 'hi']
@@ -33,7 +33,7 @@ export function middleware(request) {
 export const config = {
     matcher: [
         // Skip all internal paths (_next)
-        '/((?!_next|api|googleb9066eac88b031d8|img|favicon|ads|monitoring|robots|site|apple|android).*)',
+        '/((?!_next|api|googleb9066eac88b031d8|googlea57c359bce352c3a|img|favicon|ads|monitoring|robots|site|apple|android).*)',
         // Optional: only run on root (/) URL
         // '/'
     ],
