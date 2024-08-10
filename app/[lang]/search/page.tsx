@@ -17,6 +17,7 @@ import {logEvent} from '@/lib/ga_log';
 import {notifyFeishu} from '@/lib/feishu';
 import {env} from 'next-runtime-env';
 import axios from "axios";
+import Cookies from 'js-cookie';
 
 async function getIPLocation(ip: any) {
     try {
@@ -70,9 +71,20 @@ const publishReportAndGoogleIndex = async (title, data, referenceData, derivedQu
             // 获取用户IP所在位置（假设有getIPLocation函数）
             const location = await getIPLocation(ip);
 
+            // 使用 js-cookie 获取 user_info 并解析
+            let userInfo = {name: 'Unknown', email: 'Unknown'};
+            const userInfoCookie = Cookies.get('user_info');
+            if (userInfoCookie) {
+                try {
+                    userInfo = JSON.parse(decodeURIComponent(userInfoCookie));
+                } catch (e) {
+                    console.error('Failed to parse user_info:', e);
+                }
+            }
+
             const feishuMessage = `[${formattedDate}] [${env('NEXT_PUBLIC_BASE_URL')}/en${responseData.url}] IP: ${ip}` +
                 (location ? ` [${location.city}, ${location.region}, ${location.country_name}]` : '') +
-                `, 用户搜索了[${title}]并提交了 google 索引`;
+                `, 用户[${userInfo.name}][${userInfo.email}]搜索了[${title}]并提交了 google 索引`;
 
             notifyFeishu(feishuMessage);
 
