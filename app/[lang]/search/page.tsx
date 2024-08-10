@@ -82,9 +82,8 @@ const publishReportAndGoogleIndex = async (title, data, referenceData, derivedQu
                 }
             }
 
-            const feishuMessage = `[${formattedDate}] [${env('NEXT_PUBLIC_BASE_URL')}/en${responseData.url}] IP: ${ip}` +
-                (location ? ` [${location.city}, ${location.region}, ${location.country_name}]` : '') +
-                `, 用户[${userInfo.name}][${userInfo.email}]搜索了[${title}]并提交了 google 索引`;
+            const feishuMessage = `[${formattedDate}] 用户[${userInfo.name}][${userInfo.email}]搜索了[${title}]并提交了 google 索引, [${env('NEXT_PUBLIC_BASE_URL')}/en${responseData.url}] IP: ${ip}` +
+                (location ? ` [${location.city}, ${location.region}, ${location.country_name}]` : '');
 
             notifyFeishu(feishuMessage);
 
