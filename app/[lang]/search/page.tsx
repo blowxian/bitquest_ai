@@ -145,14 +145,14 @@ function Page({params}: { params: { lang: string } }) {
         const data = await response.json();
         setQuery(data);
         setReferenceData(data.items);
-        fetchAndDisplayUserSuggestion(keywords);
+        // fetchAndDisplayUserSuggestion(keywords);
         setIsSearching(false); // 搜索完成时重置状态
     };
 
     const processSearchResults = () => {
         const system_prompt = constructSummarizePrompt(query.items, dict?.search);
         const eventSource = new EventSource(`/api/update?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchParams?.get('q') ?? '')}`);
-        handleEventSource(eventSource, system_prompt);
+        handleEventSource(eventSource);
     };
 
     const constructSummarizePrompt = (searchResults, dictTexts) => {
@@ -172,33 +172,42 @@ function Page({params}: { params: { lang: string } }) {
     }
 
     const fetchAndDisplayUserSuggestion = (keywords: string) => {
-        const system_prompt = constructSuggestionPrompt(keywords, dict?.search);
-        const eventSource = new EventSource(`/api/update?max_token=256&system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(keywords)}`);
-        let partString = '';
-        eventSource.onmessage = (event) => {
-            if (event.data !== '[DONE]') {
-                partString += JSON.parse(event.data).choices[0].text;
-                if (['stop', 'eos'].includes(JSON.parse(event.data).choices[0].finish_reason)) {
+        return new Promise((resolve, reject) => {
+            const system_prompt = constructSuggestionPrompt(keywords, dict?.search);
+            const eventSource = new EventSource(`/api/update?max_token=256&system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(keywords)}`);
+            let partString = '';
+            eventSource.onmessage = (event) => {
+                if (event.data !== '[DONE]') {
+                    partString += JSON.parse(event.data).choices[0].text;/*
+                    if (['stop', 'eos'].includes(JSON.parse(event.data).choices[0].finish_reason)) {
+                        setDerivedQuestions(extractArrayFromString(partString));
+                        setIsLoading(false);
+                        eventSource.close();
+                        resolve(); // Resolve the promise when done
+                    }*/
+                } else {
                     setDerivedQuestions(extractArrayFromString(partString));
                     setIsLoading(false);
                     eventSource.close();
+                    resolve(extractArrayFromString(partString)); // Resolve the promise when done
                 }
-            }
-        };
-        eventSource.onerror = (error) => {
-            console.error('fetchAndDisplayUserSuggestion EventSource failed:', error);
-            eventSource.close();
-        };
+            };
+            eventSource.onerror = (error) => {
+                console.error('fetchAndDisplayUserSuggestion EventSource failed:', error);
+                eventSource.close();
+                reject(error); // Reject the promise if there's an error
+            };
+        });
     };
 
-    const handleEventSource = (eventSource, system_prompt) => {
+    const handleEventSource = (eventSource) => {
         let partString = '';
         eventSource.onmessage = (event) => {
             if (event.data !== '[DONE]') {
                 partString += JSON.parse(event.data).choices[0].text;
                 setData(partString);
             } else {
-                finalizeData(partString, eventSource, system_prompt);
+                finalizeData(partString, eventSource);
             }
         };
         eventSource.onerror = (error) => {
@@ -207,19 +216,19 @@ function Page({params}: { params: { lang: string } }) {
         };
     };
 
-    const finalizeData = (partString, eventSource, system_prompt) => {
+    const finalizeData = async (partString, eventSource) => {
         setData(partString);
         setIsFinalized(true); // 设置状态
         logEvent('search', 'ai summarization', 'summarization finish', partString);
         eventSource.close();    // 调用发送报告的函数
 
-        publishReportAndGoogleIndex(searchParams?.get('q'), partString, referenceData, derivedQuestions)
-            .then(() => {
-                console.log('Report sent successfully');
-            })
-            .catch((error) => {
-                console.error('Error sending report:', error);
-            });
+        try {
+            const derivedQuestions = await fetchAndDisplayUserSuggestion(searchParams?.get('q') as string); // Wait for derivedQuestions to be populated
+            await publishReportAndGoogleIndex(searchParams?.get('q'), partString, referenceData, derivedQuestions);
+            console.log('Report sent successfully');
+        } catch (error) {
+            console.error('Error sending report:', error);
+        }
     };
 
     const handleOverlayClose = () => {

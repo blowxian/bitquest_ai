@@ -42,12 +42,6 @@ export default async function handler(req, res) {
             }
         });
 
-        // Convert time to East 8th Zone (UTC+8)
-        const timestamp = new Date().toLocaleString("en-US", {timeZone: "Asia/Shanghai"});
-        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-
-        notifyFeishu(`[${timestamp}] [${url}] [${clientIp}]\nGoogle Indexing Success\nResponse: ${JSON.stringify(response.data)}`);
-
         res.status(200).json({ message: 'Successfully updated Google Index', data: response.data });
     } catch (error) {
         const timestamp = new Date().toLocaleString("en-US", {timeZone: "Asia/Shanghai"});
