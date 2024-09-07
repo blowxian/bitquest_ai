@@ -59,6 +59,13 @@ export default function RootLayout({
           `,
                 }}
             />
+            {/* 添加 Google AdSense 脚本 */}
+            <Script
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+                strategy="afterInteractive"
+                data-ad-client="ca-pub-8631425508883512"
+                crossOrigin="anonymous"
+            />
             <body className={pathway_extreme.className}>{children}</body>
         </html>
     )
