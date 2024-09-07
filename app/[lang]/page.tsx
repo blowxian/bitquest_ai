@@ -37,14 +37,11 @@ export default function Page({ params }) {
                 </div>
                 <div className="text-center w-full mt-8">
                     <div className="flex justify-center space-x-4 text-sm">
-                        <LinkButton href="/blog/blog/blogs-and-articles/" icon={faBlog} label={dict?.footer.blog} />
-                        <LinkButton href="/blog/forums/" icon={faComments} label={dict?.footer.forum} />
-                        <LinkButton href="/blog/forums/topic/hi-everyone-%ef%bc%8cwe-want-your-advice/"
-                            icon={faCommentDots} label={dict?.footer.feedback} />
-                        <LinkButton href="/blog/private-policy/"
-                            icon={faLock} label="Private Policy" />
-                        <LinkButton href="/blog/disclaimer-for-phind-ai-com/"
-                            icon={faShieldHalved} label="Disclaimer" />
+                        <LinkButton href={`/${params.lang}/blog`} icon={faBlog} label={dict?.footer.blog} />
+                        <LinkButton href={`/${params.lang}/forum`} icon={faComments} label={dict?.footer.forum} />
+                        <LinkButton href={`/${params.lang}/feedback`} icon={faCommentDots} label={dict?.footer.feedback} />
+                        <LinkButton href={`/${params.lang}/privacy-policy`} icon={faLock} label="Private Policy" />
+                        <LinkButton href={`/${params.lang}/disclaimer`} icon={faShieldHalved} label="Disclaimer" />
                     </div>
                     <div className="mt-4 text-xs">
                         <a
