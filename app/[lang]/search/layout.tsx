@@ -1,12 +1,12 @@
 // /app/[lang]/layout.tsx
 
-import type {Metadata} from 'next'
+import type { Metadata } from 'next'
 import Script from "next/script";
 import '../globals.css'
-import {Pathway_Extreme} from 'next/font/google'
-import {config} from '@fortawesome/fontawesome-svg-core';
+import { Pathway_Extreme } from 'next/font/google'
+import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import {PublicEnvScript} from "next-runtime-env"; // Import the CSS
+import { PublicEnvScript } from "next-runtime-env"; // Import the CSS
 config.autoAddCss = false; // Tell Font Awesome to skip adding the CSS automatically
 
 const pathway_extreme = Pathway_Extreme({
@@ -24,8 +24,8 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({
-                                       children,
-                                   }: {
+    children,
+}: {
     children: React.ReactNode
 }) {
     // 假设 NEXT_PUBLIC_GA_ID 是逗号分隔的字符串
@@ -38,26 +38,26 @@ export default function RootLayout({
 
     return (
         <html lang="en">
-        <head>
-            <PublicEnvScript/>
-        </head>
-        <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${gaIds[0]}`}
-            strategy="afterInteractive"
-        />
-        <Script
-            id="gtag-init"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-                __html: `
+            <head>
+                <PublicEnvScript />
+            </head>
+            <Script
+                src={`https://www.googletagmanager.com/gtag/js?id=${gaIds[0]}`}
+                strategy="afterInteractive"
+            />
+            <Script
+                id="gtag-init"
+                strategy="afterInteractive"
+                dangerouslySetInnerHTML={{
+                    __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             ${gaConfigScript}
           `,
-            }}
-        />
-        <body className={pathway_extreme.className}>{children}</body>
+                }}
+            />
+            <body className={pathway_extreme.className}>{children}</body>
         </html>
     )
 }

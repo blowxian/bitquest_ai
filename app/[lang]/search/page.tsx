@@ -1,21 +1,21 @@
 'use client'
 
 // Import statements
-import React, {useEffect, useState} from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faClipboardQuestion} from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClipboardQuestion } from "@fortawesome/free-solid-svg-icons";
 import Markdown from "@/lib/mark-down";
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
-import {useSearchParams} from 'next/navigation';
-import {SearchResponse} from "@/pages/api/types";
+import { useSearchParams } from 'next/navigation';
+import { SearchResponse } from "@/pages/api/types";
 import TopNavBar from "@/components/TopNavBar";
-import {Dictionary, getDictionary} from "@/app/[lang]/dictionaries";
-import {SessionProvider} from '@/app/context/sessionContext';
+import { Dictionary, getDictionary } from "@/app/[lang]/dictionaries";
+import { SessionProvider } from '@/app/context/sessionContext';
 import Overlay from '@/components/Overlay';
-import {logEvent} from '@/lib/ga_log';
-import {notifyFeishu} from '@/lib/feishu';
-import {env} from 'next-runtime-env';
+import { logEvent } from '@/lib/ga_log';
+import { notifyFeishu } from '@/lib/feishu';
+import { env } from 'next-runtime-env';
 import axios from "axios";
 import Cookies from 'js-cookie';
 
@@ -32,7 +32,7 @@ const publishReportAndGoogleIndex = async (title, data, referenceData, derivedQu
     try {
         const reportResponse = await fetch('/api/report', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 userId: null, // 或者填写用户ID
                 title: title,
@@ -65,14 +65,14 @@ const publishReportAndGoogleIndex = async (title, data, referenceData, derivedQu
             const ip = ipResponse.data.ip;
 
             const date = new Date();
-            const options = {timeZone: 'Asia/Shanghai', hour12: false};
+            const options = { timeZone: 'Asia/Shanghai', hour12: false };
             const formattedDate = date.toLocaleString('zh-CN', options);
 
             // 获取用户IP所在位置（假设有getIPLocation函数）
             const location = await getIPLocation(ip);
 
             // 使用 js-cookie 获取 user_info 并解析
-            let userInfo = {name: 'Unknown', email: 'Unknown'};
+            let userInfo = { name: 'Unknown', email: 'Unknown' };
             const userInfoCookie = Cookies.get('user_info');
             if (userInfoCookie) {
                 try {
@@ -94,11 +94,11 @@ const publishReportAndGoogleIndex = async (title, data, referenceData, derivedQu
     }
 };
 
-function Page({params}: { params: { lang: string } }) {
+function Page({ params }: { params: { lang: string } }) {
     const [dict, setDict] = useState<Dictionary | null>(null);
     const [isDictionaryLoaded, setIsDictionaryLoaded] = useState(false); // 新增状态用于追踪字典是否加载完成
     const [data, setData] = useState('');
-    const [query, setQuery] = useState<SearchResponse>({items: [], nextPageToken: null});
+    const [query, setQuery] = useState<SearchResponse>({ items: [], nextPageToken: null });
     const [referenceData, setReferenceData] = useState(['', '', '', '', '', '', '', '']);
     const [derivedQuestions, setDerivedQuestions] = useState<string[]>(['', '', '', '']);
     const [isFinalized, setIsFinalized] = useState(false);
@@ -143,15 +143,15 @@ function Page({params}: { params: { lang: string } }) {
         setReferenceData(['', '', '', '', '', '', '', '']);
         setDerivedQuestions(['', '', '', '']);
         setIsLoading(true);
-        document.title = `${keywords} | phind ai alternative`;
+        document.title = `${keywords}`;
 
         // 更新搜索计数
         localStorage.setItem('searchCount', (searchCount + 1).toString());
 
         const response = await fetch('/api/search_service', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({keywords}),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ keywords }),
         });
         const data = await response.json();
         setQuery(data);
@@ -258,30 +258,30 @@ function Page({params}: { params: { lang: string } }) {
             <div className="flex-1 mx-auto sm:p-4 pt-20 sm:pt-24 text-customBlackText max-w-6xl">
                 <div className="px-8 py-5 sm:px-6 overflow-hidden sm:rounded-lg bg-customWhite2 shadow mt-4">
                     <h2 className="text-lg font-medium text-gray-800 mb-4"><FontAwesomeIcon
-                        className="text-customOrange mr-2" icon={faClipboardQuestion}/> {searchParams?.get('q')}</h2>
+                        className="text-customOrange mr-2" icon={faClipboardQuestion} /> {searchParams?.get('q')}</h2>
 
                     <div className="prose mt-2 max-w-none pb-4">
-                        <Markdown content={data} referenceData={referenceData}/>
+                        <Markdown content={data} referenceData={referenceData} />
                     </div>
 
                     <h4 className='text-sm'>{dict?.search.refInfo}</h4>
                     <div className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
-                        {referenceData.map((data, index) => <ReferenceCard key={index} data={data}/>)}
+                        {referenceData.map((data, index) => <ReferenceCard key={index} data={data} />)}
                     </div>
 
                     <h4 className='text-sm'>{dict?.search.moreQs}</h4>
                     <div className="flex flex-wrap justify-center pt-2">
                         {isLoading ? [...Array(4)].map((_, index) => <DerivedQuestionCardSkeleton
-                            key={index}/>) : derivedQuestions.map((question, index) =>
-                            <DerivedQuestionCard
-                                key={index}
-                                question={question}
-                                lang={params.lang?.toLowerCase()}
-                            />)}
+                            key={index} />) : derivedQuestions.map((question, index) =>
+                                <DerivedQuestionCard
+                                    key={index}
+                                    question={question}
+                                    lang={params.lang?.toLowerCase()}
+                                />)}
                     </div>
                 </div>
             </div>
-            {showOverlay && <Overlay onClose={handleOverlayClose} lang={params.lang?.toLowerCase() || 'en'}/>}
+            {showOverlay && <Overlay onClose={handleOverlayClose} lang={params.lang?.toLowerCase() || 'en'} />}
         </div>
     );
 }

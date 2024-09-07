@@ -1,18 +1,18 @@
 // /components/TopNavBar.jsx
 'use client'
 
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import SearchInput from './SearchInput';
 import UserMenu from './UserMenu';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
-import {useSessionContext} from "@/app/context/sessionContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { useSessionContext } from "@/app/context/sessionContext";
 import models from '@/lib/models';
 import Cookie from 'js-cookie';
 import Overlay from './Overlay'; // 引入 Overlay 组件
 
-const TopNavBar = ({lang = 'en', searchTerms = ''}) => {
-    const {data: session, status} = useSessionContext();
+const TopNavBar = ({ lang = 'en', searchTerms = '' }) => {
+    const { data: session, status } = useSessionContext();
     const loading = status === "loading";
     const [isPro, setIsPro] = useState(false);
     const [selectedModel, setSelectedModel] = useState('');
@@ -76,8 +76,8 @@ const TopNavBar = ({lang = 'en', searchTerms = ''}) => {
                         className="text-white inset-y-0 pointer-events-none absolute left-[8.5rem] top-3"
                     />
                 </div>
-                <SearchInput lang={lang?.toLowerCase()} searchTerms={searchTerms}/>
-                <UserMenu loginBtnHoverColorClass={"hover:text-customWhite"} lang={lang?.toLowerCase()}/>
+                <SearchInput lang={lang?.toLowerCase()} searchTerms={searchTerms} />
+                <UserMenu loginBtnHoverColorClass={"hover:text-customWhite"} lang={lang?.toLowerCase()} isTopNav={true} />
             </div>
             {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={lang?.toLowerCase()} />}
         </div>

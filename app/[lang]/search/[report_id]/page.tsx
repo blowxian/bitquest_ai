@@ -1,12 +1,12 @@
-// app/[lang]/report/[report_id]/page.tsx
-import {SessionProvider} from "@/app/context/sessionContext";
+import { Metadata } from 'next'
+import { SessionProvider } from "@/app/context/sessionContext";
 import TopNavBar from "@/components/TopNavBar";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faClipboardQuestion} from "@fortawesome/free-solid-svg-icons";
-import {marked} from 'marked';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClipboardQuestion } from "@fortawesome/free-solid-svg-icons";
+import { marked } from 'marked';
 import ReferenceCard from "@/components/ReferenceCard";
 import DerivedQuestionCard from "@/components/DerivedQuestionCard";
-import {getDictionary} from "@/app/[lang]/dictionaries";
+import { getDictionary } from "@/app/[lang]/dictionaries";
 import React from "react";
 
 const replaceReferences = (text, referenceData) => {
@@ -26,7 +26,32 @@ const replaceReferences = (text, referenceData) => {
     }).join('');
 }
 
-async function ReportPage({params}) {
+export async function generateMetadata({ params }): Promise<Metadata> {
+    const reportResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/report?id=${encodeURIComponent(params.report_id)}`, {
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        }
+    });
+
+    if (!reportResponse.ok) {
+        return {
+            title: 'Report Not Found',
+        }
+    }
+
+    const report = await reportResponse.json();
+
+    return {
+        title: report.title,
+        description: 'phind alternative, ai search engine affordable for everyone',
+        keywords: ['ai search', 'phind ai', 'phind alternative', 'cheapest ai search', 'perplexity alternative', 'phind', 'ai', 'search', 'engine', 'cheap', 'affordable', 'everyone'],
+        robots: "index, follow",
+    }
+}
+
+async function ReportPage({ params }) {
     // API 请求获取报告和字典数据
     const reportResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/report?id=${encodeURIComponent(params.report_id)}`, {
         headers: {
@@ -60,17 +85,17 @@ async function ReportPage({params}) {
             <div className="flex-1 mx-auto sm:p-4 pt-20 sm:pt-24 text-customBlackText max-w-6xl">
                 <div className="px-8 py-5 sm:px-6 overflow-hidden sm:rounded-lg bg-customWhite2 shadow mt-4">
                     <h2 className="text-lg font-medium text-gray-800 mb-4">
-                        <FontAwesomeIcon className="text-customOrange mr-2" icon={faClipboardQuestion}/>
+                        <FontAwesomeIcon className="text-customOrange mr-2" icon={faClipboardQuestion} />
                         {report.title}
                     </h2>
                     <div className="prose mt-2 max-w-none pb-4">
                         <div
-                            dangerouslySetInnerHTML={{__html: marked(replaceReferences(reportData.data, reportData.referenceData))}}/>
+                            dangerouslySetInnerHTML={{ __html: marked(replaceReferences(reportData.data, reportData.referenceData)) }} />
                     </div>
                     <h4 className='text-sm'>{dictionary?.search.refInfo}</h4>
                     <div className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
                         {reportData.referenceData.map((data, index) => (
-                            <ReferenceCard key={index} data={data}/>
+                            <ReferenceCard key={index} data={data} />
                         ))}
                     </div>
                     <h4 className='text-sm'>{dictionary?.search.moreQs}</h4>
@@ -79,7 +104,7 @@ async function ReportPage({params}) {
                             .filter(question => question !== '') // 过滤掉空字符串的问题
                             .map((question, index) => (
                                 <DerivedQuestionCard key={index} question={question}
-                                                     lang={params.lang?.toLowerCase() || 'en'}/>
+                                    lang={params.lang?.toLowerCase() || 'en'} />
                             ))}
                     </div>
                 </div>

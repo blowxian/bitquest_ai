@@ -29,25 +29,54 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% {
-        transform: scale(1); /* Original size */
+
+    0%,
+    100% {
+        transform: scale(1);
+        /* Original size */
     }
+
     50% {
-        transform: scale(1.5); /* 50% larger */
+        transform: scale(1.5);
+        /* 50% larger */
     }
 }
 
 .cursor {
     display: inline-block;
-    width: 10px; /* Set the width of the circle */
-    height: 10px; /* Set the height of the circle */
-    background: #4c4243; /* Circle color */
-    border-radius: 50%; /* Makes it circular */
-    animation: pulse 1s infinite; /* Apply the pulse animation */
-    vertical-align: middle; /* Vertically aligns with text */
+    width: 10px;
+    /* Set the width of the circle */
+    height: 10px;
+    /* Set the height of the circle */
+    background: #4c4243;
+    /* Circle color */
+    border-radius: 50%;
+    /* Makes it circular */
+    animation: pulse 1s infinite;
+    /* Apply the pulse animation */
+    vertical-align: middle;
+    /* Vertically aligns with text */
 }
 
 /* 在 hover 时改变按钮内图标的颜色 */
 .hover-icon:hover .fa-clipboard-question {
     color: #1D4ED8;
+}
+
+@layer utilities {
+    .filter-white {
+        filter: brightness(0) invert(1);
+    }
+
+    .filter-bright-white {
+        filter: brightness(0) invert(1) brightness(1.2);
+    }
+
+    .filter-pink {
+        filter: invert(73%) sepia(51%) saturate(5977%) hue-rotate(300deg) brightness(101%) contrast(101%);
+    }
+
+    .filter-dark-pink {
+        filter: invert(45%) sepia(85%) saturate(7482%) hue-rotate(314deg) brightness(100%) contrast(101%);
+    }
 }
