@@ -1,4 +1,3 @@
-// /app/[lang]/page.tsx
 'use client'
 
 import React, { Suspense, useEffect, useState } from "react";
@@ -6,9 +5,10 @@ import { faBlog, faCommentDots, faComments, faLock, faShieldHalved } from "@fort
 import Header from '@/components/Header';
 import SearchBar from "@/components/SearchBar";
 import LinkButton from "@/components/LinkButton";
-import UserMenu from "@/components/UserMenu";
+import UserMenu from '@/components/UserMenu';
 import { Dictionary, getDictionary } from '@/app/[lang]/dictionaries';
 import { SessionProvider } from '../context/sessionContext';
+import VisitorTracker from '@/components/VisitorTracker';
 
 async function fetchDictionary(lang: string) {
     return await getDictionary(lang);
@@ -76,6 +76,7 @@ export default function Page({ params }) {
                     </div>
                 </div>
             </main>
+            <VisitorTracker />
         </SessionProvider>
     );
 }

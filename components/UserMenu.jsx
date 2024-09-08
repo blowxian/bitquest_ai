@@ -7,6 +7,7 @@ import { faXTwitter, faGoogle } from "@fortawesome/free-brands-svg-icons";
 import Overlay from '@/components/Overlay';
 import { useSessionContext } from '@/app/context/sessionContext';
 import Image from 'next/image';
+import VisitorTracker from './VisitorTracker';
 
 const UserMenu = ({ loginBtnHoverColorClass = '', lang = 'en', isTopNav = false }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -75,51 +76,54 @@ const UserMenu = ({ loginBtnHoverColorClass = '', lang = 'en', isTopNav = false 
     );
 
     return (
-        <div ref={menuRef} className={`relative ml-2 sm:ml-16 flex items-center ${isTopNav ? 'text-customWhite2' : ''}`}>
-            {session ? (
-                <div className="relative flex items-center">
-                    <AIGirlDanceLink />
-                    <div className="flex items-center space-x-4">
-                        {isPro ? (
-                            <FontAwesomeIcon icon={faCrown} className="text-customOrange text-xl text-shadow-default" />
-                        ) : (
-                            <button
-                                className={`py-2 px-0 text-sm leading-7 ${isTopNav ? 'text-gray-400 hover:text-customWhite' : 'text-gray-400 hover:text-customBlackText'} line-through hover:no-underline hover:text-xl transition-all duration-150 ease-in-out`}
-                                onClick={handleOpenOverlay}>
-                                <FontAwesomeIcon icon={faCrown} /> Pro
-                            </button>
-                        )}
-                        <button onClick={toggleMenu}
-                            className="flex items-center justify-center p-2 -m-2 text-xl rounded-full focus:outline-none focus:ring">
-                            <img
-                                src={session.user.image}
-                                alt={session.user.name}
-                                className="w-8 h-8 rounded-full"
-                            />
-                        </button>
-                    </div>
-                    {isMenuOpen && (
-                        <div className="absolute right-0 mt-2 py-2 w-48 bg-white shadow-lg rounded-lg text-sm">
-                            <button className="block px-4 py-2 text-customBlackText hover:bg-customWhite w-full"
-                                onClick={() => signOut()}>
-                                Sign out <FontAwesomeIcon icon={faRightToBracket} />
+        <>
+            <div ref={menuRef} className={`relative ml-2 sm:ml-16 flex items-center ${isTopNav ? 'text-customWhite2' : ''}`}>
+                {session ? (
+                    <div className="relative flex items-center">
+                        <AIGirlDanceLink />
+                        <div className="flex items-center space-x-4">
+                            {isPro ? (
+                                <FontAwesomeIcon icon={faCrown} className="text-customOrange text-xl text-shadow-default" />
+                            ) : (
+                                <button
+                                    className={`py-2 px-0 text-sm leading-7 ${isTopNav ? 'text-gray-400 hover:text-customWhite' : 'text-gray-400 hover:text-customBlackText'} line-through hover:no-underline hover:text-xl transition-all duration-150 ease-in-out`}
+                                    onClick={handleOpenOverlay}>
+                                    <FontAwesomeIcon icon={faCrown} /> Pro
+                                </button>
+                            )}
+                            <button onClick={toggleMenu}
+                                className="flex items-center justify-center p-2 -m-2 text-xl rounded-full focus:outline-none focus:ring">
+                                <img
+                                    src={session.user.image}
+                                    alt={session.user.name}
+                                    className="w-8 h-8 rounded-full"
+                                />
                             </button>
                         </div>
-                    )}
-                </div>
-            ) : (
-                <div className="flex items-center">
-                    <AIGirlDanceLink />
-                    <button
-                        className={`p-2 ${isTopNav ? 'text-customWhite2' : 'text-customBlackText'} ${loginBtnHoverColorClass} opacity-50 hover:opacity-100 transition duration-150 ease-in-out`}
-                        onClick={() => signIn('twitter')}><FontAwesomeIcon icon={faXTwitter} /></button>
-                    <button
-                        className={`p-2 ${isTopNav ? 'text-customWhite2' : 'text-customBlackText'} ${loginBtnHoverColorClass} opacity-50 hover:opacity-100 transition duration-150 ease-in-out`}
-                        onClick={() => signIn('google')}><FontAwesomeIcon icon={faGoogle} /></button>
-                </div>
-            )}
-            {isOverlayVisible && <Overlay onClose={handleCloseOverlay} lang={lang?.toLowerCase() || 'en'} />}
-        </div>
+                        {isMenuOpen && (
+                            <div className="absolute right-0 mt-2 py-2 w-48 bg-white shadow-lg rounded-lg text-sm">
+                                <button className="block px-4 py-2 text-customBlackText hover:bg-customWhite w-full"
+                                    onClick={() => signOut()}>
+                                    Sign out <FontAwesomeIcon icon={faRightToBracket} />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex items-center">
+                        <AIGirlDanceLink />
+                        <button
+                            className={`p-2 ${isTopNav ? 'text-customWhite2' : 'text-customBlackText'} ${loginBtnHoverColorClass} opacity-50 hover:opacity-100 transition duration-150 ease-in-out`}
+                            onClick={() => signIn('twitter')}><FontAwesomeIcon icon={faXTwitter} /></button>
+                        <button
+                            className={`p-2 ${isTopNav ? 'text-customWhite2' : 'text-customBlackText'} ${loginBtnHoverColorClass} opacity-50 hover:opacity-100 transition duration-150 ease-in-out`}
+                            onClick={() => signIn('google')}><FontAwesomeIcon icon={faGoogle} /></button>
+                    </div>
+                )}
+                {isOverlayVisible && <Overlay onClose={handleCloseOverlay} lang={lang?.toLowerCase() || 'en'} />}
+            </div>
+            <VisitorTracker />
+        </>
     );
 };
 

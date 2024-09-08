@@ -69,9 +69,9 @@ export default function BlogPage() {
                     <div className="px-4 sm:px-6 py-8">
                         <h1 className="text-3xl md:text-4xl font-bold mb-4 flex items-center">
                             <FontAwesomeIcon icon={faBlog} className="text-customOrange mr-2" />
-                            AI-Powered Language Learning Insights
+                            AI and Machine Learning Insights
                         </h1>
-                        <p className="mb-6 text-gray-600 text-lg">Explore cutting-edge AI applications in language learning, personalized education techniques, and the latest advancements in NLP for more effective and engaging language acquisition.</p>
+                        <p className="mb-6 text-gray-600 text-lg">Discover groundbreaking research, innovative applications, and expert analysis in the rapidly evolving fields of AI and machine learning.</p>
 
                         {isLoading ? (
                             <p className="text-center py-10">Loading posts...</p>
