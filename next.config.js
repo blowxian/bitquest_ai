@@ -2,6 +2,16 @@ const nextConfig = {
     experimental: {
         missingSuspenseWithCSRBailout: false,
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'cms.coogle.ai',
+                port: '',
+                pathname: '/wp-content/uploads/**',
+            },
+        ],
+    },
 }
 
 module.exports = nextConfig
