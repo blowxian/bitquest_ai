@@ -1,7 +1,7 @@
 'use client'
 
 import React, { Suspense, useEffect, useState } from "react";
-import { faBlog, faCommentDots, faComments, faLock, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
+import { faBlog, faCommentDots, faComments, faLock, faShieldHalved, faSitemap } from "@fortawesome/free-solid-svg-icons";
 import Header from '@/components/Header';
 import SearchBar from "@/components/SearchBar";
 import LinkButton from "@/components/LinkButton";
@@ -16,9 +16,15 @@ async function fetchDictionary(lang: string) {
 
 export default function Page({ params }) {
     const [dict, setDict] = useState<Dictionary | null>(null);
+    // const [sitemapPosts, setSitemapPosts] = useState<SitemapPost[]>([]);
 
     useEffect(() => {
         fetchDictionary(params.lang).then(setDict);
+        // const fetchSitemapPosts = async () => {
+        //     const posts = await getAllPosts();
+        //     setSitemapPosts(posts);
+        // };
+        // fetchSitemapPosts();
     }, [params.lang]);
 
     return (
@@ -36,14 +42,15 @@ export default function Page({ params }) {
                     </Suspense>
                 </div>
                 <div className="text-center w-full mt-8">
-                    <div className="flex justify-center space-x-4 text-sm">
+                    <div className="flex flex-wrap justify-center space-x-2 space-y-2 text-sm">
                         <LinkButton href={`/${params.lang}/blog`} icon={faBlog} label={dict?.footer.blog} />
                         <LinkButton href={`/${params.lang}/forum`} icon={faComments} label={dict?.footer.forum} />
                         <LinkButton href={`/${params.lang}/feedback`} icon={faCommentDots} label={dict?.footer.feedback} />
-                        <LinkButton href={`/${params.lang}/privacy-policy`} icon={faLock} label="Private Policy" />
-                        <LinkButton href={`/${params.lang}/disclaimer`} icon={faShieldHalved} label="Disclaimer" />
+                        <LinkButton href={`/${params.lang}/privacy-policy}`} icon={faLock} label="Privacy Policy" />
+                        <LinkButton href={`/${params.lang}/disclaimer}`} icon={faShieldHalved} label="Disclaimer" />
+                        <LinkButton href="/sitemap.xml" icon={faSitemap} label="Sitemap" />
                     </div>
-                    <div className="mt-4 text-xs">
+                    <div className="mt-6 text-xs flex flex-wrap justify-center items-center space-x-2">
                         <a
                             href="https://woy.ai/"
                             title="Woy AI Tools Directory"
@@ -53,7 +60,7 @@ export default function Page({ params }) {
                         >
                             Woy AI
                         </a>
-                        <span className="mx-2 text-gray-400">|</span>
+                        <span className="text-gray-400">|</span>
                         <a
                             href="https://dokeyai.com"
                             title="Dokey AI Tools Directory"
@@ -63,7 +70,7 @@ export default function Page({ params }) {
                         >
                             Dokey AI
                         </a>
-                        <span className="mx-2 text-gray-400">|</span>
+                        <span className="text-gray-400">|</span>
                         <a
                             href="https://tap4.ai/"
                             title="Tap4 AI Tools Directory"

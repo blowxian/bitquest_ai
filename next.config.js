@@ -12,6 +12,14 @@ const nextConfig = {
             },
         ],
     },
+    async rewrites() {
+        return [
+            {
+                source: '/sitemap.xml',
+                destination: '/api/sitemap',
+            },
+        ];
+    },
 }
 
 module.exports = nextConfig
@@ -60,3 +68,15 @@ if (process.env.NODE_ENV === 'production') {
         }
     );
 }
+
+module.exports = {
+    // ... 其他配置 ...
+    async rewrites() {
+        return [
+            {
+                source: '/sitemap.xml',
+                destination: '/api/sitemap',
+            },
+        ];
+    },
+};
