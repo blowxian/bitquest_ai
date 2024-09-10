@@ -162,7 +162,7 @@ function Page({ params }: { params: { lang: string } }) {
 
     const processSearchResults = () => {
         const system_prompt = constructSummarizePrompt(query.items, dict?.search);
-        const eventSource = new EventSource(`/api/update?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchParams?.get('q') ?? '')}`);
+        const eventSource = new EventSource(`/api/gemini?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchParams?.get('q') ?? '')}`);
         handleEventSource(eventSource);
     };
 
@@ -185,28 +185,29 @@ function Page({ params }: { params: { lang: string } }) {
     const fetchAndDisplayUserSuggestion = (keywords: string) => {
         return new Promise((resolve, reject) => {
             const system_prompt = constructSuggestionPrompt(keywords, dict?.search);
-            const eventSource = new EventSource(`/api/update?max_token=256&system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(keywords)}`);
+            const eventSource = new EventSource(`/api/gemini?max_token=256&system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(keywords)}`);
             let partString = '';
             eventSource.onmessage = (event) => {
                 if (event.data !== '[DONE]') {
-                    partString += JSON.parse(event.data).choices[0].text;/*
-                    if (['stop', 'eos'].includes(JSON.parse(event.data).choices[0].finish_reason)) {
-                        setDerivedQuestions(extractArrayFromString(partString));
-                        setIsLoading(false);
-                        eventSource.close();
-                        resolve(); // Resolve the promise when done
-                    }*/
+                    try {
+                        const parsedData = JSON.parse(event.data);
+                        if (parsedData.content !== undefined) {
+                            partString += parsedData.content;
+                        }
+                    } catch (error) {
+                        console.error('Error parsing event data:', error);
+                    }
                 } else {
                     setDerivedQuestions(extractArrayFromString(partString));
                     setIsLoading(false);
                     eventSource.close();
-                    resolve(extractArrayFromString(partString)); // Resolve the promise when done
+                    resolve(extractArrayFromString(partString));
                 }
             };
             eventSource.onerror = (error) => {
                 console.error('fetchAndDisplayUserSuggestion EventSource failed:', error);
                 eventSource.close();
-                reject(error); // Reject the promise if there's an error
+                reject(error);
             };
         });
     };
@@ -215,8 +216,17 @@ function Page({ params }: { params: { lang: string } }) {
         let partString = '';
         eventSource.onmessage = (event) => {
             if (event.data !== '[DONE]') {
-                partString += JSON.parse(event.data).choices[0].text;
-                setData(partString);
+                try {
+                    const parsedData = JSON.parse(event.data);
+                    if (parsedData.content !== undefined) {
+                        partString += parsedData.content;
+                        setData(partString);
+                    } else {
+                        console.warn('Unexpected data format:', parsedData);
+                    }
+                } catch (error) {
+                    console.error('Error parsing event data:', error);
+                }
             } else {
                 finalizeData(partString, eventSource);
             }
