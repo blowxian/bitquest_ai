@@ -46,6 +46,7 @@ next-env.d.ts
 
 # Google Credentials
 google-credentials.json
+google_application_credentials.json
 
 # Staging
 .env.staging
