@@ -34,7 +34,7 @@ export default function Page({ params }) {
                     <UserMenu lang={params.lang} />
                 </div>
             </div>
-            <main className="flex flex-col items-center justify-center min-h-screen w-full pt-24"> {/* 添加 pt-24 来防止内容被遮挡 */}
+            <main className="flex flex-col items-center justify-center min-h-screen w-full pt-24"> {/* 添加 pt-24 ���防止内容被遮挡 */}
                 <div className="w-full items-center justify-center flex flex-col sm:px-8">
                     <Header headerDict={dict?.header} />
                     <Suspense fallback={<div>Loading...</div>}>
@@ -42,13 +42,13 @@ export default function Page({ params }) {
                     </Suspense>
                 </div>
                 <div className="text-center w-full mt-8">
-                    <div className="flex flex-wrap justify-center space-x-2 space-y-2 text-sm">
+                    <div className="flex flex-wrap justify-center -m-1 text-sm">
                         <LinkButton href={`/${params.lang}/blog`} icon={faBlog} label={dict?.footer.blog} />
                         <LinkButton href={`/${params.lang}/forum`} icon={faComments} label={dict?.footer.forum} />
                         <LinkButton href={`/${params.lang}/feedback`} icon={faCommentDots} label={dict?.footer.feedback} />
                         <LinkButton href={`/${params.lang}/privacy-policy}`} icon={faLock} label="Privacy Policy" />
                         <LinkButton href={`/${params.lang}/disclaimer}`} icon={faShieldHalved} label="Disclaimer" />
-                        <LinkButton href="/sitemap.xml" icon={faSitemap} label="Sitemap" />
+                        <LinkButton href="/sitemap.xml" icon={faSitemap} label="Sitemap" external={true} />
                     </div>
                     <div className="mt-6 text-xs flex flex-wrap justify-center items-center space-x-2">
                         <a
