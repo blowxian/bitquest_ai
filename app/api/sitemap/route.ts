@@ -9,7 +9,7 @@ export async function GET() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     ${posts.map(post => `
     <url>
-        <loc>${baseUrl}/blog/${post.slug}</loc>
+        <loc>${baseUrl}/en/blog/${post.slug}</loc>
         <lastmod>${new Date().toISOString()}</lastmod>
     </url>
     `).join('')}
