@@ -57,9 +57,9 @@ export default async function BlogPostPage({ params }: { params: { lang: string;
                                 />
                             </div>
                         )}
-                        <div className="p-6">
+                        <div className="p-6 md:p-8 lg:p-10">
                             <h1 className="text-3xl md:text-4xl font-bold mb-6">{post.title.rendered}</h1>
-                            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
+                            <div className="wp-content prose max-w-none" dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
                         </div>
                     </article>
                 </div>

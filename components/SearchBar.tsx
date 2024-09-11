@@ -1,24 +1,24 @@
 // /components/SearchBar.tsx
 'use client';
 
-import {useRouter, useSearchParams} from 'next/navigation';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowUpRightFromSquare, faChevronDown, faMarker, faSearch} from "@fortawesome/free-solid-svg-icons";
-import React, {useEffect, useRef, useState} from "react";
+import { useRouter, useSearchParams } from 'next/navigation';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowUpRightFromSquare, faChevronDown, faMarker, faSearch } from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useRef, useState } from "react";
 import HotQuestionCard from './HotQuestionCard';
-import {useSessionContext} from '@/app/context/sessionContext';
+import { useSessionContext } from '@/app/context/sessionContext';
 import models from '@/lib/models';
 import Cookie from 'js-cookie';
 import Overlay from './Overlay'; // Ensure Overlay is imported
-import {Tooltip as ReactTooltip} from 'react-tooltip';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
 
-export default function SearchBar({searchDict, lang}) {
+export default function SearchBar({ searchDict, lang }) {
     const searchParams = useSearchParams();
     const router = useRouter();
     const inputRef = useRef<HTMLInputElement>(null as unknown as HTMLInputElement);
 
-    const {data: session, status} = useSessionContext();
+    const { data: session, status } = useSessionContext();
     const loading = status === "loading";
     const [isPro, setIsPro] = useState(false);
     const [selectedModel, setSelectedModel] = useState('');
@@ -146,14 +146,13 @@ export default function SearchBar({searchDict, lang}) {
 
     return (
         <div className={"w-3/4 max-w-6xl mt-3"}>
-            {/* 中间搜索框 */}
             <div className="flex-1 sm:mx-4 flex items-center relative w-full">
                 <div className="relative flex items-center">
                     <select
                         value={selectedModel}
                         onChange={handleModelSelection}
                         className="bg-customWhite sm:bg-gray-700 bg-opacity-0 text-sm sm:text-base text-customBlackText sm:text-white appearance-none rounded-l-full pl-10 pr-1.5 py-2 h-20 outline-none absolute top-[-6.5rem] sm:top-[-2.5rem] left-0 w-[11.5rem] overflow-hidden">
-                        {getAvailableModels().map(({key, name}) => (
+                        {getAvailableModels().map(({ key, name }) => (
                             <option key={key} value={key}>{name}</option>
                         ))}
                     </select>
@@ -167,35 +166,26 @@ export default function SearchBar({searchDict, lang}) {
                     ref={inputRef}
                     type="search"
                     placeholder={searchDict?.placeholder}
-                    className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-[2.5rem] sm:pl-[11.5rem] sm:pr-28 w-full outline-none focus:ring-0"
-                    onKeyDown={(e) => {
-                        handleSearch(e);
-                        updateAIGenerateLink(); // Update link on key down
-                    }}
-                    onInput={updateAIGenerateLink} // Update link on input change
+                    className="bg-gray-700 text-white border border-gray-600 rounded-full sm:rounded-2xl py-8 pl-[2.5rem] sm:pl-[11.5rem] pr-20 w-full outline-none focus:ring-0"
+                    onKeyDown={(e) => handleSearch(e)}
                 />
-                <div
-                    className="absolute inset-y-0 right-0 flex items-center overflow-hidden rounded-full sm:rounded-2xl">
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <span className="hidden sm:block mr-4 text-sm text-gray-400">⌘ + K</span>
-                    <button className="p-3 text-xl" onClick={() => handleSearch(null)}
-                            data-tooltip-id="my-tooltip" data-tooltip-content="Search with AI">
-                        <FontAwesomeIcon icon={faSearch}
-                                         className=" text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"/>
+                    <button
+                        className="p-3 text-xl"
+                        onClick={() => handleSearch(null)}
+                        data-tooltip-id="my-tooltip"
+                        data-tooltip-content="Search with AI"
+                    >
+                        <FontAwesomeIcon
+                            icon={faSearch}
+                            className="text-gray-400 hover:text-customWhite2 transition duration-150 ease-in-out"
+                        />
                     </button>
-                    <a
-                        ref={aiGenerateLinkRef}
-                        className="py-8 p-3 text-xl text-customWhite2 bg-customOrange transition duration-150 ease-in-out"
-                        href="https://aiparagraphgenerator.net"
-                        target="_blank"
-                        data-tooltip-id="my-tooltip" data-tooltip-content="Generate paragraphs with AI">
-                        <FontAwesomeIcon icon={faMarker}/>&nbsp;
-                        <span className="hidden lg:inline">Gen with AI </span>
-                        <FontAwesomeIcon className="text-xs align-top" icon={faArrowUpRightFromSquare}/>
-                    </a>
                 </div>
-                <ReactTooltip id="my-tooltip" variant="light"/>
+                <ReactTooltip id="my-tooltip" variant="light" />
             </div>
-            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={lang?.toLowerCase() || 'en'}/>}
+            {showOverlay && <Overlay onClose={() => setShowOverlay(false)} lang={lang?.toLowerCase() || 'en'} />}
             <div className="flex flex-wrap justify-center pt-2">
                 {hotQuestions.map((question, index) => (
                     <HotQuestionCard

@@ -80,3 +80,72 @@ body {
         filter: invert(45%) sepia(85%) saturate(7482%) hue-rotate(314deg) brightness(100%) contrast(101%);
     }
 }
+
+/* WordPress 内容样式 */
+.wp-content {
+    @apply text-lg leading-relaxed;
+}
+
+.wp-content h1 {
+    @apply text-4xl font-bold mb-6 mt-8;
+}
+
+.wp-content h2 {
+    @apply text-3xl font-semibold mb-4 mt-6;
+}
+
+.wp-content h3 {
+    @apply text-2xl font-medium mb-3 mt-5;
+}
+
+.wp-content p {
+    @apply mb-4;
+}
+
+.wp-content ul,
+.wp-content ol {
+    @apply ml-6 mb-4;
+}
+
+.wp-content li {
+    @apply mb-2;
+}
+
+.wp-content a {
+    @apply text-blue-600 hover:underline;
+}
+
+.wp-content img {
+    @apply max-w-full h-auto my-4 rounded-lg;
+}
+
+.wp-content blockquote {
+    @apply border-l-4 border-gray-300 pl-4 italic my-4;
+}
+
+.wp-content pre {
+    @apply bg-gray-100 p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.wp-content code {
+    @apply bg-gray-100 px-1 py-0.5 rounded;
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+    .wp-content {
+        @apply text-base;
+    }
+
+    .wp-content h1 {
+        @apply text-3xl;
+    }
+
+    .wp-content h2 {
+        @apply text-2xl;
+    }
+
+    .wp-content h3 {
+        @apply text-xl;
+    }
+}
