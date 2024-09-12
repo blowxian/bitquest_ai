@@ -112,6 +112,8 @@ function Page({ params }: { params: { lang: string } }) {
     const [shouldFetchSuggestions, setShouldFetchSuggestions] = useState(false);
     const [cachedSuggestions, setCachedSuggestions] = useState<{ [key: string]: string[] }>({});
     const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
+    const [isSummarizationDone, setIsSummarizationDone] = useState(false);
+    const [isSuggestionDone, setIsSuggestionDone] = useState(false);
     const searchParams = useSearchParams();
 
     useEffect(() => {
@@ -153,6 +155,12 @@ function Page({ params }: { params: { lang: string } }) {
             fetchSuggestions();
         }
     }, [shouldFetchSuggestions, cachedSuggestions, searchParams]);
+
+    useEffect(() => {
+        if (isSummarizationDone && isSuggestionDone) {
+            finalizeData();
+        }
+    }, [isSummarizationDone, isSuggestionDone]);
 
     const performSearch = async (keywords: string) => {
         try {
@@ -256,11 +264,24 @@ function Page({ params }: { params: { lang: string } }) {
                     reject('Error parsing event data');
                 }
             } else {
-                if (!isSuggestion) {
-                    finalizeData(partString);
+                if (partString.trim() === '') {
+                    // Gemini returned [DONE] without any content
+                    console.log('Gemini returned no content, treating as safety issue');
+                    eventSource.close();
+                    reject("SAFETY_BLOCK");
+                } else {
+                    if (!isSuggestion) {
+                        setData(partString);
+                        setIsSummarizationDone(true);
+                    } else {
+                        const extractedQuestions = extractArrayFromString(partString);
+                        setDerivedQuestions(extractedQuestions);
+                        setCachedSuggestions(prev => ({ ...prev, [searchParams?.get('q') as string]: extractedQuestions }));
+                        setIsSuggestionDone(true);
+                    }
+                    eventSource.close();
+                    resolve(partString);
                 }
-                eventSource.close();
-                resolve(partString);
             }
         };
         eventSource.onerror = (error) => {
@@ -271,18 +292,18 @@ function Page({ params }: { params: { lang: string } }) {
         };
     };
 
-    const finalizeData = async (partString: string) => {
-        setData(partString);
+    const finalizeData = async () => {
         setIsFinalized(true);
-        logEvent('search', 'ai summarization', 'summarization finish', partString);
+        logEvent('search', 'ai summarization', 'summarization finish', data);
 
         try {
-            await publishReportAndGoogleIndex(searchParams?.get('q'), partString, referenceData, derivedQuestions);
+            await publishReportAndGoogleIndex(searchParams?.get('q'), data, referenceData, derivedQuestions);
             console.log('Report sent successfully');
         } catch (error) {
             console.error('Error sending report:', error);
             warnFeishu(`Error sending report for query "${searchParams?.get('q')}": ${error}`);
         }
+        setIsLoading(false);
     };
 
     const fetchAndDisplayUserSuggestion = async (keywords: string) => {
