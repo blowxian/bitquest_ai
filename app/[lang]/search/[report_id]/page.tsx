@@ -90,7 +90,7 @@ async function ReportPage({ params }) {
                     </h2>
                     <div className="prose mt-2 max-w-none pb-4">
                         <div
-                            dangerouslySetInnerHTML={{ __html: marked(replaceReferences(reportData.data, reportData.referenceData)) }} />
+                            dangerouslySetInnerHTML={{ __html: marked(replaceReferences(reportData.data, reportData.referenceData)) as any }} />
                     </div>
                     <h4 className='text-sm'>{dictionary?.search.refInfo}</h4>
                     <div className="flex flex-wrap justify-center overflow-x-auto pt-2 pb-2">
