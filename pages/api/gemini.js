@@ -48,37 +48,51 @@ async function handler(req, res) {
             'Connection': 'keep-alive',
         });
 
-        // 准备请求内容
+        console.log('Preparing request content...');
         const messages = [
             { role: 'user', content: req.query.system_prompt },
             { role: 'user', content: req.query.query }
         ];
+        console.log('Messages prepared:', JSON.stringify(messages));
 
-        // 发送流式请求到 Gemini
+        console.log('Sending request to Gemini...');
         const streamingResp = await generativeModel.generateContentStream({
             contents: [{ role: 'user', parts: [{ text: messages.map(m => m.content).join('\n') }] }],
         });
+        console.log('Received response from Gemini');
 
         // 处理流式响应
         for await (const item of streamingResp.stream) {
-            if (item.candidates && item.candidates[0].content) {
-                const content = item.candidates[0].content.parts[0].text;
-                res.write(`data: ${JSON.stringify({ content })}\n\n`);
-                res.flush();
+            console.log('Processing stream item:', JSON.stringify(item));
+            if (item.candidates && item.candidates.length > 0) {
+                const candidate = item.candidates[0];
+                if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+                    const content = candidate.content.parts[0].text;
+                    console.log('Sending content chunk:', content);
+                    res.write(`data: ${JSON.stringify({ content })}\n\n`);
+                    res.flush();
+                } else if (candidate.finishReason === "SAFETY") {
+                    console.log('Content blocked due to safety concerns');
+                    res.write(`data: ${JSON.stringify({ error: "SAFETY_BLOCK" })}\n\n`);
+                    res.end();
+                    return;
+                }
+            } else if (item.promptFeedback && item.promptFeedback.blockReason === "SAFETY") {
+                console.log('Prompt blocked due to safety concerns');
+                res.write(`data: ${JSON.stringify({ error: "SAFETY_BLOCK" })}\n\n`);
+                res.end();
+                return;
             }
         }
 
+        console.log('Stream processing completed');
         res.write('data: [DONE]\n\n');
         res.end();
 
     } catch (error) {
-        console.error('Gemini API 错误:', error);
-        let errorMessage = error.message || '未知错误';
-        if (error.response && error.response.data) {
-            errorMessage += ` - ${JSON.stringify(error.response.data)}`;
-        }
-        await warnFeishu(`Gemini API 错误: ${errorMessage}`);
-        res.status(500).json({ error: errorMessage });
+        console.error('Detailed Gemini API error:', error);
+        res.write(`data: ${JSON.stringify({ error: "API_ERROR", message: error.message })}\n\n`);
+        res.end();
     }
 }
 

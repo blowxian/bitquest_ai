@@ -5,6 +5,7 @@ import TopNavBar from "@/components/TopNavBar";
 import { getPostBySlug } from '@/lib/wordpress';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+import DOMPurify from 'isomorphic-dompurify';
 
 // Remove 'use client' directive
 
@@ -37,6 +38,8 @@ export default async function BlogPostPage({ params }: { params: { lang: string;
         );
     }
 
+    const sanitizedContent = DOMPurify.sanitize(post.content.rendered);
+
     return (
         <div className="flex min-h-screen flex-col">
             <TopNavBar lang={lang} />
@@ -59,7 +62,10 @@ export default async function BlogPostPage({ params }: { params: { lang: string;
                         )}
                         <div className="p-6 md:p-8 lg:p-10">
                             <h1 className="text-3xl md:text-4xl font-bold mb-6">{post.title.rendered}</h1>
-                            <div className="wp-content prose max-w-none" dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
+                            <div
+                                className="wp-content prose max-w-none"
+                                dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+                            />
                         </div>
                     </article>
                 </div>

@@ -1,11 +1,11 @@
 // /pages/api/update.js
 import axios from 'axios';
 import Cookie from 'cookie';
-import models from '../../lib/models'; // 确保正确引入 models
-import {warnFeishu} from '../../lib/feishu';
+import models from '@/lib/models'; // 确保正确引入 models
+import { warnFeishu } from '@/lib/feishu';
 
 const tokens = ['8c7bf4c91e7e88de0448fae9a285794b5712ea876c8b2c5c503553ead74cf6e5', 'd2b108b4b2d13ba6da964db40eaef61ad3e308c9c09b7e653373c88a5a689d6b',
-'d830cb423a3348e817f4826908b92f28e192372b6624717ef65d775d61c95fd4','96be3b7b845c00454ebcef8037a5399e45c6e29aa482ad6b9772dae5e1f385bb','25b30f26ec6ee6883fd7f6b372e03dfa5fca333cf14546bc7a7266141cea805b']; // 替换为你的实际 token
+    'd830cb423a3348e817f4826908b92f28e192372b6624717ef65d775d61c95fd4', '96be3b7b845c00454ebcef8037a5399e45c6e29aa482ad6b9772dae5e1f385bb', '25b30f26ec6ee6883fd7f6b372e03dfa5fca333cf14546bc7a7266141cea805b']; // 替换为你的实际 token
 let currentTokenIndex = 0;
 
 const togetherAIRequest = axios.create({
@@ -31,8 +31,8 @@ async function handler(req, res) {
             // TogetherAI API 请求体
             model: selectedModel.identifier,
             messages: [
-                {"role": "system", "content": req.query.system_prompt},
-                {"role": "user", "content": req.query.query}
+                { "role": "system", "content": req.query.system_prompt },
+                { "role": "user", "content": req.query.query }
             ],
             max_tokens: req.query.max_token ? +req.query.max_token : 1024,
             stop: '[/INST],</s>,<|im_end|>,[End],[end],\nReferences:\n,\nSources:\n,End.',

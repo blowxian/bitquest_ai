@@ -14,7 +14,7 @@ import { Dictionary, getDictionary } from "@/app/[lang]/dictionaries";
 import { SessionProvider } from '@/app/context/sessionContext';
 import Overlay from '@/components/Overlay';
 import { logEvent } from '@/lib/ga_log';
-import { notifyFeishu } from '@/lib/feishu';
+import { notifyFeishu, warnFeishu } from '@/lib/feishu';
 import { env } from 'next-runtime-env';
 import axios from "axios";
 import Cookies from 'js-cookie';
@@ -94,6 +94,10 @@ const publishReportAndGoogleIndex = async (title, data, referenceData, derivedQu
     }
 };
 
+interface SafetyError extends Error {
+    safetyRatings?: any;
+}
+
 function Page({ params }: { params: { lang: string } }) {
     const [dict, setDict] = useState<Dictionary | null>(null);
     const [isDictionaryLoaded, setIsDictionaryLoaded] = useState(false); // 新增状态用于追踪字典是否加载完成
@@ -105,6 +109,9 @@ function Page({ params }: { params: { lang: string } }) {
     const [isLoading, setIsLoading] = useState(true);
     const [showOverlay, setShowOverlay] = useState(false);
     const [isSearching, setIsSearching] = useState(false); // 新增状态变量
+    const [shouldFetchSuggestions, setShouldFetchSuggestions] = useState(false);
+    const [cachedSuggestions, setCachedSuggestions] = useState<{ [key: string]: string[] }>({});
+    const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
     const searchParams = useSearchParams();
 
     useEffect(() => {
@@ -129,41 +136,191 @@ function Page({ params }: { params: { lang: string } }) {
         }
     }, [query]);
 
+    useEffect(() => {
+        if (shouldFetchSuggestions && !isFetchingSuggestions) {
+            const fetchSuggestions = async () => {
+                setIsFetchingSuggestions(true);
+                const keywords = searchParams?.get('q') as string;
+                if (cachedSuggestions[keywords]) {
+                    setDerivedQuestions(cachedSuggestions[keywords]);
+                    setIsLoading(false);
+                } else {
+                    await fetchAndDisplayUserSuggestion(keywords);
+                }
+                setShouldFetchSuggestions(false);
+                setIsFetchingSuggestions(false);
+            };
+            fetchSuggestions();
+        }
+    }, [shouldFetchSuggestions, cachedSuggestions, searchParams]);
+
     const performSearch = async (keywords: string) => {
-        const searchCount = parseInt(localStorage.getItem('searchCount') || '0');
+        try {
+            setIsSearching(true);
+            setData('');
+            setReferenceData(['', '', '', '', '', '', '', '']);
+            setDerivedQuestions(['', '', '', '']);
+            setIsLoading(true);
+            document.title = `${keywords}`;
 
-        // 检查搜索计数并显示浮层，如果满足条件则禁止搜索
-        /*if (searchCount >= 10) {
-            setShowOverlay(true);
-            return;
-        }*/
+            const response = await fetch('/api/search_service', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keywords }),
+            });
 
-        setIsSearching(true); // 开始搜索时设置状态
-        setData('');
-        setReferenceData(['', '', '', '', '', '', '', '']);
-        setDerivedQuestions(['', '', '', '']);
-        setIsLoading(true);
-        document.title = `${keywords}`;
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-        // 更新搜索计数
-        localStorage.setItem('searchCount', (searchCount + 1).toString());
-
-        const response = await fetch('/api/search_service', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ keywords }),
-        });
-        const data = await response.json();
-        setQuery(data);
-        setReferenceData(data.items);
-        // fetchAndDisplayUserSuggestion(keywords);
-        setIsSearching(false); // 搜索完成时重置状态
+            const data = await response.json();
+            setQuery(data);
+            setReferenceData(data.items);
+        } catch (error) {
+            console.error('Search failed:', error);
+            warnFeishu(`Search failed for keywords "${keywords}": ${error}`);
+            setData('Error: Failed to perform search. Please try again later.');
+        } finally {
+            setIsSearching(false);
+        }
     };
 
-    const processSearchResults = () => {
+    const processSearchResults = async () => {
         const system_prompt = constructSummarizePrompt(query.items, dict?.search);
-        const eventSource = new EventSource(`/api/gemini?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(searchParams?.get('q') ?? '')}`);
-        handleEventSource(eventSource);
+        const searchQuery = searchParams?.get('q') ?? '';
+
+        try {
+            await handleGeminiRequest(system_prompt, searchQuery, false);
+            setShouldFetchSuggestions(true);
+        } catch (error) {
+            console.error('Gemini request failed:', error);
+            if (error === "SAFETY_BLOCK") {
+                console.log('Switching to TogetherAI due to safety concerns');
+                notifyFeishu(`Gemini request blocked for safety reasons. Query: "${searchQuery}". Switching to TogetherAI.`);
+                try {
+                    await handleTogetherAIRequest(system_prompt, searchQuery, false);
+                    setShouldFetchSuggestions(true);
+                } catch (togetherError) {
+                    console.error('TogetherAI request failed:', togetherError);
+                    setData('Error: Failed to fetch data from both Gemini and TogetherAI. Please try again later.');
+                    warnFeishu(`Search failed on both Gemini and TogetherAI for query "${searchQuery}": ${togetherError}`);
+                }
+            } else {
+                setData('Error: Failed to fetch data. Please try again later.');
+                warnFeishu(`Search failed on Gemini for query "${searchQuery}": ${error}`);
+            }
+        }
+    };
+
+    const handleGeminiRequest = (system_prompt: string, query: string, isSuggestion: boolean): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const eventSource = new EventSource(`/api/gemini?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(query)}`);
+            handleEventSource(eventSource, resolve, reject, isSuggestion);
+        });
+    };
+
+    const handleTogetherAIRequest = (system_prompt: string, query: string, isSuggestion: boolean): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const eventSource = new EventSource(`/api/update?system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(query)}`);
+            handleEventSource(eventSource, resolve, reject, isSuggestion);
+        });
+    };
+
+    const handleEventSource = (eventSource: EventSource, resolve: (value: string) => void, reject: (reason: string) => void, isSuggestion: boolean) => {
+        let partString = '';
+        eventSource.onmessage = (event) => {
+            if (event.data !== '[DONE]') {
+                try {
+                    const parsedData = JSON.parse(event.data);
+                    if (parsedData.content !== undefined) {
+                        // Gemini format
+                        partString += parsedData.content;
+                        if (!isSuggestion) {
+                            setData(partString);
+                        }
+                    } else if (parsedData.choices && parsedData.choices[0].text !== undefined) {
+                        // TogetherAI format
+                        partString += parsedData.choices[0].text;
+                        if (!isSuggestion) {
+                            setData(partString);
+                        }
+                    } else if (parsedData.error) {
+                        console.error('API error:', parsedData.error);
+                        warnFeishu(`API error during ${isSuggestion ? 'suggestion' : 'main'} request: ${parsedData.error}`);
+                        eventSource.close();
+                        reject(parsedData.error);
+                    }
+                } catch (error) {
+                    console.error('Error parsing event data:', error);
+                    warnFeishu(`Error parsing event data during ${isSuggestion ? 'suggestion' : 'main'} request: ${error}`);
+                    reject('Error parsing event data');
+                }
+            } else {
+                if (!isSuggestion) {
+                    finalizeData(partString);
+                }
+                eventSource.close();
+                resolve(partString);
+            }
+        };
+        eventSource.onerror = (error) => {
+            console.error('EventSource failed:', error);
+            warnFeishu(`EventSource failed during ${isSuggestion ? 'suggestion' : 'main'} request: ${error}`);
+            eventSource.close();
+            reject('EventSource failed');
+        };
+    };
+
+    const finalizeData = async (partString: string) => {
+        setData(partString);
+        setIsFinalized(true);
+        logEvent('search', 'ai summarization', 'summarization finish', partString);
+
+        try {
+            await publishReportAndGoogleIndex(searchParams?.get('q'), partString, referenceData, derivedQuestions);
+            console.log('Report sent successfully');
+        } catch (error) {
+            console.error('Error sending report:', error);
+            warnFeishu(`Error sending report for query "${searchParams?.get('q')}": ${error}`);
+        }
+    };
+
+    const fetchAndDisplayUserSuggestion = async (keywords: string) => {
+        if (cachedSuggestions[keywords]) {
+            setDerivedQuestions(cachedSuggestions[keywords]);
+            setIsLoading(false);
+            return;
+        }
+
+        const system_prompt = constructSuggestionPrompt(keywords, dict?.search);
+        try {
+            const questions = await handleGeminiRequest(system_prompt, keywords, true);
+            const extractedQuestions = extractArrayFromString(questions);
+            setDerivedQuestions(extractedQuestions);
+            setCachedSuggestions(prev => ({ ...prev, [keywords]: extractedQuestions }));
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Gemini suggestion request failed:', error);
+            if (error === "SAFETY_BLOCK") {
+                console.log('Switching to TogetherAI for suggestions due to safety concerns');
+                try {
+                    const questions = await handleTogetherAIRequest(system_prompt, keywords, true);
+                    const extractedQuestions = extractArrayFromString(questions);
+                    setDerivedQuestions(extractedQuestions);
+                    setCachedSuggestions(prev => ({ ...prev, [keywords]: extractedQuestions }));
+                    setIsLoading(false);
+                } catch (togetherError) {
+                    console.error('TogetherAI suggestion request failed:', togetherError);
+                    setDerivedQuestions([]);
+                    setIsLoading(false);
+                    warnFeishu(`Failed to fetch suggestions from both Gemini and TogetherAI: ${togetherError}`);
+                }
+            } else {
+                setDerivedQuestions([]);
+                setIsLoading(false);
+                warnFeishu(`Failed to fetch suggestions: ${error}`);
+            }
+        }
     };
 
     const constructSummarizePrompt = (searchResults, dictTexts) => {
@@ -178,79 +335,12 @@ function Page({ params }: { params: { lang: string } }) {
     };
 
     const extractArrayFromString = (str: string) => {
-        const matches = str.match(/'[^']+'/g);
-        return matches ? matches.map(match => match.replace(/'/g, "")) : [];
+        const matches = str.match(/"[^"]+"/g);
+        return matches ? matches.map(match =>
+            match.replace(/^"|"$/g, "")  // 移除开头和结尾的双引号
+                .replace(/&quot;/g, "'")  // 将 &quot; 转换回单引号
+        ) : [];
     }
-
-    const fetchAndDisplayUserSuggestion = (keywords: string) => {
-        return new Promise((resolve, reject) => {
-            const system_prompt = constructSuggestionPrompt(keywords, dict?.search);
-            const eventSource = new EventSource(`/api/gemini?max_token=256&system_prompt=${encodeURIComponent(system_prompt)}&query=${encodeURIComponent(keywords)}`);
-            let partString = '';
-            eventSource.onmessage = (event) => {
-                if (event.data !== '[DONE]') {
-                    try {
-                        const parsedData = JSON.parse(event.data);
-                        if (parsedData.content !== undefined) {
-                            partString += parsedData.content;
-                        }
-                    } catch (error) {
-                        console.error('Error parsing event data:', error);
-                    }
-                } else {
-                    setDerivedQuestions(extractArrayFromString(partString));
-                    setIsLoading(false);
-                    eventSource.close();
-                    resolve(extractArrayFromString(partString));
-                }
-            };
-            eventSource.onerror = (error) => {
-                console.error('fetchAndDisplayUserSuggestion EventSource failed:', error);
-                eventSource.close();
-                reject(error);
-            };
-        });
-    };
-
-    const handleEventSource = (eventSource) => {
-        let partString = '';
-        eventSource.onmessage = (event) => {
-            if (event.data !== '[DONE]') {
-                try {
-                    const parsedData = JSON.parse(event.data);
-                    if (parsedData.content !== undefined) {
-                        partString += parsedData.content;
-                        setData(partString);
-                    } else {
-                        console.warn('Unexpected data format:', parsedData);
-                    }
-                } catch (error) {
-                    console.error('Error parsing event data:', error);
-                }
-            } else {
-                finalizeData(partString, eventSource);
-            }
-        };
-        eventSource.onerror = (error) => {
-            console.error('handleEventSource EventSource failed:', error);
-            eventSource.close();
-        };
-    };
-
-    const finalizeData = async (partString, eventSource) => {
-        setData(partString);
-        setIsFinalized(true); // 设置状态
-        logEvent('search', 'ai summarization', 'summarization finish', partString);
-        eventSource.close();    // 调用发送报告的函数
-
-        try {
-            const derivedQuestions = await fetchAndDisplayUserSuggestion(searchParams?.get('q') as string); // Wait for derivedQuestions to be populated
-            await publishReportAndGoogleIndex(searchParams?.get('q'), partString, referenceData, derivedQuestions);
-            console.log('Report sent successfully');
-        } catch (error) {
-            console.error('Error sending report:', error);
-        }
-    };
 
     const handleOverlayClose = () => {
         setShowOverlay(false);

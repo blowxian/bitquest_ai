@@ -116,7 +116,7 @@ body {
 }
 
 .wp-content img {
-    @apply max-w-full h-auto my-4 rounded-lg;
+    @apply max-w-full h-auto my-4 rounded-lg float-left mr-4 mb-4;
 }
 
 .wp-content blockquote {
@@ -148,4 +148,10 @@ body {
     .wp-content h3 {
         @apply text-xl;
     }
+}
+
+.wp-content::after {
+    content: "";
+    display: table;
+    clear: both;
 }
