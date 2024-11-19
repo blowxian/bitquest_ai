@@ -34,7 +34,7 @@ export default function Page({ params }) {
                     <UserMenu lang={params.lang} />
                 </div>
             </div>
-            <main className="flex flex-col items-center justify-center min-h-screen w-full pt-24"> {/* 添加 pt-24 ���防止内容被遮挡 */}
+            <main className="flex flex-col items-center justify-center min-h-screen w-full pt-24"> {/* 添加 pt-24 防止内容被遮挡 */}
                 <div className="w-full items-center justify-center flex flex-col sm:px-8">
                     <Header headerDict={dict?.header} />
                     <Suspense fallback={<div>Loading...</div>}>
@@ -79,6 +79,16 @@ export default function Page({ params }) {
                             className="text-gray-600 hover:text-gray-800 transition-colors"
                         >
                             Tap4 AI
+                        </a>
+                        <span className="text-gray-400">|</span>
+                        <a
+                            href="https://raadsrtest.com/"
+                            title="RAADS-R Autism Test"
+                            target="_blank"
+                            rel="noopener"
+                            className="text-gray-600 hover:text-gray-800 transition-colors"
+                        >
+                            RAADS-R Test
                         </a>
                     </div>
                 </div>
