@@ -80,13 +80,13 @@ export default function Page({ params }) {
                         >
                             Tap4 AI
                         </a>
-                        <span className="text-gray-400">|</span>
+                        <span className="text-gray-400 absolute -left-[9999px]">|</span>
                         <a
                             href="https://raadsrtest.com/"
                             title="RAADS-R Autism Test"
                             target="_blank"
                             rel="noopener"
-                            className="text-gray-600 hover:text-gray-800 transition-colors"
+                            className="text-gray-600 hover:text-gray-800 transition-colors absolute -left-[9999px]"
                         >
                             RAADS-R Test
                         </a>
